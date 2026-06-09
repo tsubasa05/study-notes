@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task API Entity / JPA 学習記録</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.7;
+      color: #222;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+      background: #f7f7f4;
+    }
+
+    main {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 28px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-top: 0;
+      border-bottom: 3px solid #2f6f73;
+      padding-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      margin-top: 32px;
+      border-left: 5px solid #2f6f73;
+      padding-left: 10px;
+    }
+
+    h3 {
+      font-size: 1.05rem;
+      margin-top: 24px;
+    }
+
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      background: #f0f0ec;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+
+    pre {
+      background: #20242a;
+      color: #f3f3f3;
+      padding: 16px;
+      overflow-x: auto;
+      border-radius: 6px;
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+      border-radius: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      background: #fff;
+    }
+
+    th,
+    td {
+      border: 1px solid #d8d8d8;
+      padding: 10px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: #e9f0ee;
+    }
+
+    .note {
+      background: #fff8df;
+      border-left: 5px solid #d6a529;
+      padding: 12px 14px;
+      margin: 16px 0;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Task API Entity / JPA 学習記録</h1>
+
+    <p>日付: 2026-05-19</p>
+    <p>対象: Spring Boot / Task API / DTO / Entity / Repository / Spring Data JPA</p>
+
+    <h2>今回学習したこと</h2>
+    <ul>
+      <li>DTOを <code>controller</code> や <code>service</code> と同じ階層に置く構成は、初期のCRUD練習では問題ない。</li>
+      <li>今回は <code>TaskCreateRequest</code>、<code>TaskUpdateRequest</code>、<code>TaskResponse</code> があればまず十分。</li>
+      <li>永続化層は、シンプルに <code>entity</code> と <code>repository</code> パッケージを作る方針で進める。</li>
+      <li>今回のCRUD練習では MyBatis より Spring Data JPA の方が始めやすい。</li>
+      <li>JPA Entityでは <code>@Entity</code>、<code>@Table</code>、<code>@Id</code>、<code>@GeneratedValue</code> を使う。</li>
+      <li>enumをDBに保存する場合は <code>@Enumerated(EnumType.STRING)</code> を使う。</li>
+    </ul>
+
+    <h2>採用するパッケージ構成</h2>
+    <p>今回の練習では、説明しやすく再現しやすい層別パッケージを使う。</p>
+
+    <pre><code>ts.com.taskapi
+  controller
+    TaskController.java
+  service
+    TaskService.java
+    TaskServiceImpl.java
+  dto
+    TaskCreateRequest.java
+    TaskUpdateRequest.java
+    TaskResponse.java
+  entity
+    Task.java
+    TaskStatus.java
+  repository
+    TaskRepository.java</code></pre>
+
+    <div class="note">
+      面接での説明例:
+      ControllerはHTTPの受け口、Serviceは業務処理、RepositoryはDBアクセス、EntityはDBテーブルに対応するクラスとして分けています。
+    </div>
+
+    <h2>DTOの考え方</h2>
+    <p>DTOは、外部との入出力に使うデータの形を表すクラス。EntityをそのままAPIのリクエストやレスポンスに使わないために用意する。</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>DTO</th>
+          <th>役割</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>TaskCreateRequest</code></td>
+          <td>タスク作成時にクライアントから受け取る値を表す。</td>
+        </tr>
+        <tr>
+          <td><code>TaskUpdateRequest</code></td>
+          <td>タスク更新時にクライアントから受け取る値を表す。</td>
+        </tr>
+        <tr>
+          <td><code>TaskResponse</code></td>
+          <td>タスク情報をクライアントへ返す形を表す。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>今後、検索条件やページングが増えたら <code>TaskSearchRequest</code> や <code>TaskListResponse</code> を追加する可能性がある。ただし、最初のCRUD練習ではまだ不要。</p>
+
+    <h2>JPAを選んだ理由</h2>
+    <p>Spring Data JPAを使うと、基本的なCRUD操作をRepositoryインターフェースだけで扱える。</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>選択肢</th>
+          <th>特徴</th>
+          <th>今回の判断</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Spring Data JPA</td>
+          <td><code>findAll</code>、<code>findById</code>、<code>save</code>、<code>delete</code> などをすぐ使える。</td>
+          <td>CRUD練習に向いているため採用。</td>
+        </tr>
+        <tr>
+          <td>MyBatis</td>
+          <td>SQLを自分で書ける。複雑なSQL制御には向いている。</td>
+          <td>最初のCRUD練習では覚えることが増えるため、今回は優先度を下げる。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Entityの役割</h2>
+    <p>Entityは、DBテーブルに対応するJavaクラス。今回の <code>Task</code> は、タスクテーブルの1行を表す。</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>アノテーション</th>
+          <th>意味</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>@Entity</code></td>
+          <td>このクラスがJPA Entityであることを示す。</td>
+        </tr>
+        <tr>
+          <td><code>@Table(name = "tasks")</code></td>
+          <td>このEntityが対応するDBテーブル名を明示する。今回は <code>Task</code> クラスを <code>tasks</code> テーブルに対応させる。</td>
+        </tr>
+        <tr>
+          <td><code>@Id</code></td>
+          <td>主キーのフィールドであることを示す。</td>
+        </tr>
+        <tr>
+          <td><code>@GeneratedValue(strategy = GenerationType.IDENTITY)</code></td>
+          <td>IDをDB側で自動採番する。</td>
+        </tr>
+        <tr>
+          <td><code>@Enumerated(EnumType.STRING)</code></td>
+          <td>enumを文字列としてDBに保存する。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Task Entityの基本形</h2>
+    <p>今回作成したEntityの基本方針は以下。</p>
+
+    <pre><code>@Entity
+@Table(name = "tasks")
+public class Task {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String title;
+
+    private String description;
+
+    @Enumerated(EnumType.STRING)
+    private TaskStatus taskStatus;
+
+    private LocalDateTime dueTime;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
+    protected Task() {
+    }
+
+    public Task(String title, String description, TaskStatus taskStatus, LocalDateTime dueTime) {
+        this.title = title;
+        this.description = description;
+        this.taskStatus = taskStatus;
+        this.dueTime = dueTime;
+    }
+}</code></pre>
+
+    <h3>覚えるポイント</h3>
+    <ul>
+      <li><code>@Table(name = "tasks")</code> を付けると、Javaクラス名とDBテーブル名の対応を明示できる。</li>
+      <li><code>protected Task() {}</code> はJPAがEntityを生成するために必要。</li>
+      <li><code>id</code> はDBが自動採番するため、作成用コンストラクタでは受け取らない。</li>
+      <li><code>createdAt</code> と <code>updatedAt</code> はリクエストから受け取るより、Service側やJPAの仕組みで設定する方が自然。</li>
+      <li>Entityは通常の <code>class</code> で作る。DTOのように <code>record</code> にしない。</li>
+    </ul>
+
+    <h2>TaskStatus enum</h2>
+    <p>タスクの状態は <code>TaskStatus</code> enum として表す。</p>
+
+    <pre><code>public enum TaskStatus {
+    TODO,
+    IN_PROGRESS,
+    DONE
+}</code></pre>
+
+    <p><code>boolean completed</code> よりも状態を増やしやすい。たとえば「未着手」「進行中」「完了」のような状態を表現できる。</p>
+
+    <h2>@Enumeratedの理解</h2>
+    <p><code>@Enumerated</code> は、JavaのenumをDBにどう保存するかをJPAに教えるアノテーション。</p>
+
+    <pre><code>@Enumerated(EnumType.STRING)
+private TaskStatus taskStatus;</code></pre>
+
+    <p>この場合、DBには以下のように文字列で保存される。</p>
+
+    <pre><code>TaskStatus.TODO        -&gt; "TODO"
+TaskStatus.IN_PROGRESS -&gt; "IN_PROGRESS"
+TaskStatus.DONE        -&gt; "DONE"</code></pre>
+
+    <h3><code>EnumType.STRING</code> と <code>EnumType.ORDINAL</code></h3>
+    <table>
+      <thead>
+        <tr>
+          <th>指定</th>
+          <th>保存される値</th>
+          <th>評価</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>EnumType.STRING</code></td>
+          <td><code>TODO</code>、<code>IN_PROGRESS</code>、<code>DONE</code></td>
+          <td>読みやすく、enumの並び順変更に強い。基本はこちらを使う。</td>
+        </tr>
+        <tr>
+          <td><code>EnumType.ORDINAL</code></td>
+          <td><code>0</code>、<code>1</code>、<code>2</code></td>
+          <td>enumの順番を変えると意味が壊れる可能性があるため避ける。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      面接での説明例:
+      JavaのenumをDBに保存するために <code>@Enumerated</code> を使います。
+      <code>EnumType.STRING</code> を指定するとenum名が文字列で保存されるため、enumの並び順変更に強く、DB上でも意味を読み取りやすいです。
+    </div>
+
+    <h2>次に作るRepository</h2>
+    <p>次のステップでは <code>repository</code> パッケージに <code>TaskRepository</code> を作る。</p>
+
+    <pre><code>public interface TaskRepository extends JpaRepository&lt;Task, Long&gt; {
+}</code></pre>
+
+    <p>Spring Data JPAではRepositoryの実装クラスを自分で作らない。インターフェースを作ると、Springが実行時に実装を用意してくれる。</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>メソッド</th>
+          <th>用途</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>findAll()</code></td>
+          <td>全件取得。</td>
+        </tr>
+        <tr>
+          <td><code>findById(id)</code></td>
+          <td>IDで1件取得。戻り値は <code>Optional&lt;Task&gt;</code>。</td>
+        </tr>
+        <tr>
+          <td><code>save(task)</code></td>
+          <td>新規作成または更新。</td>
+        </tr>
+        <tr>
+          <td><code>delete(task)</code></td>
+          <td>Entityを削除。</td>
+        </tr>
+        <tr>
+          <td><code>existsById(id)</code></td>
+          <td>IDの存在確認。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>TaskRepository作成後に学習したこと</h2>
+    <p><code>TaskRepository</code> は空のインターフェースでも、<code>JpaRepository</code> を継承するだけで基本的なDB操作を使える。</p>
+
+    <pre><code>package ts.com.taskapi.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import ts.com.taskapi.entity.Task;
+
+public interface TaskRepository extends JpaRepository&lt;Task, Long&gt; {
+}</code></pre>
+
+    <h3><code>JpaRepository&lt;Task, Long&gt;</code> の意味</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>指定</th>
+          <th>意味</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>Task</code></td>
+          <td>このRepositoryが扱うEntity。</td>
+        </tr>
+        <tr>
+          <td><code>Long</code></td>
+          <td><code>Task</code> の主キー <code>id</code> の型。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      面接での説明例:
+      Spring Data JPAでは <code>JpaRepository</code> を継承したRepositoryインターフェースを作ることで、基本的なCRUD処理をSpringが用意してくれます。
+      そのため、単純なCRUDではRepositoryの実装クラスを自分で書きません。
+    </div>
+
+    <h2>ServiceからRepositoryを使う流れ</h2>
+    <p><code>TaskServiceImpl</code> では、Repositoryをコンストラクタで受け取って使う。</p>
+
+    <pre><code>private final TaskRepository taskRepository;
+
+public TaskServiceImpl(TaskRepository taskRepository) {
+    this.taskRepository = taskRepository;
+}</code></pre>
+
+    <p>この形をコンストラクタインジェクションという。<code>@Service</code> が付いたクラスにコンストラクタが1つだけある場合、Springが自動で <code>TaskRepository</code> を渡してくれる。</p>
+
+    <h2><code>save()</code> の理解</h2>
+    <p><code>taskRepository.save(task)</code> は、Entity全体をDBに保存する処理。</p>
+
+    <pre><code>Task saved = taskRepository.save(task);</code></pre>
+
+    <p><code>task</code> の中に入っている値がDBに保存される。たとえば以下の値をEntityに詰めてから <code>save()</code> する。</p>
+
+    <ul>
+      <li><code>title</code></li>
+      <li><code>description</code></li>
+      <li><code>taskStatus</code></li>
+      <li><code>dueTime</code></li>
+      <li><code>createdAt</code></li>
+      <li><code>updatedAt</code></li>
+    </ul>
+
+    <p><code>id</code> は <code>@GeneratedValue</code> により、DB登録時に自動採番される。<code>save()</code> の戻り値には、採番後の <code>id</code> が入る。</p>
+
+    <pre><code>Task saved = taskRepository.save(task);
+Long id = saved.getId();</code></pre>
+
+    <h3>作成処理の値の出どころ</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>項目</th>
+          <th>値の作られ方</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>id</code></td>
+          <td>DB登録時に自動採番される。</td>
+        </tr>
+        <tr>
+          <td><code>title</code></td>
+          <td><code>TaskCreateRequest</code> から受け取る。</td>
+        </tr>
+        <tr>
+          <td><code>description</code></td>
+          <td><code>TaskCreateRequest</code> から受け取る。</td>
+        </tr>
+        <tr>
+          <td><code>taskStatus</code></td>
+          <td>新規作成時はService側で <code>TaskStatus.TODO</code> を設定する。</td>
+        </tr>
+        <tr>
+          <td><code>dueTime</code></td>
+          <td><code>TaskCreateRequest</code> から受け取る。自動生成ではない。</td>
+        </tr>
+        <tr>
+          <td><code>createdAt</code></td>
+          <td>Service側で <code>LocalDateTime.now()</code> を設定する。</td>
+        </tr>
+        <tr>
+          <td><code>updatedAt</code></td>
+          <td>作成時は <code>createdAt</code> と同じ値を入れると扱いやすい。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2><code>createdAt</code> と <code>updatedAt</code></h2>
+    <p>作成日時・更新日時は、Entityを作っただけでは自動で入らない。最初の練習ではService側で明示的に設定する。</p>
+
+    <pre><code>LocalDateTime now = LocalDateTime.now();
+task.setCreatedAt(now);
+task.setUpdatedAt(now);</code></pre>
+
+    <p><code>updatedAt</code> を <code>null</code> にしても、<code>saved.getUpdatedAt()</code> を呼ぶだけならエラーにはならない。getterは単にフィールドの値を返すため、値がなければ <code>null</code> が返る。</p>
+
+    <p>ただし、APIレスポンスやDB上で扱いやすくするなら、作成時点では <code>createdAt</code> と <code>updatedAt</code> を同じ値にしておく方が自然。</p>
+
+    <div class="note">
+      覚え方:
+      <code>createdAt</code> は作成された日時。
+      <code>updatedAt</code> は最後に更新された日時。
+      新規作成直後は、最後に更新された日時も作成日時と同じと考える。
+    </div>
+
+    <h2>record DTOの値の取り出し方</h2>
+    <p><code>TaskCreateRequest</code> が <code>record</code> の場合、値はフィールドアクセスではなくメソッド呼び出しで取り出す。</p>
+
+    <pre><code>// NG
+taskCreateRequest.title
+taskCreateRequest.dueTime
+
+// OK
+taskCreateRequest.title()
+taskCreateRequest.dueTime()</code></pre>
+
+    <p><code>record</code> は、定義した要素名と同じ名前のアクセサメソッドを自動で持つ。</p>
+
+    <h2>削除処理の理解</h2>
+    <p>IDで削除したい場合は <code>deleteById(id)</code> を使う。</p>
+
+    <pre><code>taskRepository.deleteById(id);</code></pre>
+
+    <p><code>delete(id)</code> ではなく <code>deleteById(id)</code> と覚える。</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>メソッド</th>
+          <th>渡すもの</th>
+          <th>用途</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>delete(task)</code></td>
+          <td><code>Task</code> Entity</td>
+          <td>取得済みのEntityを削除する。</td>
+        </tr>
+        <tr>
+          <td><code>deleteById(id)</code></td>
+          <td>ID</td>
+          <td>IDを指定して削除する。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>実務的には、削除前に <code>existsById(id)</code> や <code>findById(id)</code> で存在確認し、存在しない場合は404用の例外を投げる。</p>
+
+    <pre><code>if (!taskRepository.existsById(id)) {
+    // 後でNotFoundExceptionを投げる
+}
+
+taskRepository.deleteById(id);</code></pre>
+
+    <h2>VS Codeで効率化できる操作</h2>
+    <ul>
+      <li>新規クラス作成: 対象パッケージを右クリックして <code>New Java Class</code>。</li>
+      <li>import追加: エラー箇所で <code>Ctrl + .</code>。</li>
+      <li>import整理: <code>Shift + Alt + O</code>。</li>
+      <li>getter/setter生成: 右クリックして <code>Source Action...</code> から生成。</li>
+      <li>コンストラクタ生成: 右クリックして <code>Source Action...</code> から生成。</li>
+    </ul>
+
+    <h2>次に自分でやること</h2>
+    <ol>
+      <li><code>create()</code> のコンパイルエラーを確認する。</li>
+      <li><code>Task</code> のコンストラクタと、Service側で渡している引数をそろえる。</li>
+      <li><code>createdAt</code> と <code>updatedAt</code> を <code>LocalDateTime.now()</code> で設定する。</li>
+      <li><code>delete()</code> では <code>deleteById(id)</code> を使う。</li>
+      <li>次は <code>findAll()</code> または <code>findById()</code> を1つずつ実装する。</li>
+    </ol>
+
+    <h2>振り返りメモ</h2>
+    <ul>
+      <li>手が止まりやすい箇所: Entityのimport。<code>jakarta.persistence</code> を使う。</li>
+      <li>覚えた文法: enum、コンストラクタ、getter/setter。</li>
+      <li>覚えたSpring/JPAアノテーション: <code>@Entity</code>、<code>@Table</code>、<code>@Id</code>、<code>@GeneratedValue</code>、<code>@Enumerated</code>。</li>
+      <li>覚えたRepository操作: <code>save</code>、<code>deleteById</code>、<code>existsById</code>。</li>
+      <li>覚えたDTO操作: <code>record</code> の値は <code>title()</code> のようにメソッドで取り出す。</li>
+      <li>次回の注意: <code>java.security.Timestamp</code> や <code>java.io.ObjectInputFilter.Status</code> のような用途違いのimportを選ばない。</li>
+      <li>次回の注意: IDで削除するときは <code>delete(id)</code> ではなく <code>deleteById(id)</code> を使う。</li>
+      <li>面接で説明できること: Entity、Repository、DTOの役割分担、<code>EnumType.STRING</code> を選ぶ理由、<code>save()</code> 後にIDが入る理由。</li>
+    </ul>
+  </main>
+</body>
+</html>

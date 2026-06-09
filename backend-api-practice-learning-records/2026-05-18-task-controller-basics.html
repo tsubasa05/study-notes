@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task API Controller 学習記録</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.7;
+      color: #222;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+      background: #f7f7f4;
+    }
+
+    main {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 28px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-top: 0;
+      border-bottom: 3px solid #2f6f73;
+      padding-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      margin-top: 32px;
+      border-left: 5px solid #2f6f73;
+      padding-left: 10px;
+    }
+
+    h3 {
+      font-size: 1.05rem;
+      margin-top: 24px;
+    }
+
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      background: #f0f0ec;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+
+    pre {
+      background: #20242a;
+      color: #f3f3f3;
+      padding: 16px;
+      overflow-x: auto;
+      border-radius: 6px;
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+      border-radius: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      background: #fff;
+    }
+
+    th,
+    td {
+      border: 1px solid #d8d8d8;
+      padding: 10px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: #e9f0ee;
+    }
+
+    .note {
+      background: #fff8df;
+      border-left: 5px solid #d6a529;
+      padding: 12px 14px;
+      margin: 16px 0;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Task API Controller 学習記録</h1>
+
+    <p>日付: 2026-05-18</p>
+    <p>対象: Spring Boot / Task API / Controller の基本</p>
+
+    <h2>今回学習したこと</h2>
+    <ul>
+      <li>Controller は HTTP リクエストの入口を担当する。</li>
+      <li>Controller には DB 操作や業務ロジックを書きすぎない。</li>
+      <li>VS Code では Java の機能を使うと <code>package</code> 文を自動生成できる。</li>
+      <li>Spring アノテーションは Quick Fix や Organize Imports で import を整理できる。</li>
+      <li><code>@PathVariable</code> と <code>@RequestParam</code> は用途が違う。</li>
+    </ul>
+
+    <h2>Controller の役割</h2>
+    <p>Controller は、HTTP の受け口として以下を担当する。</p>
+    <ul>
+      <li>URL の定義</li>
+      <li>HTTP メソッドの定義</li>
+      <li>リクエスト DTO の受け取り</li>
+      <li>パス変数やクエリパラメータの受け取り</li>
+      <li>Service の呼び出し</li>
+      <li>HTTP ステータスコードの指定</li>
+    </ul>
+
+    <div class="note">
+      面接での説明例:
+      Controller は HTTP リクエストを受け取り、必要な値を取り出して Service に処理を渡す層です。
+      業務ロジックや DB アクセスは Controller には書かず、Service や Repository に分けます。
+    </div>
+
+    <h2>VS Code でクラスを作る方法</h2>
+    <ol>
+      <li><code>src/main/java</code> 配下の対象パッケージを開く。</li>
+      <li><code>ts/com/taskapi</code> の下に <code>controller</code> フォルダを作る。</li>
+      <li><code>controller</code> フォルダを右クリックする。</li>
+      <li><code>New Java Class</code> を選ぶ。</li>
+      <li>クラス名に <code>TaskController</code> を入力する。</li>
+    </ol>
+
+    <p>この方法で作成すると、以下のような <code>package</code> 文が自動で入る。</p>
+
+    <pre><code>package ts.com.taskapi.controller;
+
+public class TaskController {
+
+}</code></pre>
+
+    <h2>Spring アノテーションの import 方法</h2>
+    <ol>
+      <li>赤い波線が出ているアノテーション名にカーソルを置く。</li>
+      <li><code>Ctrl + .</code> を押す。</li>
+      <li><code>Import 'RestController'</code> のような候補を選ぶ。</li>
+    </ol>
+
+    <p>不要な import を整理するには、以下を使う。</p>
+
+    <pre><code>Shift + Alt + O</code></pre>
+
+    <p>コマンドパレットから実行する場合は、以下を使う。</p>
+
+    <pre><code>Java: Organize Imports</code></pre>
+
+    <h2>Controller でよく使うアノテーション</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>アノテーション</th>
+          <th>用途</th>
+          <th>使用例</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>@RestController</code></td>
+          <td>REST API の Controller であることを示す。</td>
+          <td><code>@RestController</code></td>
+        </tr>
+        <tr>
+          <td><code>@RequestMapping</code></td>
+          <td>Controller 全体の共通 URL を指定する。</td>
+          <td><code>@RequestMapping("/tasks")</code></td>
+        </tr>
+        <tr>
+          <td><code>@GetMapping</code></td>
+          <td>GET API を作る。取得処理で使う。</td>
+          <td><code>@GetMapping("/{id}")</code></td>
+        </tr>
+        <tr>
+          <td><code>@PostMapping</code></td>
+          <td>POST API を作る。新規作成で使う。</td>
+          <td><code>@PostMapping</code></td>
+        </tr>
+        <tr>
+          <td><code>@PutMapping</code></td>
+          <td>PUT API を作る。更新で使う。</td>
+          <td><code>@PutMapping("/{id}")</code></td>
+        </tr>
+        <tr>
+          <td><code>@DeleteMapping</code></td>
+          <td>DELETE API を作る。削除で使う。</td>
+          <td><code>@DeleteMapping("/{id}")</code></td>
+        </tr>
+        <tr>
+          <td><code>@RequestBody</code></td>
+          <td>JSON リクエストを DTO として受け取る。</td>
+          <td><code>@RequestBody TaskCreateRequest request</code></td>
+        </tr>
+        <tr>
+          <td><code>@PathVariable</code></td>
+          <td>URL パスの一部を受け取る。</td>
+          <td><code>@PathVariable Long id</code></td>
+        </tr>
+        <tr>
+          <td><code>@RequestParam</code></td>
+          <td>クエリパラメータを受け取る。</td>
+          <td><code>@RequestParam String status</code></td>
+        </tr>
+        <tr>
+          <td><code>@Valid</code></td>
+          <td>Request DTO の Bean Validation を有効にする。</td>
+          <td><code>@Valid @RequestBody TaskCreateRequest request</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>最小実装例</h2>
+    <p>Controller のイメージをつかむための最小例。</p>
+
+    <pre><code>package ts.com.taskapi.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/tasks")
+public class TaskController {
+
+    @GetMapping("/{id}")
+    public String findById(@PathVariable Long id) {
+        return "task id = " + id;
+    }
+}</code></pre>
+
+    <p>実際の練習では、戻り値は <code>String</code> ではなく <code>TaskResponse</code> などの DTO にして、処理は Service に渡す。</p>
+
+    <h2>@PathVariable と @RequestParam の違い</h2>
+
+    <h3>@PathVariable</h3>
+    <p>URL のパスの一部を受け取る。主に ID のように、特定のリソースを指定する値に使う。</p>
+
+    <pre><code>GET /tasks/10</code></pre>
+
+    <pre><code>@GetMapping("/{id}")
+public TaskResponse findById(@PathVariable Long id) {
+    return taskService.findById(id);
+}</code></pre>
+
+    <p>この場合、<code>10</code> が <code>id</code> に入る。</p>
+
+    <h3>@RequestParam</h3>
+    <p><code>?</code> の後ろにあるクエリパラメータを受け取る。主に検索条件、絞り込み条件、ページ番号などに使う。</p>
+
+    <pre><code>GET /tasks?status=DONE</code></pre>
+
+    <pre><code>@GetMapping
+public List&lt;TaskResponse&gt; findAll(@RequestParam String status) {
+    return taskService.findAll(status);
+}</code></pre>
+
+    <p>この場合、<code>DONE</code> が <code>status</code> に入る。</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>観点</th>
+          <th>@PathVariable</th>
+          <th>@RequestParam</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>URL例</td>
+          <td><code>/tasks/1</code></td>
+          <td><code>/tasks?status=DONE</code></td>
+        </tr>
+        <tr>
+          <td>用途</td>
+          <td>特定の1件を指定する</td>
+          <td>一覧の検索・絞り込みをする</td>
+        </tr>
+        <tr>
+          <td>よく使う値</td>
+          <td>ID</td>
+          <td>status, keyword, page, size など</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      面接での説明例:
+      <code>@PathVariable</code> は URL パスの一部を受け取るために使い、主に ID などリソースを特定する値に使います。
+      <code>@RequestParam</code> はクエリパラメータを受け取るために使い、検索条件や絞り込み条件に使います。
+    </div>
+
+    <h2>ResponseEntity の使い方</h2>
+    <p><code>ResponseEntity</code> は、レスポンスボディだけでなく HTTP ステータスコードも明示したいときに使う。</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>書き方</th>
+          <th>意味</th>
+          <th>よく使う場面</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>ResponseEntity.ok(body)</code></td>
+          <td><code>200 OK</code> とレスポンスボディを返す。</td>
+          <td>取得、更新後の結果返却</td>
+        </tr>
+        <tr>
+          <td><code>ResponseEntity.status(HttpStatus.CREATED).body(body)</code></td>
+          <td><code>201 Created</code> とレスポンスボディを返す。</td>
+          <td>新規作成</td>
+        </tr>
+        <tr>
+          <td><code>ResponseEntity.noContent().build()</code></td>
+          <td><code>204 No Content</code> を返す。ボディは返さない。</td>
+          <td>削除成功</td>
+        </tr>
+        <tr>
+          <td><code>ResponseEntity.badRequest().body(body)</code></td>
+          <td><code>400 Bad Request</code> とエラー内容を返す。</td>
+          <td>入力不正。ただし通常は例外ハンドラで共通化する。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>よくある間違い</h3>
+    <p><code>ResponseEntity</code> はジェネリクスに変数名を書いて返すものではない。</p>
+
+    <pre><code>// NG
+return ResponseEntity&lt;taskResponse&gt;;
+
+// OK
+return ResponseEntity.ok(taskResponse);</code></pre>
+
+    <h2>Task API の HTTP ステータス</h2>
+    <p>今回のような基本的な CRUD API では、まず以下を使い分ければよい。</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>API</th>
+          <th>成功時ステータス</th>
+          <th>理由</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>GET /tasks</code></td>
+          <td><code>200 OK</code></td>
+          <td>一覧取得に成功したため。</td>
+        </tr>
+        <tr>
+          <td><code>GET /tasks/{id}</code></td>
+          <td><code>200 OK</code></td>
+          <td>指定した1件の取得に成功したため。</td>
+        </tr>
+        <tr>
+          <td><code>POST /tasks</code></td>
+          <td><code>201 Created</code></td>
+          <td>新しいリソースを作成したため。</td>
+        </tr>
+        <tr>
+          <td><code>PUT /tasks/{id}</code></td>
+          <td><code>200 OK</code></td>
+          <td>更新後の内容をレスポンスボディで返すため。</td>
+        </tr>
+        <tr>
+          <td><code>DELETE /tasks/{id}</code></td>
+          <td><code>204 No Content</code></td>
+          <td>削除成功だけを伝え、レスポンスボディを返さないため。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      面接での説明例:
+      GET と PUT は成功時に <code>200 OK</code>、POST は新規作成なので <code>201 Created</code>、
+      DELETE は返すボディが不要なので <code>204 No Content</code> にしています。
+    </div>
+
+    <h2>URL 設計の基本</h2>
+    <p>URL には <code>create</code> や <code>delete</code> のような動詞を入れすぎず、HTTP メソッドで操作を表す。</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>避けたい例</th>
+          <th>推奨例</th>
+          <th>意味</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>GET /tasks/all</code></td>
+          <td><code>GET /tasks</code></td>
+          <td>タスク一覧を取得する。</td>
+        </tr>
+        <tr>
+          <td><code>POST /tasks/create</code></td>
+          <td><code>POST /tasks</code></td>
+          <td>タスクを新規作成する。</td>
+        </tr>
+        <tr>
+          <td><code>PUT /tasks/update/{id}</code></td>
+          <td><code>PUT /tasks/{id}</code></td>
+          <td>指定したタスクを更新する。</td>
+        </tr>
+        <tr>
+          <td><code>DELETE /tasks/delete/{id}</code></td>
+          <td><code>DELETE /tasks/{id}</code></td>
+          <td>指定したタスクを削除する。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>主要アノテーションを使ったControllerサンプル</h2>
+    <p>Controller でよく使うアノテーションを一通り確認するためのサンプル。Service の中身は別で実装する。</p>
+
+    <pre><code>package ts.com.taskapi.controller;
+
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.validation.Valid;
+import ts.com.taskapi.dto.TaskCreateRequest;
+import ts.com.taskapi.dto.TaskResponse;
+import ts.com.taskapi.dto.TaskUpdateRequest;
+import ts.com.taskapi.service.TaskService;
+
+@RestController
+@RequestMapping("/tasks")
+public class TaskController {
+
+    private final TaskService taskService;
+
+    public TaskController(TaskService taskService) {
+        this.taskService = taskService;
+    }
+
+    @GetMapping
+    public ResponseEntity&lt;List&lt;TaskResponse&gt;&gt; findAll(
+            @RequestParam(required = false) String status) {
+        List&lt;TaskResponse&gt; responses = taskService.findAll(status);
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity&lt;TaskResponse&gt; findById(@PathVariable Long id) {
+        TaskResponse response = taskService.findById(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping
+    public ResponseEntity&lt;TaskResponse&gt; create(
+            @Valid @RequestBody TaskCreateRequest request) {
+        TaskResponse response = taskService.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity&lt;TaskResponse&gt; update(
+            @PathVariable Long id,
+            @Valid @RequestBody TaskUpdateRequest request) {
+        TaskResponse response = taskService.update(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity&lt;Void&gt; delete(@PathVariable Long id) {
+        taskService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+}</code></pre>
+
+    <div class="note">
+      注意:
+      上のサンプルは Controller の書き方を確認するための例。
+      <code>taskService.findAll(status)</code> や <code>taskService.update(id, request)</code> を使う場合は、
+      Service 側のメソッド定義も同じ引数にそろえる。
+    </div>
+
+    <h2>DTO 層の基本</h2>
+    <p>DTO は API の入出力専用の形を表すクラス。Entity をそのままリクエストやレスポンスに使わず、Request DTO と Response DTO に分ける。</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>クラス</th>
+          <th>役割</th>
+          <th>入れる項目の考え方</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>TaskCreateRequest</code></td>
+          <td>作成APIの入力</td>
+          <td>クライアントが作成時に入力する値だけ。通常 <code>id</code>, <code>createdAt</code>, <code>updatedAt</code> は入れない。</td>
+        </tr>
+        <tr>
+          <td><code>TaskUpdateRequest</code></td>
+          <td>更新APIの入力</td>
+          <td>更新可能な値だけ。更新対象の <code>id</code> は URL の <code>@PathVariable</code> で受け取る。</td>
+        </tr>
+        <tr>
+          <td><code>TaskResponse</code></td>
+          <td>APIの出力</td>
+          <td>クライアントに返したい値。<code>id</code>, <code>createdAt</code>, <code>updatedAt</code> を含めてもよい。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      面接での説明例:
+      Request DTO にはクライアントが入力する項目だけを持たせ、<code>id</code> や作成日時・更新日時のようなサーバー管理項目は基本的に入れません。
+      Response DTO には、APIとしてクライアントへ返したい項目を定義します。
+    </div>
+
+    <h2>record を DTO に使う理由</h2>
+    <p><code>record</code> は、値のまとまりを簡潔に表すための Java の構文。DTO は値の受け渡しが主目的なので、<code>record</code> と相性がよい。</p>
+
+    <pre><code>public record TaskResponse(
+        Long id,
+        String title
+) {
+}</code></pre>
+
+    <p>上のように書くと、Java が以下を自動生成する。</p>
+
+    <ul>
+      <li><code>private final</code> フィールド</li>
+      <li>全項目を受け取るコンストラクタ</li>
+      <li><code>id()</code>, <code>title()</code> のようなアクセサ</li>
+      <li><code>equals()</code></li>
+      <li><code>hashCode()</code></li>
+      <li><code>toString()</code></li>
+    </ul>
+
+    <p>値を取り出すときは、getter ではなくコンポーネント名のメソッドを使う。</p>
+
+    <pre><code>TaskResponse response = new TaskResponse(1L, "Javaを勉強する");
+
+Long id = response.id();
+String title = response.title();</code></pre>
+
+    <h3>record が変更できない理由</h3>
+    <p><code>record</code> のコンポーネントは自動的に <code>private final</code> フィールドになる。作成後にフィールドへ再代入できず、setter を作っても <code>final</code> フィールドには代入できない。</p>
+
+    <pre><code>public record TaskResponse(Long id, String title) {
+
+    // NG: title は final フィールドなので再代入できない
+    // public void setTitle(String title) {
+    //     this.title = title;
+    // }
+}</code></pre>
+
+    <div class="note">
+      注意:
+      <code>record</code> はフィールドの再代入を防ぐ。ただし、<code>List</code> のような可変オブジェクトを持つ場合、その中身まで完全に不変になるわけではない。
+    </div>
+
+    <h2>Bean Validation の基本</h2>
+    <p>Bean Validation は、Java オブジェクトの入力チェックをアノテーションで書くための仕組み。Spring Boot では <code>spring-boot-starter-validation</code> を入れると使える。</p>
+
+    <p>Controller の引数に <code>@Valid</code> を付けると、Request DTO に付けた制約が実行される。</p>
+
+    <pre><code>@PostMapping
+public ResponseEntity&lt;TaskResponse&gt; create(
+        @Valid @RequestBody TaskCreateRequest request) {
+    TaskResponse response = taskService.create(request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+}</code></pre>
+
+    <table>
+      <thead>
+        <tr>
+          <th>アノテーション</th>
+          <th>用途</th>
+          <th>注意点</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>@NotBlank</code></td>
+          <td><code>null</code>, 空文字, 空白だけの文字列を禁止する。</td>
+          <td><code>String</code> 用。<code>LocalDateTime</code> には使わない。</td>
+        </tr>
+        <tr>
+          <td><code>@NotNull</code></td>
+          <td><code>null</code> を禁止する。</td>
+          <td>日時、Enum、数値などを必須にしたいときに使う。</td>
+        </tr>
+        <tr>
+          <td><code>@Size</code></td>
+          <td>文字列やリストの長さを制限する。</td>
+          <td><code>@Size(max = 100)</code> のように使う。</td>
+        </tr>
+        <tr>
+          <td><code>@Min</code>, <code>@Max</code></td>
+          <td>数値の最小値・最大値を制限する。</td>
+          <td>優先度や数量などに使う。</td>
+        </tr>
+        <tr>
+          <td><code>@Email</code></td>
+          <td>メールアドレス形式をチェックする。</td>
+          <td>ユーザー登録系でよく使う。</td>
+        </tr>
+        <tr>
+          <td><code>@Pattern</code></td>
+          <td>正規表現で文字列をチェックする。</td>
+          <td>単純な状態値は Enum で表す方が分かりやすい場合もある。</td>
+        </tr>
+        <tr>
+          <td><code>@Future</code>, <code>@Past</code></td>
+          <td>日時が未来または過去かをチェックする。</td>
+          <td>期限日などに使える。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Task DTO の設計メモ</h2>
+    <p>今回の Task API では、まず以下の分け方を基本にする。</p>
+
+    <pre><code>TaskCreateRequest
+- title
+- description
+- taskStatus
+- dueTime
+
+TaskUpdateRequest
+- title
+- description
+- taskStatus
+- dueTime
+
+TaskResponse
+- id
+- title
+- description
+- taskStatus
+- dueTime
+- createdAt
+- updatedAt</code></pre>
+
+    <p>作成時の <code>taskStatus</code> は、設計として次のどちらかを選ぶ。</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>方針</th>
+          <th>DTO</th>
+          <th>説明</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>クライアントが指定する</td>
+          <td><code>TaskCreateRequest</code> に <code>taskStatus</code> を入れる。</td>
+          <td>入力値として <code>@NotNull</code> を付ける候補になる。</td>
+        </tr>
+        <tr>
+          <td>必ず初期値にする</td>
+          <td><code>TaskCreateRequest</code> から <code>taskStatus</code> を外す。</td>
+          <td>Service 側で <code>TODO</code> などの初期値を設定する。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>今回のレビューで出た注意点</h3>
+    <ul>
+      <li><code>taskstatus</code> や <code>taskStatu</code> ではなく、Java の命名として <code>taskStatus</code> にする。</li>
+      <li><code>LocalDateTime</code> に <code>@NotBlank</code> は使わない。必須なら <code>@NotNull</code> を使う。</li>
+      <li>record の最後の項目に余計なカンマを残さない。</li>
+      <li>Request DTO に <code>id</code>, <code>createdAt</code>, <code>updatedAt</code> を入れすぎない。</li>
+      <li>PUT の全体更新なら、<code>title</code> を <code>@NotBlank</code> にする方針でよい。</li>
+    </ul>
+
+    <h2>次に自分でやること</h2>
+    <ol>
+      <li><code>TaskController</code> に <code>@RestController</code> と <code>@RequestMapping("/tasks")</code> を付ける。</li>
+      <li>まずは <code>GET /tasks/{id}</code> か <code>POST /tasks</code> のどちらか1つだけ実装する。</li>
+      <li>Controller では Service を呼び出すだけにする。</li>
+      <li>不要な import は <code>Shift + Alt + O</code> で整理する。</li>
+    </ol>
+
+    <h2>振り返りメモ</h2>
+    <ul>
+      <li>手が止まった箇所: VS Code で Spring アノテーションの import 候補が出なかった。</li>
+      <li>覚えた操作: <code>Ctrl + .</code> で Quick Fix、<code>Shift + Alt + O</code> で import 整理。</li>
+      <li>覚えた考え方: Controller は HTTP の入口。業務ロジックは Service に置く。</li>
+      <li>次回注意すること: ファイル作成時は Java のクラス作成機能を使い、<code>package</code> 文を自動生成する。</li>
+    </ul>
+  </main>
+</body>
+</html>

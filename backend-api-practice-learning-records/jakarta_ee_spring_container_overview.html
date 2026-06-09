@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jakarta EEコンテナ・Spring DIコンテナ・Tomcat・APIの体系整理</title>
+  <style>
+    :root {
+      --bg: #f7f8fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #d9dee8;
+      --accent: #2457a6;
+      --accent-soft: #eaf1ff;
+      --warn: #8a5b00;
+      --warn-soft: #fff6dc;
+      --ok: #116149;
+      --ok-soft: #e7f7f1;
+      --danger: #8c1d18;
+      --danger-soft: #fdebea;
+      --code-bg: #f1f5f9;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+      line-height: 1.75;
+    }
+
+    header {
+      background: linear-gradient(135deg, #173b75, #2457a6 60%, #3f7fd1);
+      color: white;
+      padding: 48px 24px 40px;
+    }
+
+    header .inner,
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      margin: 0;
+      max-width: 860px;
+      font-size: 17px;
+      opacity: 0.92;
+    }
+
+    main {
+      padding: 32px 20px 64px;
+    }
+
+    section {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 28px;
+      margin: 22px 0;
+      box-shadow: var(--shadow);
+    }
+
+    h2 {
+      margin: 0 0 18px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--accent-soft);
+      font-size: 26px;
+      line-height: 1.35;
+      color: #153a72;
+    }
+
+    h3 {
+      margin: 28px 0 12px;
+      font-size: 21px;
+      color: #1e437f;
+    }
+
+    h4 {
+      margin: 22px 0 8px;
+      font-size: 17px;
+      color: #334155;
+    }
+
+    p { margin: 10px 0; }
+
+    ul, ol { padding-left: 1.4em; }
+
+    li { margin: 6px 0; }
+
+    .toc {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 10px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .toc a {
+      display: block;
+      padding: 12px 14px;
+      background: var(--accent-soft);
+      border-radius: 12px;
+      color: #174782;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .toc a:hover { text-decoration: underline; }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .summary-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      background: #fbfdff;
+    }
+
+    .summary-card strong {
+      color: var(--accent);
+      display: block;
+      margin-bottom: 6px;
+      font-size: 17px;
+    }
+
+    .note,
+    .question,
+    .correction,
+    .keypoint {
+      border-radius: 14px;
+      padding: 15px 17px;
+      margin: 16px 0;
+      border: 1px solid transparent;
+    }
+
+    .note {
+      background: var(--accent-soft);
+      border-color: #c8d9ff;
+    }
+
+    .question {
+      background: var(--warn-soft);
+      border-color: #f1d28a;
+    }
+
+    .correction {
+      background: var(--danger-soft);
+      border-color: #f4b5b2;
+    }
+
+    .keypoint {
+      background: var(--ok-soft);
+      border-color: #b8e5d5;
+    }
+
+    .label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      padding: 2px 8px;
+      border-radius: 999px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    .label.q { background: #ffe6a6; color: var(--warn); }
+    .label.a { background: #d7f3e8; color: var(--ok); }
+    .label.fix { background: #ffd0cd; color: var(--danger); }
+    .label.core { background: #d9e7ff; color: var(--accent); }
+
+    code {
+      background: var(--code-bg);
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 1px 6px;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.93em;
+    }
+
+    pre {
+      background: #0f172a;
+      color: #e5e7eb;
+      border-radius: 14px;
+      padding: 18px;
+      overflow-x: auto;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 22px;
+      font-size: 15px;
+    }
+
+    th, td {
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eef4ff;
+      color: #16396e;
+      text-align: left;
+    }
+
+    tr:nth-child(even) td { background: #fbfcff; }
+
+    .diagram {
+      background: #f8fafc;
+      border: 1px dashed #b9c4d4;
+      border-radius: 16px;
+      padding: 18px;
+      margin: 16px 0;
+    }
+
+    .diagram-title {
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 8px;
+    }
+
+    .small { color: var(--muted); font-size: 14px; }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .flow .step {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    footer {
+      max-width: 1120px;
+      margin: 0 auto 40px;
+      color: var(--muted);
+      padding: 0 20px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="inner">
+      <h1>Jakarta EEコンテナ・Spring DIコンテナ・Tomcat・APIの体系整理</h1>
+      <p>
+        これまでの対話で扱った「Jakarta EEアプリケーションサーバ」「コンテナ」「Tomcat」「Spring Boot」「API」「WAR/EAR/JAR」の関係を、
+        レイヤー構造と実行の流れを中心に整理した資料です。
+      </p>
+    </div>
+  </header>
+
+  <main>
+    <section id="toc">
+      <h2>目次</h2>
+      <ul class="toc">
+        <li><a href="#big-picture">1. 全体像</a></li>
+        <li><a href="#terms">2. 用語の位置づけ</a></li>
+        <li><a href="#spec-api">3. Jakarta EE仕様とAPI</a></li>
+        <li><a href="#jakarta-server">4. Jakarta EEアプリケーションサーバとコンテナ</a></li>
+        <li><a href="#tomcat">5. Tomcatの位置づけ</a></li>
+        <li><a href="#spring">6. Spring / Spring Bootとの違い</a></li>
+        <li><a href="#deploy">7. 外部サーバ方式と組み込みサーバ方式</a></li>
+        <li><a href="#war-ear-jar">8. WAR / EAR / JARの違い</a></li>
+        <li><a href="#api-word">9. REST APIとプログラミングAPI</a></li>
+        <li><a href="#final-model">10. 最終理解モデル</a></li>
+      </ul>
+    </section>
+
+    <section id="big-picture">
+      <h2>1. 全体像</h2>
+      <p>
+        このテーマで最も重要なのは、<strong>仕様・実装・実行環境・アプリケーションコード</strong>を分けて考えることです。
+        混乱の多くは、「コンテナ」「サーバ」「API」という言葉が複数のレイヤーで使われることから起きます。
+      </p>
+
+      <div class="keypoint">
+        <span class="label core">核心</span>
+        Webアプリは、あなたが書いたJavaコードだけで動いているわけではありません。
+        <strong>あなたのコード + フレームワークのコード + コンテナ/サーバのコード + JVM</strong>が一緒に動いています。
+      </div>
+
+      <div class="diagram">
+        <div class="diagram-title">大まかなレイヤー</div>
+        <pre><code>OS
+  ↓
+JVM
+  ↓
+Javaで動くサーバ/フレームワーク
+  ├─ Jakarta EEアプリケーションサーバ
+  │   ├─ Webコンテナ
+  │   ├─ CDIコンテナ
+  │   ├─ EJBコンテナ
+  │   └─ 各種サービス
+  │
+  └─ Spring Bootアプリ
+      ├─ 組み込みTomcat
+      ├─ Spring ApplicationContext
+      ├─ Spring MVC
+      ├─ Spring Security
+      └─ Spring Transaction
+  ↓
+あなたのアプリケーションコード</code></pre>
+      </div>
+
+      <div class="question">
+        <p><span class="label q">疑問</span>Jakarta EEアプリケーションサーバはJVMなのか？</p>
+        <p><span class="label a">解説</span>違います。JVMはJavaバイトコードを実行する土台です。Jakarta EEアプリケーションサーバは、JVM上で動くサーバ製品です。Servlet、CDI、EJB、トランザクション管理などはJVM自体が提供するのではなく、サーバ製品やライブラリが提供します。</p>
+      </div>
+    </section>
+
+    <section id="terms">
+      <h2>2. 用語の位置づけ</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>用語</th>
+            <th>分類</th>
+            <th>意味</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>JVM</td>
+            <td>実行基盤</td>
+            <td>Javaのバイトコードを実行するランタイム。ServletやSpring Beanを直接提供するものではない。</td>
+          </tr>
+          <tr>
+            <td>Jakarta EE</td>
+            <td>標準仕様群</td>
+            <td>Javaでエンタープライズアプリケーションを作るための標準仕様。Servlet、CDI、EJB、JPA、JTA、Validationなどを含む。</td>
+          </tr>
+          <tr>
+            <td>Jakarta EE API</td>
+            <td>プログラミングAPI</td>
+            <td>Jakarta EE仕様として定義されたJavaのクラス、インターフェース、アノテーション群。</td>
+          </tr>
+          <tr>
+            <td>Jakarta EEアプリケーションサーバ</td>
+            <td>サーバ製品</td>
+            <td>Jakarta EE仕様を実装したサーバ。WildFly、Payara、Open Liberty、WebLogicなど。</td>
+          </tr>
+          <tr>
+            <td>Jakarta EEコンテナ</td>
+            <td>実行機構</td>
+            <td>アプリケーションサーバ内部で、Servlet、CDI Bean、EJBなどを生成・管理・呼び出しする仕組み。</td>
+          </tr>
+          <tr>
+            <td>Webコンテナ / Servletコンテナ</td>
+            <td>HTTP/Servlet実行環境</td>
+            <td>HTTPリクエストを受け、Servletを実行する環境。Tomcatが代表例。</td>
+          </tr>
+          <tr>
+            <td>CDIコンテナ</td>
+            <td>Jakarta EE側のDIコンテナ</td>
+            <td>CDI Beanの生成、スコープ管理、依存性注入を行う。</td>
+          </tr>
+          <tr>
+            <td>EJBコンテナ</td>
+            <td>Enterprise Beans実行環境</td>
+            <td>EJBのライフサイクル、トランザクション、セキュリティ、プーリングなどを管理する。</td>
+          </tr>
+          <tr>
+            <td>Tomcat</td>
+            <td>Servletコンテナ</td>
+            <td>Servlet/JSP周辺を実装するWebコンテナ。フルJakarta EEアプリケーションサーバではない。</td>
+          </tr>
+          <tr>
+            <td>Spring Framework</td>
+            <td>Javaフレームワーク</td>
+            <td>DI、AOP、MVC、Transactionなどを提供するSpring独自のフレームワーク。</td>
+          </tr>
+          <tr>
+            <td>Spring Boot</td>
+            <td>Springアプリ構築基盤</td>
+            <td>Springアプリを簡単に構成・起動する仕組み。組み込みTomcatを含めて実行可能JARとして動かす構成が多い。</td>
+          </tr>
+          <tr>
+            <td>Spring DIコンテナ</td>
+            <td>Spring側のDIコンテナ</td>
+            <td>Spring Beanを生成・注入・管理するApplicationContextのこと。</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="correction">
+        <span class="label fix">注意</span>
+        「コンテナ」という言葉は1種類ではありません。Servletコンテナ、CDIコンテナ、EJBコンテナ、Spring DIコンテナ、Dockerコンテナは、それぞれ別の文脈の言葉です。
+      </div>
+    </section>
+
+    <section id="spec-api">
+      <h2>3. Jakarta EE仕様とAPI</h2>
+      <p>
+        Jakarta EEは、単なる参考資料ではなく、<strong>Javaでエンタープライズアプリケーションを作るための標準仕様群</strong>です。
+        仕様とは、「どのようなAPIを提供し、どのように振る舞うべきか」を定義するルールです。
+      </p>
+
+      <div class="diagram">
+        <div class="diagram-title">仕様・API・実装・アプリの関係</div>
+        <pre><code>Jakarta EE仕様
+  ├─ 仕様書
+  ├─ Java API
+  │   ├─ class
+  │   ├─ interface
+  │   └─ annotation
+  └─ 準拠確認用のテスト/ルール
+
+実装製品
+  ├─ Tomcat
+  ├─ Jetty
+  ├─ WildFly
+  ├─ Payara
+  └─ Open Liberty
+
+アプリ開発者
+  └─ Jakarta EE APIを使ってアプリを書く</code></pre>
+      </div>
+
+      <h3>3.1 Jakarta EE APIはインターフェースだけなのか</h3>
+      <p>
+        インターフェースだけではありません。クラス、抽象クラス、アノテーション、例外クラスなども含みます。
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>種類</th>
+            <th>例</th>
+            <th>説明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>interface</td>
+            <td><code>HttpServletRequest</code>, <code>HttpServletResponse</code></td>
+            <td>実装クラスを隠し、アプリコードとコンテナの接点になる。</td>
+          </tr>
+          <tr>
+            <td>class / abstract class</td>
+            <td><code>HttpServlet</code></td>
+            <td>開発者が継承して使う基底クラス。</td>
+          </tr>
+          <tr>
+            <td>annotation</td>
+            <td><code>@Inject</code>, <code>@Entity</code>, <code>@NotNull</code></td>
+            <td>コンテナや実装ライブラリに意味を伝えるメタデータ。</td>
+          </tr>
+          <tr>
+            <td>exception / utility</td>
+            <td>各種例外クラスなど</td>
+            <td>API利用時の例外表現や補助機能。</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="question">
+        <p><span class="label q">疑問</span>Jakarta EE APIはインターフェースで、実装クラスはTomcat / Jetty / WildFlyが実装する理解でよいか？</p>
+        <p><span class="label a">解説</span>大筋では合っています。ただしAPIはインターフェースだけではありません。Jakarta EE APIにはクラスやアノテーションも含まれます。実際の処理は、Tomcat、Jetty、WildFly、Payara、Hibernateなどの実装製品が仕様に沿って提供します。</p>
+      </div>
+
+      <h3>3.2 「契約」と表現する理由</h3>
+      <p>
+        Jakarta EE APIは「Javaのクラス・インターフェース・アノテーション群」と言っても間違いではありません。
+        ただし、それだけだと「そのAPIライブラリを入れれば実行機能まで入る」と誤解しやすいです。
+      </p>
+      <p>
+        ここでいう「契約」とは、<strong>アプリ開発者とサーバ/ライブラリ実装者の双方が従う標準ルール</strong>という意味です。
+      </p>
+
+      <div class="two-col">
+        <div class="summary-card">
+          <strong>アプリ開発者側の契約</strong>
+          <p>このAPIを使って、この形式でコードを書けば、コンテナが適切に呼び出してくれる。</p>
+        </div>
+        <div class="summary-card">
+          <strong>実装製品側の契約</strong>
+          <p>このAPIに対応する実装を用意し、仕様で定められた振る舞いを満たす。</p>
+        </div>
+      </div>
+
+      <div class="question">
+        <p><span class="label q">疑問</span>Javaのすべてのライブラリも契約ではないのか？</p>
+        <p><span class="label a">解説</span>広い意味ではその通りです。すべてのAPIは利用者との契約です。ただしJakarta EE APIは、単一ライブラリのAPIというより、複数の実装製品が準拠するための標準仕様としての契約です。そのため特に「契約」と表現しました。</p>
+      </div>
+    </section>
+
+    <section id="jakarta-server">
+      <h2>4. Jakarta EEアプリケーションサーバとコンテナ</h2>
+
+      <h3>4.1 Jakarta EEアプリケーションサーバとは</h3>
+      <p>
+        Jakarta EEアプリケーションサーバは、Jakarta EE仕様を実装したサーバ製品です。
+        JVM上で動作し、内部にWebコンテナ、CDIコンテナ、EJBコンテナ、トランザクション管理、セキュリティ、リソース管理などを持ちます。
+      </p>
+
+      <div class="diagram">
+        <div class="diagram-title">Jakarta EEアプリケーションサーバのイメージ</div>
+        <pre><code>Jakarta EEアプリケーションサーバ
+  ├─ Webコンテナ
+  │   └─ Servlet / JSP / RESTリソースなどを実行
+  ├─ CDIコンテナ
+  │   └─ CDI Beanの生成・DI・スコープ管理
+  ├─ EJBコンテナ
+  │   └─ EJBのライフサイクル・トランザクション・セキュリティ管理
+  ├─ JTA Transaction Manager
+  ├─ DataSource / 接続プール
+  ├─ Security
+  └─ その他エンタープライズ機能</code></pre>
+      </div>
+
+      <h3>4.2 Jakarta EEアプリケーションとは</h3>
+      <p>
+        Jakarta EEアプリケーションは、開発者が作る業務アプリケーションです。
+        典型的にはWARやEARとしてパッケージングされ、Jakarta EEアプリケーションサーバにデプロイされます。
+      </p>
+
+      <pre><code>myapp.war / myapp.ear
+  ├─ Servlet / RESTリソース
+  ├─ CDI Bean
+  ├─ EJB
+  ├─ JPA Entity
+  ├─ 設定ファイル
+  └─ 業務ロジック</code></pre>
+
+      <div class="question">
+        <p><span class="label q">疑問</span>Jakarta EEアプリケーションとJakarta EEコンテナのイメージが湧かない。</p>
+        <p><span class="label a">解説</span>Jakarta EEアプリケーションは「開発者が作る業務アプリ」です。コンテナは、そのアプリを読み込み、インスタンス生成、DI、リクエスト時のメソッド呼び出し、トランザクション、セキュリティ、リソース管理を行う実行環境です。アプリは単独で全部を動かすのではなく、コンテナに管理される部品群として作られます。</p>
+      </div>
+
+      <h3>4.3 コンテナは具体的に何をしているのか</h3>
+      <p>
+        コンテナの本質は、<strong>あなたのアプリケーションコードを、適切なタイミング・依存関係・実行条件で呼び出すこと</strong>です。
+      </p>
+
+      <div class="flow">
+        <div class="step">WAR/EARを読む</div>
+        <div class="step">クラスをスキャン</div>
+        <div class="step">アノテーション解析</div>
+        <div class="step">インスタンス生成</div>
+        <div class="step">DI</div>
+        <div class="step">URL対応付け</div>
+        <div class="step">リクエスト処理</div>
+        <div class="step">トランザクション制御</div>
+      </div>
+
+      <pre><code>HTTPリクエスト
+  ↓
+アプリケーションサーバ
+  ↓
+Webコンテナ
+  ↓
+対象のServlet / RESTリソースを特定
+  ↓
+必要なBeanを取得・DI
+  ↓
+認証・認可、トランザクションなどを制御
+  ↓
+あなたの業務メソッドを呼び出す
+  ↓
+HTTPレスポンスを返す</code></pre>
+
+      <div class="question">
+        <p><span class="label q">疑問</span>なぜJavaコードで実現していないのか？</p>
+        <p><span class="label a">解説</span>実際にはJavaコードで実現されています。ただし、それはあなたのアプリケーションコードではなく、Tomcat、WildFly、Payaraなどのサーバ製品側のコードです。HTTP処理、DI、トランザクション、リソース管理などを毎回アプリ開発者が実装するのは非現実的なため、サーバやフレームワークが共通基盤として提供します。</p>
+      </div>
+    </section>
+
+    <section id="tomcat">
+      <h2>5. Tomcatの位置づけ</h2>
+      <p>
+        Tomcatは、主に<strong>Servletコンテナ / Webコンテナ</strong>です。
+        Servlet/JSPなどを実行するHTTP系の実行基盤であり、フル機能のJakarta EEアプリケーションサーバではありません。
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>製品</th>
+            <th>位置づけ</th>
+            <th>主な役割</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Tomcat</td>
+            <td>Servletコンテナ</td>
+            <td>HTTPを受ける、Servletを動かす、JSPを処理する。</td>
+          </tr>
+          <tr>
+            <td>Jetty</td>
+            <td>Servletコンテナ</td>
+            <td>軽量なServlet/Web実行基盤。</td>
+          </tr>
+          <tr>
+            <td>WildFly</td>
+            <td>Jakarta EEアプリケーションサーバ</td>
+            <td>Servlet、CDI、EJB、JTA、JPA、JMSなど広範囲を提供。</td>
+          </tr>
+          <tr>
+            <td>Payara</td>
+            <td>Jakarta EEアプリケーションサーバ</td>
+            <td>Jakarta EE仕様群を広く実装。</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="question">
+        <p><span class="label q">疑問</span>Tomcatは結局どこに位置するのか？</p>
+        <p><span class="label a">解説</span>TomcatはServlet仕様を実装するWebコンテナです。Spring Bootでは組み込みTomcatとしてアプリ内に入り、HTTPリクエストを受ける役割を担います。ただし、SpringのDIを担当するのはTomcatではなくSpring ApplicationContextです。</p>
+      </div>
+
+      <pre><code>Spring Bootアプリ
+  ├─ 組み込みTomcat
+  │   └─ HTTP受付 / Servlet実行
+  │
+  └─ Spring ApplicationContext
+      └─ Controller / Service / Repositoryの生成・DI・管理</code></pre>
+    </section>
+
+    <section id="spring">
+      <h2>6. Spring / Spring Bootとの違い</h2>
+
+      <h3>6.1 SpringはJakarta EEアプリケーションサーバではない</h3>
+      <p>
+        SpringはJakarta EEアプリケーションサーバの実装ではありません。
+        Springは、Javaアプリケーションを作るための独自フレームワークです。
+      </p>
+
+      <p>
+        ただし、SpringはJakarta EE由来のAPIを一部利用・統合しています。たとえばServlet、JPA、Bean Validationなどです。
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>領域</th>
+            <th>Springでの位置づけ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>DI</td>
+            <td>Spring独自のApplicationContextが中心。</td>
+          </tr>
+          <tr>
+            <td>HTTP / Web</td>
+            <td>Spring MVCはServlet上で動く。HTTP受付はTomcatなどが担当。</td>
+          </tr>
+          <tr>
+            <td>JPA</td>
+            <td>Jakarta Persistence APIとHibernateなどをSpringが統合する。</td>
+          </tr>
+          <tr>
+            <td>Validation</td>
+            <td>Jakarta Bean ValidationのアノテーションをSpringが利用する。</td>
+          </tr>
+          <tr>
+            <td>Security</td>
+            <td>Spring Securityが中心。</td>
+          </tr>
+          <tr>
+            <td>Transaction</td>
+            <td>Spring Transactionが中心。</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="question">
+        <p><span class="label q">疑問</span>SpringはJakarta EE仕様を参照しているわけではなく、独自仕様のフレームワークなのか？</p>
+        <p><span class="label a">解説</span>Springの中核モデルは独自です。DI、AOP、Bean管理、Spring MVC、Spring TransactionなどはSpringのプログラミングモデルです。ただしServlet、JPA、Validation、InjectなどJakarta EE系のAPIも利用・サポートします。完全に無関係でも、Jakarta EEそのものでもありません。</p>
+      </div>
+
+      <h3>6.2 Spring DIとCDIの違い</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th>Spring DI</th>
+            <th>CDI</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>所属</td>
+            <td>Spring Framework</td>
+            <td>Jakarta EE</td>
+          </tr>
+          <tr>
+            <td>管理主体</td>
+            <td>Spring ApplicationContext</td>
+            <td>CDIコンテナ</td>
+          </tr>
+          <tr>
+            <td>代表アノテーション</td>
+            <td><code>@Component</code>, <code>@Service</code>, <code>@Autowired</code></td>
+            <td><code>@Inject</code>, <code>@ApplicationScoped</code></td>
+          </tr>
+          <tr>
+            <td>使う場面</td>
+            <td>Spring / Spring Bootアプリ</td>
+            <td>Jakarta EEアプリ</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="keypoint">
+        <span class="label core">方針</span>
+        Spring Bootを使うなら、基本はSpring DIを使います。CDIはJakarta EE側のDI標準として理解しておけば十分です。
+      </div>
+    </section>
+
+    <section id="deploy">
+      <h2>7. 外部サーバ方式と組み込みサーバ方式</h2>
+      <p>
+        Webアプリには、HTTPリクエストを受ける実行基盤が必要です。
+        その実行基盤を<strong>アプリの外に置く</strong>か、<strong>アプリの中に同梱する</strong>かで構成が変わります。
+      </p>
+
+      <div class="two-col">
+        <div class="summary-card">
+          <strong>外部サーバ方式</strong>
+          <pre><code>OS
+ ↓
+JVM
+ ↓
+Tomcat / WildFly
+ ↓
+myapp.war</code></pre>
+          <p>先にサーバを起動し、そこにWAR/EARをデプロイする。</p>
+        </div>
+        <div class="summary-card">
+          <strong>組み込みサーバ方式</strong>
+          <pre><code>OS
+ ↓
+JVM
+ ↓
+myapp.jar
+  ├─ Spring Boot
+  ├─ Tomcat
+  └─ アプリコード</code></pre>
+          <p><code>java -jar</code>でアプリを起動すると、内包されたTomcatも起動する。</p>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>観点</th>
+            <th>外部サーバ方式</th>
+            <th>組み込みサーバ方式</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>起動の主役</td>
+            <td>Tomcat / WildFlyなどの外部サーバ</td>
+            <td>アプリケーション自身</td>
+          </tr>
+          <tr>
+            <td>成果物</td>
+            <td>WAR / EARが多い</td>
+            <td>実行可能JARが多い</td>
+          </tr>
+          <tr>
+            <td>Tomcatの位置</td>
+            <td>アプリの外</td>
+            <td>アプリの中</td>
+          </tr>
+          <tr>
+            <td>起動方法</td>
+            <td>サーバ起動 → アプリをデプロイ</td>
+            <td><code>java -jar app.jar</code></td>
+          </tr>
+          <tr>
+            <td>アプリの性質</td>
+            <td>サーバに載せる部品</td>
+            <td>自分でサーバ機能を持って起動するアプリ</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="question">
+        <p><span class="label q">疑問</span>外部サーバにデプロイすることと、アプリ内にサーバを内包することは何が違うのか？</p>
+        <p><span class="label a">解説</span>HTTP実行基盤をどこに置くかが違います。外部サーバ方式では、TomcatやWildFlyが先に存在し、アプリはそこに配置されます。組み込みサーバ方式では、Spring Bootアプリ自身がTomcatを依存ライブラリとして持ち、アプリ起動時にTomcatも一緒に起動します。</p>
+      </div>
+    </section>
+
+    <section id="war-ear-jar">
+      <h2>8. WAR / EAR / JARの違い</h2>
+      <p>
+        WAR、EAR、JARの違いは、<strong>何をまとめたファイルか</strong>と<strong>どこで実行される前提か</strong>です。
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>形式</th>
+            <th>正式名</th>
+            <th>中身</th>
+            <th>実行前提</th>
+            <th>代表用途</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>JAR</td>
+            <td>Java Archive</td>
+            <td>Javaクラス、リソース、依存ライブラリなど</td>
+            <td>JVM。実行可能JARなら単体起動可能。</td>
+            <td>ライブラリ、Spring Bootアプリ</td>
+          </tr>
+          <tr>
+            <td>WAR</td>
+            <td>Web Application Archive</td>
+            <td>Webアプリ、<code>WEB-INF</code>、クラス、ライブラリ、静的ファイルなど</td>
+            <td>Tomcat/WildFlyなどのWebコンテナ</td>
+            <td>Servlet/JSP/Spring MVCなどのWebアプリ</td>
+          </tr>
+          <tr>
+            <td>EAR</td>
+            <td>Enterprise Application Archive</td>
+            <td>WAR、EJB JAR、共通JARなど複数モジュール</td>
+            <td>Jakarta EEアプリケーションサーバ</td>
+            <td>大規模Jakarta EEアプリ</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="diagram">
+        <div class="diagram-title">成果物ごとのイメージ</div>
+        <pre><code>実行可能JAR
+  = java -jar app.jar で起動する
+  = Spring BootではTomcatも中に含むことが多い
+
+WAR
+  = Tomcat / WildFlyなどにデプロイするWebアプリ部品
+
+EAR
+  = WARやEJB JARなどをまとめたJakarta EEアプリ一式</code></pre>
+      </div>
+
+      <div class="question">
+        <p><span class="label q">疑問</span>WAR/EARのデプロイとJARのデプロイの違いは？</p>
+        <p><span class="label a">解説</span>WAR/EARは外部サーバに載せる前提の成果物です。一方、Spring Bootの実行可能JARはアプリ自身が起動の主体で、組み込みTomcatなども含めて<code>java -jar</code>で起動できます。</p>
+      </div>
+    </section>
+
+    <section id="api-word">
+      <h2>9. REST APIとプログラミングAPI</h2>
+      <p>
+        「API」という言葉は、REST APIだけを指すわけではありません。
+        APIの本来の意味は、<strong>あるプログラムが別のプログラムや機能を使うための接点</strong>です。
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>種類</th>
+            <th>REST API</th>
+            <th>Jakarta EE API / Spring API</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>分類</td>
+            <td>ネットワークAPI</td>
+            <td>プログラミングAPI</td>
+          </tr>
+          <tr>
+            <td>利用方法</td>
+            <td>HTTPで呼ぶ</td>
+            <td>Javaコードでimportして使う</td>
+          </tr>
+          <tr>
+            <td>利用者</td>
+            <td>ブラウザ、フロントエンド、外部システム</td>
+            <td>Javaアプリ開発者</td>
+          </tr>
+          <tr>
+            <td>例</td>
+            <td><code>GET /users/1</code></td>
+            <td><code>HttpServletRequest</code>, <code>@Entity</code>, <code>@Service</code></td>
+          </tr>
+          <tr>
+            <td>接点</td>
+            <td>外部システム ↔ アプリ</td>
+            <td>アプリコード ↔ ライブラリ/コンテナ/フレームワーク</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>9.1 Jakarta EE APIの具体例</h3>
+      <pre><code>// Servlet API
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+// CDI API
+import jakarta.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+
+// JPA API
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
+// Bean Validation API
+import jakarta.validation.NotNull;
+import jakarta.validation.Size;</code></pre>
+
+      <h3>9.2 Spring APIの具体例</h3>
+      <pre><code>import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.transaction.annotation.Transactional;</code></pre>
+
+      <div class="question">
+        <p><span class="label q">疑問</span>REST APIは理解しているが、ここでいうAPIは別物ではないか？</p>
+        <p><span class="label a">解説</span>その認識は正しいです。ここでいうJakarta EE APIは、HTTPで外部から呼ばれるAPIではなく、Javaコード内で利用するクラス、インターフェース、アノテーション群です。REST APIは外部システム向けの入口、Jakarta EE APIはJavaアプリがコンテナや標準機能を使うための入口です。</p>
+      </div>
+
+      <div class="keypoint">
+        <span class="label core">整理</span>
+        <code>@RestController</code>や<code>@GetMapping</code>はSpringのプログラミングAPIです。
+        その結果として外部に公開される<code>GET /users/1</code>がREST APIです。
+      </div>
+    </section>
+
+    <section id="final-model">
+      <h2>10. 最終理解モデル</h2>
+      <p>
+        これまでの理解を、Spring Boot中心のバックエンド開発者向けに最終整理すると以下です。
+      </p>
+
+      <div class="summary-grid">
+        <div class="summary-card">
+          <strong>JVM</strong>
+          <p>Javaプログラムを実行する土台。ServletやSpring Beanを直接提供するものではない。</p>
+        </div>
+        <div class="summary-card">
+          <strong>Jakarta EE</strong>
+          <p>エンタープライズJavaの標準仕様群。APIと振る舞いのルールを定義する。</p>
+        </div>
+        <div class="summary-card">
+          <strong>Jakarta EEアプリケーションサーバ</strong>
+          <p>Jakarta EE仕様を実装したサーバ製品。アプリを読み込み、コンテナ機能で管理・実行する。</p>
+        </div>
+        <div class="summary-card">
+          <strong>Tomcat</strong>
+          <p>Servletコンテナ。HTTPを受け、Servletを動かす。Spring Bootでは組み込みTomcatとして使われる。</p>
+        </div>
+        <div class="summary-card">
+          <strong>Spring Framework</strong>
+          <p>Spring独自のDI、AOP、MVC、Transactionなどを提供するJavaフレームワーク。</p>
+        </div>
+        <div class="summary-card">
+          <strong>Spring Boot</strong>
+          <p>Springアプリを簡単に構成・起動する仕組み。実行可能JARとして組み込みTomcatと一緒に起動する構成が多い。</p>
+        </div>
+      </div>
+
+      <h3>Spring Bootでのリクエスト処理の理解</h3>
+      <pre><code>HTTPクライアント
+  ↓
+組み込みTomcat
+  ↓
+DispatcherServlet
+  ↓
+Spring MVC
+  ↓
+Controller Bean
+  ↓
+Service Bean
+  ↓
+Repository Bean
+  ↓
+DB</code></pre>
+
+      <h3>役割分担</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>対象</th>
+            <th>役割</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Tomcat</td>
+            <td>HTTP受付、Servlet実行。</td>
+          </tr>
+          <tr>
+            <td>DispatcherServlet</td>
+            <td>Spring MVCの入口。</td>
+          </tr>
+          <tr>
+            <td>Spring ApplicationContext</td>
+            <td>Controller、Service、RepositoryなどのBean生成・DI・管理。</td>
+          </tr>
+          <tr>
+            <td>Spring Security</td>
+            <td>認証・認可。</td>
+          </tr>
+          <tr>
+            <td>Spring Transaction</td>
+            <td>トランザクション境界制御。</td>
+          </tr>
+          <tr>
+            <td>あなたのアプリコード</td>
+            <td>業務ロジック、API設計、DBアクセス、例外処理など。</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="keypoint">
+        <span class="label core">最重要結論</span>
+        Jakarta EEでもSpring Bootでも、根本は「自分のコードを自分で全部呼び出す」のではなく、
+        <strong>コンテナ/フレームワークに管理され、適切なタイミングで呼び出される</strong>という考え方です。
+      </div>
+
+      <h3>学習優先順位</h3>
+      <p>
+        Spring Bootでバックエンド実装力を上げる目的なら、Jakarta EE/CDI/EJBを深掘りするより、まず以下を優先するとよいです。
+      </p>
+      <ol>
+        <li>Spring DIコンテナ：Bean、DI、スコープ、ライフサイクル</li>
+        <li>Spring MVC：DispatcherServlet、Controller、リクエストマッピング</li>
+        <li>Tomcat：HTTPを受けるServletコンテナとしての役割</li>
+        <li>Spring Transaction：<code>@Transactional</code>とプロキシ</li>
+        <li>Spring Data JPA / MyBatis：DBアクセス層</li>
+        <li>Spring Security：認証・認可</li>
+      </ol>
+
+      <div class="correction">
+        <span class="label fix">率直な補足</span>
+        今回混乱した根本原因は、「API」「コンテナ」「サーバ」という言葉をすべて同じ粒度で捉えようとしたことです。
+        技術用語はレイヤーごとに意味が変わります。今後は、各用語を必ず「仕様なのか、実装なのか、実行環境なのか、アプリコードなのか」に分類してから理解すると崩れにくくなります。
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>作成目的：Jakarta EE、Spring Boot、Tomcat、コンテナ、API、WAR/EAR/JARに関する対話内容の体系整理。</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,1030 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auth LLM Chat App 学習記録 - JPA・Validation・RestClient・OpenAI連携</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f8fa;
+      --panel: #ffffff;
+      --text: #1f2937;
+      --muted: #5f6b7a;
+      --line: #d9dee7;
+      --accent: #1f6feb;
+      --accent-soft: #e8f1ff;
+      --code-bg: #111827;
+      --code-text: #f8fafc;
+      --warn-bg: #fff8e6;
+      --warn-line: #e9c46a;
+      --ok-bg: #eefaf3;
+      --ok-line: #5bbf7a;
+      --bad-bg: #fff0f0;
+      --bad-line: #e57373;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif;
+      line-height: 1.75;
+    }
+
+    .page {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 40px 24px 72px;
+    }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 32px;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 44px 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line);
+      font-size: 24px;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 28px 0 10px;
+      font-size: 19px;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 10px 0;
+    }
+
+    ul, ol {
+      padding-left: 24px;
+    }
+
+    li {
+      margin: 6px 0;
+    }
+
+    code {
+      border-radius: 4px;
+      background: #eef1f5;
+      padding: 2px 5px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.92em;
+    }
+
+    pre {
+      overflow-x: auto;
+      border-radius: 8px;
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 16px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px;
+      background: var(--panel);
+    }
+
+    th, td {
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: #f0f3f8;
+      font-weight: 700;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 22px;
+      margin: 22px 0;
+    }
+
+    .note, .warning, .good, .bad {
+      border-left: 5px solid;
+      border-radius: 6px;
+      margin: 16px 0;
+      padding: 12px 14px;
+    }
+
+    .note {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .warning {
+      border-color: var(--warn-line);
+      background: var(--warn-bg);
+    }
+
+    .good {
+      border-color: var(--ok-line);
+      background: var(--ok-bg);
+    }
+
+    .bad {
+      border-color: var(--bad-line);
+      background: var(--bad-bg);
+    }
+
+    .toc a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .toc a:hover {
+      text-decoration: underline;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <h1>Auth LLM Chat App 学習記録</h1>
+      <p class="meta">対象: Spring Boot / JPA / DTO Validation / 例外設計 / RestClient / OpenAI Responses API</p>
+      <p class="meta">作成日: 2026-05-31</p>
+      <p>
+        このドキュメントは、チャットアプリのバックエンド実装を進める中で確認した設計判断と知識をまとめたものです。
+        特に、<code>UserMessage</code>、<code>AiMessage</code>、<code>Conversation</code> のJPA設計、enumの扱い、DTOでの入力制約、
+        Service層での例外、外部LLM呼び出しの実装方針を整理しています。
+      </p>
+    </header>
+
+    <section class="section toc">
+      <h2 id="toc">目次</h2>
+      <ol>
+        <li><a href="#entity-relationship">エンティティ設計とDBの関係</a></li>
+        <li><a href="#many-to-one">@ManyToOne の考え方</a></li>
+        <li><a href="#one-to-many">@OneToMany(mappedBy = "...") の考え方</a></li>
+        <li><a href="#column">@Column が必要な場所・不要な場所</a></li>
+        <li><a href="#fetch-lazy">fetch = FetchType.LAZY</a></li>
+        <li><a href="#constructors-accessors">コンストラクタ、getter、setterの設計</a></li>
+        <li><a href="#enum-validation">enum、DTO、Validation</a></li>
+        <li><a href="#exceptions">Service層で投げる例外</a></li>
+        <li><a href="#naming">変数命名の考え方</a></li>
+        <li><a href="#restclient-openai">RestClientとOpenAI連携</a></li>
+        <li><a href="#properties">application.properties と ${...}</a></li>
+        <li><a href="#jackson">JacksonによるJSON変換</a></li>
+        <li><a href="#stream">OpenAIレスポンス抽出のStream処理</a></li>
+        <li><a href="#recommended-code">推奨コード例</a></li>
+      </ol>
+    </section>
+
+    <section class="section" id="entity-relationship">
+      <h2>1. エンティティ設計とDBの関係</h2>
+      <p>
+        今回のアプリでは、ユーザーが会話に対してメッセージを送り、その会話に紐づいてAIの回答が保存される構造を想定しています。
+      </p>
+      <pre><code>Conversation 1件
+  ├─ UserMessage 複数
+  └─ AiMessage 複数</code></pre>
+      <p>DBテーブルとしては、概念的に次のようになります。</p>
+      <pre><code>users
+- id
+- email
+- name
+- hash_password
+
+conversation
+- id
+- ai_model
+- created_at
+
+user_messages
+- id
+- text
+- user_id          -> users.id
+- conversation_id  -> conversation.id
+- created_at
+
+ai_messages
+- id
+- text
+- ai_model
+- conversation_id  -> conversation.id
+- created_at</code></pre>
+      <div class="note">
+        <p>
+          JPAでは、Javaのフィールドにアノテーションを付けることで、DB上のカラムや外部キーとの対応を表します。
+          特にエンティティ同士の関連は <code>@Column</code> ではなく、<code>@ManyToOne</code> や <code>@OneToMany</code> で表します。
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="many-to-one">
+      <h2>2. @ManyToOne の考え方</h2>
+      <p>
+        <code>@ManyToOne</code> は「多くの子レコードが、1つの親レコードに属する」関係を表します。
+        例えば、多くの <code>UserMessage</code> は1つの <code>Conversation</code> に属します。
+      </p>
+      <pre><code>@ManyToOne(fetch = FetchType.LAZY, optional = false)
+@JoinColumn(name = "conversation_id", nullable = false)
+private Conversation conversation;</code></pre>
+      <p>このコードの意味は次の通りです。</p>
+      <table>
+        <thead>
+          <tr>
+            <th>記述</th>
+            <th>意味</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>@ManyToOne</code></td>
+            <td>このエンティティの多くの行が、相手エンティティの1行に紐づく。</td>
+          </tr>
+          <tr>
+            <td><code>fetch = FetchType.LAZY</code></td>
+            <td>関連先を必要になるまで読み込まない。</td>
+          </tr>
+          <tr>
+            <td><code>optional = false</code></td>
+            <td>Java/JPA上、この関連をnull不可として扱う。</td>
+          </tr>
+          <tr>
+            <td><code>@JoinColumn(name = "conversation_id")</code></td>
+            <td>このテーブルに作る外部キー列の名前を指定する。</td>
+          </tr>
+          <tr>
+            <td><code>nullable = false</code></td>
+            <td>DB上、この外部キー列をNULL不可にする。</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        <code>@ManyToOne</code> を書く側が、基本的に外部キーを持つ側です。
+        したがって、<code>UserMessage</code> 側に <code>conversation_id</code> ができます。
+      </p>
+      <div class="good">
+        <p>
+          「外部キーを持つ側 = <code>@ManyToOne</code> + <code>@JoinColumn</code>」と覚えると理解しやすいです。
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="one-to-many">
+      <h2>3. @OneToMany(mappedBy = "...") の考え方</h2>
+      <p>
+        <code>@OneToMany</code> は、親側から子の一覧を参照したいときに使います。
+        例えば、<code>Conversation</code> からその会話に属する <code>UserMessage</code> 一覧を見たい場合です。
+      </p>
+      <pre><code>@OneToMany(mappedBy = "conversation")
+private List&lt;UserMessage&gt; userMessages = new ArrayList&lt;&gt;();</code></pre>
+      <p>
+        <code>mappedBy = "conversation"</code> の <code>conversation</code> はDBカラム名ではありません。
+        <code>UserMessage</code> クラスのJavaフィールド名です。
+      </p>
+      <pre><code>// UserMessage.java
+@ManyToOne(fetch = FetchType.LAZY, optional = false)
+@JoinColumn(name = "conversation_id", nullable = false)
+private Conversation conversation;</code></pre>
+      <p>
+        つまり <code>mappedBy = "conversation"</code> は、
+        「この関連の本体は <code>UserMessage.conversation</code> 側にあります」という意味です。
+      </p>
+      <div class="warning">
+        <p>
+          <code>mappedBy = "conversation_id"</code> ではありません。
+          <code>conversation_id</code> はDBカラム名であり、<code>mappedBy</code> に指定するのはJavaのフィールド名です。
+        </p>
+      </div>
+      <h3>所有者という考え方</h3>
+      <p>
+        JPAの双方向関連では、どちらか一方が「関連の所有者」になります。
+        今回の所有者は、外部キーを持つ <code>UserMessage</code> 側です。
+      </p>
+      <pre><code>// 所有者側
+@ManyToOne
+@JoinColumn(name = "conversation_id")
+private Conversation conversation;</code></pre>
+      <p>
+        <code>Conversation</code> 側の <code>@OneToMany(mappedBy = "conversation")</code> は、
+        逆方向から一覧を見られるようにするための定義です。
+      </p>
+    </section>
+
+    <section class="section" id="column">
+      <h2>4. @Column が必要な場所・不要な場所</h2>
+      <p>
+        <code>@Column</code> は、単一の値をDBカラムに保存するためのアノテーションです。
+      </p>
+      <pre><code>@Column(nullable = false, name = "text")
+private String text;
+
+@Column(name = "created_at")
+private LocalDateTime createdAt;</code></pre>
+      <p>
+        一方、<code>List&lt;UserMessage&gt;</code> のような関連一覧は、DBの1カラムに保存される値ではありません。
+      </p>
+      <pre><code>// NG
+@OneToMany(mappedBy = "conversation")
+@Column(nullable = false, name = "user_messages")
+private List&lt;UserMessage&gt; userMessages;</code></pre>
+      <p>
+        <code>Conversation</code> テーブルに <code>user_messages</code> というカラムが作られて、そこに配列が入るわけではありません。
+        実際の関連は、子テーブル側の <code>conversation_id</code> によって表されます。
+      </p>
+      <pre><code>// OK
+@OneToMany(mappedBy = "conversation")
+private List&lt;UserMessage&gt; userMessages = new ArrayList&lt;&gt;();</code></pre>
+    </section>
+
+    <section class="section" id="fetch-lazy">
+      <h2>5. fetch = FetchType.LAZY</h2>
+      <p>
+        <code>fetch = FetchType.LAZY</code> は、関連先のエンティティを「必要になるまで読み込まない」設定です。
+      </p>
+      <pre><code>@ManyToOne(fetch = FetchType.LAZY, optional = false)
+@JoinColumn(name = "conversation_id", nullable = false)
+private Conversation conversation;</code></pre>
+      <p>例えば、次のように <code>UserMessage</code> を取得したとします。</p>
+      <pre><code>UserMessage message = userMessageRepository.findById(1L).orElseThrow();</code></pre>
+      <p>
+        <code>LAZY</code> の場合、この時点では基本的に <code>UserMessage</code> 本体だけを読み込みます。
+        <code>message.getConversation()</code> などで関連先が必要になったタイミングで、<code>Conversation</code> を読みに行きます。
+      </p>
+      <p>
+        <code>@ManyToOne</code> のデフォルトは <code>EAGER</code> です。
+        つまり、明示しないと関連先を最初から読み込む動きになりがちです。
+        不要なSQLや意図しない読み込みを避けるため、<code>@ManyToOne</code> では <code>LAZY</code> を明示することが多いです。
+      </p>
+    </section>
+
+    <section class="section" id="constructors-accessors">
+      <h2>6. コンストラクタ、getter、setterの設計</h2>
+      <h3>JPA用の引数なしコンストラクタ</h3>
+      <p>
+        JPAエンティティには、<code>protected</code> または <code>public</code> の引数なしコンストラクタが必要です。
+        アプリ側から自由に使わせる必要はないため、通常は <code>protected</code> にします。
+      </p>
+      <pre><code>protected UserMessage() {
+}</code></pre>
+      <h3>idのsetterは基本不要</h3>
+      <p>
+        <code>id</code> はDBが採番する値なので、外部から変更できるsetterは基本的に不要です。
+      </p>
+      <pre><code>@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+private Long id;
+
+public Long getId() {
+    return id;
+}</code></pre>
+      <h3>userやconversationのsetterも基本不要</h3>
+      <p>
+        「あるメッセージを書いたユーザー」や「あるメッセージが属する会話」は、作成後に変わると不自然です。
+        そのため、コンストラクタでセットし、setterは置かない設計が安全です。
+      </p>
+      <pre><code>public UserMessage(String text, User user, Conversation conversation) {
+    this.text = text;
+    this.user = user;
+    this.conversation = conversation;
+    this.createdAt = LocalDateTime.now();
+}</code></pre>
+      <h3>本文編集は意味のあるメソッド名にする</h3>
+      <p>
+        本文は編集機能を想定するなら変更可能にしてよいですが、単純な <code>setText</code> より
+        <code>editText</code> のようなドメイン上の意味が分かる名前にすると読みやすくなります。
+      </p>
+      <pre><code>public void editText(String text) {
+    this.text = text;
+}</code></pre>
+    </section>
+
+    <section class="section" id="enum-validation">
+      <h2>7. enum、DTO、Validation</h2>
+      <h3>enumをDBに保存する</h3>
+      <p>
+        JPAでenumをDBに保存する場合は、<code>@Enumerated(EnumType.STRING)</code> を使います。
+      </p>
+      <pre><code>public enum AiModel {
+    GPT,
+    GEMINI,
+    CLAUDE
+}</code></pre>
+      <pre><code>@Enumerated(EnumType.STRING)
+@Column(name = "ai_model", nullable = false)
+private AiModel aiModel;</code></pre>
+      <p>
+        <code>EnumType.STRING</code> にすると、DBには <code>GPT</code>、<code>GEMINI</code>、<code>CLAUDE</code> のような文字列で保存されます。
+        <code>EnumType.ORDINAL</code> は順番の数値で保存され、enumの並び替えに弱いため避けるのが無難です。
+      </p>
+      <h3>DTOでenumの値を制限する</h3>
+      <p>
+        リクエストDTOの型を <code>AiModel</code> にすると、JSONで受け取れる値はenumの中身に制限されます。
+      </p>
+      <pre><code>public record CreateConversationRequest(
+        @NotNull
+        AiModel aiModel
+) {
+}</code></pre>
+      <p>次はOKです。</p>
+      <pre><code>{
+  "aiModel": "GPT"
+}</code></pre>
+      <p>次は <code>AiModel</code> に存在しないためNGです。</p>
+      <pre><code>{
+  "aiModel": "CHATGPT"
+}</code></pre>
+      <div class="warning">
+        <p>
+          <code>@NotBlank</code> は文字列用です。enumやLongなどには <code>@NotNull</code> を使います。
+        </p>
+      </div>
+      <p>Controllerでは <code>@Valid</code> を付けることでBean Validationを有効にします。</p>
+      <pre><code>@PostMapping("/conversations")
+public ResponseEntity&lt;CreateConversationResponse&gt; createConversation(
+        @Valid @RequestBody CreateConversationRequest request
+) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(chatService.createConversation(request));
+}</code></pre>
+    </section>
+
+    <section class="section" id="exceptions">
+      <h2>8. Service層で投げる例外</h2>
+      <p>
+        <code>sendMessage</code> では、<code>userId</code> と <code>conversationId</code> からDBを検索します。
+        存在しないIDが指定された場合は、404 Not Found系の例外にするのが自然です。
+      </p>
+      <pre><code>User messageSender = userRepository.findById(request.userId())
+        .orElseThrow(() -> new UserNotFoundException(request.userId()));
+
+Conversation targetConversation = conversationRepository.findById(request.conversationId())
+        .orElseThrow(() -> new ConversationNotFoundException(request.conversationId()));</code></pre>
+      <p>例外クラス例です。</p>
+      <pre><code>@ResponseStatus(HttpStatus.NOT_FOUND)
+public class UserNotFoundException extends RuntimeException {
+
+    public UserNotFoundException(Long userId) {
+        super("User not found: " + userId);
+    }
+}</code></pre>
+      <pre><code>@ResponseStatus(HttpStatus.NOT_FOUND)
+public class ConversationNotFoundException extends RuntimeException {
+
+    public ConversationNotFoundException(Long conversationId) {
+        super("Conversation not found: " + conversationId);
+    }
+}</code></pre>
+      <p>
+        DTOの <code>@NotNull</code> は「値が未指定でないこと」を確認します。
+        一方で「そのIDがDBに存在するか」はService層でRepositoryを使って確認します。
+      </p>
+    </section>
+
+    <section class="section" id="naming">
+      <h2>9. 変数命名の考え方</h2>
+      <p>
+        <code>sended</code> は英語として不自然です。過去分詞は <code>sent</code> ですが、コードでは無理に過去形にせず、役割を表す名前にすると読みやすくなります。
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>避けたい名前</th>
+            <th>推奨名</th>
+            <th>理由</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>sendUser</code></td>
+            <td><code>messageSender</code> または <code>user</code></td>
+            <td>メッセージ送信者であることが分かる。</td>
+          </tr>
+          <tr>
+            <td><code>sendedConversation</code></td>
+            <td><code>targetConversation</code> または <code>conversation</code></td>
+            <td>送信先の会話であることが分かる。</td>
+          </tr>
+          <tr>
+            <td><code>sendedMessage</code></td>
+            <td><code>userMessage</code></td>
+            <td>エンティティ型と役割が一致する。</td>
+          </tr>
+          <tr>
+            <td><code>savedMessage</code></td>
+            <td><code>savedUserMessage</code></td>
+            <td>保存済みのユーザーメッセージであることが明確。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section" id="restclient-openai">
+      <h2>10. RestClientとOpenAI連携</h2>
+      <p>
+        外部LLMにメッセージを送信して回答を取得する場合、Springの <code>RestClient</code> を使えます。
+        <code>ChatService</code> にHTTP通信を直接書くより、<code>OpenAiClient</code> のような専用クラスに分けると責務が明確になります。
+      </p>
+      <pre><code>sendMessage
+1. userId から User を取得
+2. conversationId から Conversation を取得
+3. UserMessage を保存
+4. OpenAiClient で外部LLMへ送信
+5. 返ってきた回答を AiMessage として保存
+6. AiAnswerResponse を返す</code></pre>
+      <h3>RestClientの基本構成</h3>
+      <pre><code>@Configuration
+public class OpenAiConfig {
+
+    @Bean
+    RestClient openAiRestClient(
+            RestClient.Builder builder,
+            @Value("${openai.base-url}") String baseUrl,
+            @Value("${openai.api-key}") String apiKey
+    ) {
+        return builder
+                .baseUrl(baseUrl)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+    }
+}</code></pre>
+      <h3>post() の意味</h3>
+      <pre><code>OpenAiResponse response = restClient.post()
+        .uri("/responses")
+        .body(new OpenAiRequest(model, instructions, userText))
+        .retrieve()
+        .body(OpenAiResponse.class);</code></pre>
+      <table>
+        <thead>
+          <tr>
+            <th>メソッド</th>
+            <th>意味</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>post()</code></td>
+            <td>HTTP POSTリクエストを送る。</td>
+          </tr>
+          <tr>
+            <td><code>uri("/responses")</code></td>
+            <td>baseUrlに続くパスを指定する。実際には <code>https://api.openai.com/v1/responses</code> へ送る。</td>
+          </tr>
+          <tr>
+            <td><code>body(...)</code></td>
+            <td>JavaオブジェクトをHTTPリクエスト本文として渡す。JacksonによりJSON化される。</td>
+          </tr>
+          <tr>
+            <td><code>retrieve()</code></td>
+            <td>リクエストを実行してレスポンスを取得する。</td>
+          </tr>
+          <tr>
+            <td><code>body(OpenAiResponse.class)</code></td>
+            <td>レスポンスJSONをJavaの <code>OpenAiResponse</code> に変換する。</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>OpenAIのrequest形式</h3>
+      <p>
+        一旦GPTのみを使うなら、OpenAI Responses APIに対して <code>model</code>、<code>instructions</code>、<code>input</code> を送る形にできます。
+        <code>instructions</code> は必須ではありませんが、AIの振る舞いを指定したい場合に使います。
+      </p>
+      <pre><code>private record OpenAiRequest(
+        String model,
+        String instructions,
+        String input
+) {
+}</code></pre>
+      <p>このrecordは次のJSONに変換されます。</p>
+      <pre><code>{
+  "model": "gpt-5.4-mini",
+  "instructions": "あなたは日本語で簡潔に回答するAIアシスタントです。",
+  "input": "ユーザーの入力文"
+}</code></pre>
+      <p>
+        最小構成にしたい場合は <code>instructions</code> を外し、<code>model</code> と <code>input</code> だけでも構いません。
+      </p>
+    </section>
+
+    <section class="section" id="properties">
+      <h2>11. application.properties と ${...}</h2>
+      <p>次の設定を例にします。</p>
+      <pre><code>openai.base-url=https://api.openai.com/v1
+openai.api-key=${OPENAI_API_KEY}
+openai.model=${OPENAI_MODEL:gpt-5.4-mini}</code></pre>
+      <p>
+        左辺の <code>openai.api-key</code> は、Springアプリ内で使う設定名です。
+        右辺の <code>${OPENAI_API_KEY}</code> は、OSの環境変数 <code>OPENAI_API_KEY</code> の値を埋め込むという意味です。
+      </p>
+      <pre><code>Spring内の設定名       実際の値
+openai.api-key   &lt;-  環境変数 OPENAI_API_KEY</code></pre>
+      <p>
+        APIキーを <code>application.properties</code> に直接書くとGitに混ざる危険があります。
+        そのため、秘密情報は環境変数から読む形にします。
+      </p>
+      <pre><code>// Java側で受け取る
+@Value("${openai.model}")
+String model</code></pre>
+      <p>
+        <code>${OPENAI_MODEL:gpt-5.4-mini}</code> はデフォルト値付きです。
+        環境変数 <code>OPENAI_MODEL</code> があればその値を使い、なければ <code>gpt-5.4-mini</code> を使います。
+      </p>
+    </section>
+
+    <section class="section" id="jackson">
+      <h2>12. JacksonによるJSON変換</h2>
+      <h3>Java recordをJSONに変換する仕組み</h3>
+      <p>
+        <code>RestClient.body(...)</code> にJavaオブジェクトを渡すと、Springの <code>HttpMessageConverter</code> がHTTP本文へ変換します。
+        JSONの場合は、通常Jacksonが使われます。
+      </p>
+      <p>
+        このプロジェクトでは <code>spring-boot-starter-webmvc</code> が入っているため、通常はJackson関連の変換が自動構成されます。
+        そのため、明示的に <code>ObjectMapper</code> を作らなくても、recordをJSONに変換できます。
+      </p>
+      <pre><code>private record OpenAiRequest(
+        String model,
+        String instructions,
+        String input
+) {
+}</code></pre>
+      <pre><code>.body(new OpenAiRequest(model, instructions, userText))</code></pre>
+      <p>これは概念的には次のJSONとして送信されます。</p>
+      <pre><code>{
+  "model": "gpt-5.4-mini",
+  "instructions": "あなたは日本語で簡潔に回答するAIアシスタントです。",
+  "input": "こんにちは"
+}</code></pre>
+      <h3>レスポンスの必要な部分だけ受け取れる理由</h3>
+      <p>
+        OpenAIのレスポンスJSONには多くの項目があります。しかし、Java側で必要な項目だけrecordに定義しておけば、
+        Spring Boot/Jacksonはその項目を中心にマッピングします。
+      </p>
+      <pre><code>private record OpenAiResponse(
+        List&lt;Output&gt; output
+) {
+}</code></pre>
+      <p>
+        JSONに <code>id</code>、<code>model</code>、<code>usage</code>、<code>status</code> などが含まれていても、
+        Java側に定義していなければ基本的には無視されます。
+      </p>
+      <div class="warning">
+        <p>
+          未知の項目があることは通常問題になりませんが、必要な項目がない場合は <code>null</code> になる可能性があります。
+          そのため、<code>output == null</code> のようなチェックは必要です。
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="stream">
+      <h2>13. OpenAIレスポンス抽出のStream処理</h2>
+      <p>OpenAIのレスポンスが次のような構造だとします。</p>
+      <pre><code>{
+  "output": [
+    {
+      "type": "message",
+      "content": [
+        {
+          "type": "output_text",
+          "text": "こんにちは。何を手伝いましょうか？"
+        }
+      ]
+    }
+  ]
+}</code></pre>
+      <p>この中から回答本文だけを取り出す処理です。</p>
+      <pre><code>return output.stream()
+        .filter(item -&gt; "message".equals(item.type()))
+        .filter(item -&gt; item.content() != null)
+        .flatMap(item -&gt; item.content().stream())
+        .filter(content -&gt; "output_text".equals(content.type()))
+        .map(Content::text)
+        .filter(text -&gt; text != null &amp;&amp; !text.isBlank())
+        .findFirst()
+        .orElseThrow(() -&gt; new LlmApiException("OpenAI output text is empty."));</code></pre>
+      <table>
+        <thead>
+          <tr>
+            <th>処理</th>
+            <th>意味</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>output.stream()</code></td>
+            <td><code>List&lt;Output&gt;</code> を1件ずつ処理するStreamにする。</td>
+          </tr>
+          <tr>
+            <td><code>filter(item -&gt; "message".equals(item.type()))</code></td>
+            <td><code>type</code> が <code>message</code> の出力だけ残す。</td>
+          </tr>
+          <tr>
+            <td><code>filter(item -&gt; item.content() != null)</code></td>
+            <td><code>content</code> がnullのものを除外する。</td>
+          </tr>
+          <tr>
+            <td><code>flatMap(item -&gt; item.content().stream())</code></td>
+            <td><code>List&lt;Output&gt;</code> の中にある <code>List&lt;Content&gt;</code> を平らにして、<code>Content</code> を1件ずつ扱えるようにする。</td>
+          </tr>
+          <tr>
+            <td><code>filter(content -&gt; "output_text".equals(content.type()))</code></td>
+            <td>回答本文である <code>output_text</code> だけ残す。</td>
+          </tr>
+          <tr>
+            <td><code>map(Content::text)</code></td>
+            <td><code>Content</code> オブジェクトから <code>text</code> 文字列だけ取り出す。</td>
+          </tr>
+          <tr>
+            <td><code>findFirst()</code></td>
+            <td>条件に合う最初のテキストを取得する。結果は <code>Optional&lt;String&gt;</code>。</td>
+          </tr>
+          <tr>
+            <td><code>orElseThrow(...)</code></td>
+            <td>テキストが見つからなければ例外を投げる。</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>for文で書くと、ほぼ次の処理と同じです。</p>
+      <pre><code>for (Output item : output) {
+    if (!"message".equals(item.type())) {
+        continue;
+    }
+    if (item.content() == null) {
+        continue;
+    }
+
+    for (Content content : item.content()) {
+        if (!"output_text".equals(content.type())) {
+            continue;
+        }
+        if (content.text() == null || content.text().isBlank()) {
+            continue;
+        }
+
+        return content.text();
+    }
+}
+
+throw new LlmApiException("OpenAI output text is empty.");</code></pre>
+    </section>
+
+    <section class="section" id="recommended-code">
+      <h2>14. 推奨コード例</h2>
+      <h3>UserMessage</h3>
+      <pre><code>@Entity
+@Table(name = "user_messages")
+public class UserMessage {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, name = "text")
+    private String text;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(nullable = false, name = "user_id")
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(nullable = false, name = "conversation_id")
+    private Conversation conversation;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    protected UserMessage() {
+    }
+
+    public UserMessage(String text, User user, Conversation conversation) {
+        this.text = text;
+        this.user = user;
+        this.conversation = conversation;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void editText(String text) {
+        this.text = text;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public Conversation getConversation() {
+        return conversation;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+}</code></pre>
+      <h3>Conversation</h3>
+      <pre><code>@Entity
+@Table(name = "conversation")
+public class Conversation {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToMany(mappedBy = "conversation")
+    private List&lt;UserMessage&gt; userMessages = new ArrayList&lt;&gt;();
+
+    @OneToMany(mappedBy = "conversation")
+    private List&lt;AiMessage&gt; aiMessages = new ArrayList&lt;&gt;();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ai_model", nullable = false)
+    private AiModel aiModel;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    protected Conversation() {
+    }
+
+    public Conversation(AiModel aiModel) {
+        this.aiModel = aiModel;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public List&lt;UserMessage&gt; getUserMessages() {
+        return userMessages;
+    }
+
+    public List&lt;AiMessage&gt; getAiMessages() {
+        return aiMessages;
+    }
+
+    public AiModel getAiModel() {
+        return aiModel;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+}</code></pre>
+      <h3>ChatServiceのsendMessage</h3>
+      <pre><code>public AiAnswerResponse sendMessage(SendMessageRequest request) {
+    User messageSender = userRepository.findById(request.userId())
+            .orElseThrow(() -&gt; new UserNotFoundException(request.userId()));
+
+    Conversation targetConversation = conversationRepository.findById(request.conversationId())
+            .orElseThrow(() -&gt; new ConversationNotFoundException(request.conversationId()));
+
+    UserMessage userMessage = new UserMessage(
+            request.text(),
+            messageSender,
+            targetConversation
+    );
+    userMessageRepository.save(userMessage);
+
+    String answerText = openAiClient.generateAnswer(request.text());
+
+    AiMessage aiMessage = new AiMessage(
+            answerText,
+            targetConversation.getAiModel(),
+            targetConversation
+    );
+    AiMessage savedAiMessage = aiMessageRepository.save(aiMessage);
+
+    return new AiAnswerResponse(
+            savedAiMessage.getId(),
+            savedAiMessage.getText(),
+            savedAiMessage.getAiModel(),
+            savedAiMessage.getCreatedAt()
+    );
+}</code></pre>
+      <h3>OpenAiClient</h3>
+      <pre><code>@Service
+public class OpenAiClient {
+    private final RestClient restClient;
+    private final String model;
+
+    public OpenAiClient(
+            RestClient openAiRestClient,
+            @Value("${openai.model}") String model
+    ) {
+        this.restClient = openAiRestClient;
+        this.model = model;
+    }
+
+    public String generateAnswer(String userText) {
+        OpenAiResponse response = restClient.post()
+                .uri("/responses")
+                .body(new OpenAiRequest(
+                        model,
+                        "あなたは日本語で簡潔に回答するAIアシスタントです。",
+                        userText
+                ))
+                .retrieve()
+                .body(OpenAiResponse.class);
+
+        if (response == null) {
+            throw new LlmApiException("OpenAI response is empty.");
+        }
+
+        return response.extractText();
+    }
+
+    private record OpenAiRequest(
+            String model,
+            String instructions,
+            String input
+    ) {
+    }
+
+    private record OpenAiResponse(
+            List&lt;Output&gt; output
+    ) {
+        String extractText() {
+            if (output == null) {
+                throw new LlmApiException("OpenAI output is empty.");
+            }
+
+            return output.stream()
+                    .filter(item -&gt; "message".equals(item.type()))
+                    .filter(item -&gt; item.content() != null)
+                    .flatMap(item -&gt; item.content().stream())
+                    .filter(content -&gt; "output_text".equals(content.type()))
+                    .map(Content::text)
+                    .filter(text -&gt; text != null &amp;&amp; !text.isBlank())
+                    .findFirst()
+                    .orElseThrow(() -&gt; new LlmApiException("OpenAI output text is empty."));
+        }
+    }
+
+    private record Output(
+            String type,
+            List&lt;Content&gt; content
+    ) {
+    }
+
+    private record Content(
+            String type,
+            String text
+    ) {
+    }
+}</code></pre>
+    </section>
+
+    <section class="section">
+      <h2>まとめ</h2>
+      <ul>
+        <li>外部キーを持つ側には <code>@ManyToOne</code> と <code>@JoinColumn</code> を書く。</li>
+        <li>親側から子一覧を見たい場合に <code>@OneToMany(mappedBy = "Javaフィールド名")</code> を書く。</li>
+        <li><code>@Column</code> は単一カラム用であり、関連一覧には付けない。</li>
+        <li><code>@ManyToOne</code> はデフォルトEAGERなので、通常は <code>fetch = FetchType.LAZY</code> を検討する。</li>
+        <li>JPAエンティティには <code>protected</code> の引数なしコンストラクタが必要。</li>
+        <li>enumの入力制約はDTOの型をenumにし、null制約には <code>@NotNull</code> を使う。</li>
+        <li>存在しないIDはService層でRepository検索し、404系の独自例外にする。</li>
+        <li>外部API呼び出しは <code>OpenAiClient</code> に分離すると、Service層が読みやすくなる。</li>
+        <li><code>application.properties</code> の <code>${ENV_VAR:default}</code> は環境変数参照とデフォルト値指定。</li>
+        <li>Spring/Jacksonにより、recordはJSONへ、JSONはrecordへ変換できる。</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026-05-21 User API Security, Validation, and Error Handling</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.75;
+      color: #1f2937;
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      background: #f8fafc;
+    }
+    main {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 32px;
+    }
+    h1, h2, h3 {
+      line-height: 1.35;
+      color: #111827;
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 1.9rem;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 12px;
+    }
+    h2 {
+      margin-top: 36px;
+      font-size: 1.35rem;
+      border-left: 4px solid #2563eb;
+      padding-left: 10px;
+    }
+    h3 {
+      margin-top: 24px;
+      font-size: 1.08rem;
+    }
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      background: #f3f4f6;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+    pre {
+      background: #111827;
+      color: #f9fafb;
+      padding: 16px;
+      border-radius: 6px;
+      overflow-x: auto;
+      line-height: 1.55;
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+      color: inherit;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      background: #ffffff;
+    }
+    th, td {
+      border: 1px solid #e5e7eb;
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #f3f4f6;
+    }
+    .note {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      padding: 12px 14px;
+    }
+    .warn {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 6px;
+      padding: 12px 14px;
+    }
+    .ok {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 6px;
+      padding: 12px 14px;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>User API Security, Validation, and Error Handling</h1>
+  <p>日付: 2026-05-21</p>
+  <p>対象アプリ: <code>apps/user-app</code></p>
+
+  <h2>1. 今回の改善全体像</h2>
+  <p>
+    今回の修正では、User API を「動く CRUD」から「入力、保存、エラー、テストまで最低限安全に扱える API」へ近づけた。
+    特に重要なのは、パスワードをレスポンスに返さないこと、DB に平文で保存しないこと、更新時に既存データを壊さないこと、
+    例外発生時にクライアントへ一貫した JSON を返すことである。
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>領域</th>
+        <th>主な修正</th>
+        <th>目的</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Security</td>
+        <td><code>PasswordEncoder</code> と <code>BCryptPasswordEncoder</code> を導入</td>
+        <td>パスワードを平文保存しない</td>
+      </tr>
+      <tr>
+        <td>DTO</td>
+        <td><code>UserResponse</code> から <code>password</code> を削除</td>
+        <td>API レスポンスで秘密情報を漏らさない</td>
+      </tr>
+      <tr>
+        <td>Update</td>
+        <td><code>PUT /user/{id}</code> を部分更新に変更</td>
+        <td>未指定項目を <code>null</code> で上書きしない</td>
+      </tr>
+      <tr>
+        <td>Validation</td>
+        <td><code>@Valid</code>, <code>@NotBlank</code>, <code>@Size</code>, <code>@Pattern</code> を利用</td>
+        <td>Controller 入り口で不正な入力を止める</td>
+      </tr>
+      <tr>
+        <td>Error Handling</td>
+        <td><code>@RestControllerAdvice</code> と独自例外を追加</td>
+        <td>400, 404, 409 を統一 JSON で返す</td>
+      </tr>
+      <tr>
+        <td>Test</td>
+        <td><code>MockMvc</code> による API 統合テストを追加</td>
+        <td>正常系と異常系の API 挙動を固定する</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <strong>設計のポイント:</strong>
+    Controller は HTTP の入り口、Service は業務処理、Repository は DB アクセス、Entity は永続化対象、DTO は API 入出力という役割に分けている。
+    今回の改善も、この責務分離を崩さないように実装している。
+  </div>
+
+  <h2>2. パスワードをレスポンスから消した理由</h2>
+  <p>
+    以前の <code>UserResponse</code> は <code>password</code> を含んでいたため、ユーザー作成、一覧取得、検索、更新などのレスポンスで
+    パスワードが外部へ返ってしまう状態だった。これはパスワードが平文かハッシュかに関係なく避けるべきである。
+    ハッシュ値であっても、攻撃者に渡れば総当たり攻撃や辞書攻撃の材料になる。
+  </p>
+
+  <h3>修正後の UserResponse</h3>
+  <pre><code>public record UserResponse(
+    Long id,
+    String loginId,
+    String name,
+    String role
+) {
+
+}</code></pre>
+
+  <p>
+    ここでは Java の <code>record</code> を使っている。<code>record</code> は Java 16 以降で正式化された構文で、
+    値を運ぶだけのクラスを短く書ける。上記の定義だけで、次のものが自動生成される。
+  </p>
+
+  <ul>
+    <li>全フィールドを受け取るコンストラクタ</li>
+    <li><code>id()</code>, <code>loginId()</code>, <code>name()</code>, <code>role()</code> のアクセサメソッド</li>
+    <li><code>equals()</code>, <code>hashCode()</code>, <code>toString()</code></li>
+  </ul>
+
+  <div class="warn">
+    <strong>注意:</strong>
+    <code>record</code> は不変データを表現するのに向いている。
+    API レスポンス DTO のように「生成後に値を書き換える必要がない」用途と相性がよい。
+    一方で、JPA Entity には通常使わない。JPA は引数なしコンストラクタやフィールド更新を必要とするためである。
+  </div>
+
+  <h2>3. BCrypt によるパスワードハッシュ化</h2>
+  <p>
+    パスワードは DB に保存する前に <code>PasswordEncoder</code> でハッシュ化するようにした。
+    実装クラスとしては <code>BCryptPasswordEncoder</code> を使っている。
+  </p>
+
+  <h3>PasswordConfig</h3>
+  <pre><code>@Configuration
+public class PasswordConfig {
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}</code></pre>
+
+  <p>
+    <code>@Configuration</code> は「このクラスは Spring の設定クラスです」という意味である。
+    <code>@Bean</code> が付いたメソッドの戻り値は、Spring の DI コンテナに登録される。
+    その結果、Service では次のようにコンストラクタ引数として <code>PasswordEncoder</code> を受け取れる。
+  </p>
+
+  <pre><code>private final PasswordEncoder passwordEncoder;
+
+public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
+}</code></pre>
+
+  <p>
+    これはコンストラクタインジェクションと呼ばれる。フィールドに直接 <code>@Autowired</code> を付ける方法よりも、
+    必須依存がコンストラクタで明確になるため、テストしやすく、設計上も扱いやすい。
+  </p>
+
+  <h3>保存時の encode</h3>
+  <pre><code>User user = new User(
+    userCreateRequest.loginId(),
+    userCreateRequest.name(),
+    parseRole(userCreateRequest.role()),
+    passwordEncoder.encode(userCreateRequest.password())
+);</code></pre>
+
+  <p>
+    <code>passwordEncoder.encode(...)</code> は、入力されたパスワードを BCrypt 形式のハッシュ文字列に変換する。
+    BCrypt は同じパスワードでも毎回違うハッシュを作る。これはソルトと呼ばれるランダム要素が含まれるためである。
+    そのため、テストではハッシュ文字列を直接比較せず、<code>matches</code> を使う。
+  </p>
+
+  <pre><code>assertNotEquals("secret", saved.getPassword());
+assertTrue(passwordEncoder.matches("secret", saved.getPassword()));</code></pre>
+
+  <p>
+    <code>matches(平文, ハッシュ)</code> は、平文パスワードがそのハッシュに対応しているかを検証する。
+    ログイン機能を作る場合も、DB のハッシュを復号するのではなく、同じく <code>matches</code> で確認する。
+  </p>
+
+  <h2>4. Entity の DB 制約と更新用メソッド</h2>
+  <p>
+    <code>User</code> Entity には <code>@Column</code> を追加し、DB レベルの制約を明示した。
+    DTO のバリデーションだけでは、Service やテストから直接 Entity を保存する経路まで完全には守れない。
+    DB 制約を持たせることで、永続化の最終防衛線を作っている。
+  </p>
+
+  <pre><code>@Column(nullable = false, unique = true, length = 15)
+private String loginId;
+
+@Column(nullable = false, length = 15)
+private String name;
+
+@Enumerated(EnumType.STRING)
+@Column(nullable = false, length = 20)
+private Role role;
+
+@Column(nullable = false, length = 100)
+private String password;</code></pre>
+
+  <table>
+    <thead>
+      <tr>
+        <th>指定</th>
+        <th>意味</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>nullable = false</code></td>
+        <td>DB カラムに <code>null</code> を保存できない</td>
+      </tr>
+      <tr>
+        <td><code>unique = true</code></td>
+        <td>同じ <code>loginId</code> を複数ユーザーで使えない</td>
+      </tr>
+      <tr>
+        <td><code>length = 15</code></td>
+        <td>文字列カラムの最大長を指定する</td>
+      </tr>
+      <tr>
+        <td><code>@Enumerated(EnumType.STRING)</code></td>
+        <td>Enum を数値ではなく文字列として保存する</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>setId をやめた理由</h3>
+  <p>
+    以前の更新処理では、新しい <code>User</code> インスタンスを作り、<code>setId(id)</code> で ID を入れて <code>save()</code> していた。
+    この方法は、存在しない ID でも新規登録に近い挙動になったり、未指定項目を <code>null</code> で保存したりする危険がある。
+  </p>
+
+  <p>
+    修正後は、まず既存ユーザーを DB から取得し、その Entity に対して必要な項目だけを変更する。
+    Entity には汎用 setter ではなく、意味のある更新用メソッドを用意した。
+  </p>
+
+  <pre><code>public void updateLoginId(String loginId) {
+    this.loginId = loginId;
+}
+
+public void updateName(String name) {
+    this.name = name;
+}
+
+public void updateRole(Role role) {
+    this.role = role;
+}
+
+public void updatePassword(String password) {
+    this.password = password;
+}</code></pre>
+
+  <div class="note">
+    <strong>設計上の意図:</strong>
+    setter を大量に公開すると、どこからでも Entity の内部状態を変更できる。
+    今回は学習用としてシンプルな <code>updateXxx</code> メソッドにしているが、実務では「メールアドレス変更」「退会処理」など業務用語に近いメソッド名にすることも多い。
+  </div>
+
+  <h2>5. 部分更新の実装</h2>
+  <p>
+    <code>PUT /user/{id}</code> は、リクエストに含まれる項目だけを更新する仕様にした。
+    例えば <code>{"name": "New Name"}</code> だけを送った場合、<code>loginId</code>, <code>role</code>, <code>password</code> は変更されない。
+  </p>
+
+  <h3>UserUpdateRequest</h3>
+  <pre><code>public record UserUpdateRequest(
+    @Size(max = 15)
+    @Pattern(regexp = ".*\\S.*", message = "loginId must not be blank")
+    String loginId,
+
+    @Size(max = 15)
+    @Pattern(regexp = ".*\\S.*", message = "name must not be blank")
+    String name,
+
+    @Pattern(regexp = "MANAGER|MEMBER", message = "role must be MANAGER or MEMBER")
+    String role,
+
+    @Size(max = 20)
+    @Pattern(regexp = ".*\\S.*", message = "password must not be blank")
+    String password
+) {
+
+    public boolean hasAnyValue() {
+        return loginId != null || name != null || role != null || password != null;
+    }
+}</code></pre>
+
+  <p>
+    更新 DTO では <code>@NotBlank</code> を外している。理由は、部分更新では未指定を <code>null</code> として許可する必要があるためである。
+    ただし、指定された場合に空文字は許可したくない。そのため <code>@Pattern(regexp = ".*\\S.*")</code> を使っている。
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>値</th>
+        <th>扱い</th>
+        <th>理由</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>項目なし、または <code>null</code></td>
+        <td>更新しない</td>
+        <td>部分更新の未指定扱い</td>
+      </tr>
+      <tr>
+        <td><code>""</code></td>
+        <td>400 Bad Request</td>
+        <td>空文字で既存値を壊さない</td>
+      </tr>
+      <tr>
+        <td><code>"   "</code></td>
+        <td>400 Bad Request</td>
+        <td>空白だけの値も実質空文字だから</td>
+      </tr>
+      <tr>
+        <td><code>"New Name"</code></td>
+        <td>更新する</td>
+        <td>有効な値だから</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Service 側の更新処理</h3>
+  <pre><code>if (!userUpdateRequest.hasAnyValue()) {
+    throw new BadRequestException("at least one field must be specified");
+}
+
+User user = userRepository.findById(id)
+    .orElseThrow(() -> new ResourceNotFoundException("user not found: " + id));
+
+if (userUpdateRequest.name() != null) {
+    user.updateName(userUpdateRequest.name());
+}</code></pre>
+
+  <p>
+    <code>findById(id)</code> の戻り値は <code>Optional&lt;User&gt;</code> である。
+    <code>Optional</code> は「値があるかもしれないし、ないかもしれない」ことを型で表す Java のクラスである。
+    <code>orElseThrow</code> を使うと、値があれば取り出し、なければ例外を投げられる。
+  </p>
+
+  <p>
+    <code>() -&gt; new ResourceNotFoundException(...)</code> はラムダ式である。
+    ラムダ式は「後で実行される処理」を短く書く構文で、ここでは Optional が空だった場合だけ例外インスタンスを作る。
+  </p>
+
+  <h2>6. Role の扱いと Enum</h2>
+  <p>
+    <code>Role</code> は Java の <code>enum</code> として定義されている。
+    Enum は決められた候補だけを値として持てる型で、今回なら <code>MANAGER</code> と <code>MEMBER</code> だけが有効である。
+  </p>
+
+  <pre><code>public enum Role {
+    MANAGER,
+    MEMBER
+}</code></pre>
+
+  <p>
+    API では role を文字列として受け取るため、Service で <code>Role.valueOf(role)</code> を使って Enum に変換している。
+    ただし <code>Role.valueOf("ADMIN")</code> のような不正値は <code>IllegalArgumentException</code> になるため、
+    独自の <code>BadRequestException</code> に変換して 400 として返している。
+  </p>
+
+  <pre><code>private Role parseRole(String role) {
+    try {
+        return Role.valueOf(role);
+    } catch (IllegalArgumentException exception) {
+        throw new BadRequestException("role must be MANAGER or MEMBER");
+    }
+}</code></pre>
+
+  <p>
+    <code>try-catch</code> は例外処理の構文である。<code>try</code> ブロック内で例外が発生した場合、
+    対応する <code>catch</code> ブロックに処理が移る。ここでは Java 標準の例外を API 用の例外に置き換えている。
+  </p>
+
+  <h2>7. Bean Validation と @Valid</h2>
+  <p>
+    DTO に <code>@NotBlank</code>, <code>@Size</code>, <code>@Pattern</code> を付けただけでは、
+    Controller のリクエストボディ検証は実行されない。Controller 引数に <code>@Valid</code> を付けることで、
+    Spring がリクエスト JSON を DTO に変換した後、Bean Validation を実行する。
+  </p>
+
+  <pre><code>@PostMapping("/create")
+public ResponseEntity&lt;UserResponse&gt; createUser(
+    @Valid @RequestBody UserCreateRequest userCreateRequest
+) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userCreateRequest));
+}</code></pre>
+
+  <table>
+    <thead>
+      <tr>
+        <th>アノテーション</th>
+        <th>役割</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>@RequestBody</code></td>
+        <td>HTTP リクエストボディの JSON を Java オブジェクトへ変換する</td>
+      </tr>
+      <tr>
+        <td><code>@Valid</code></td>
+        <td>DTO に付いている Validation アノテーションを実行する</td>
+      </tr>
+      <tr>
+        <td><code>@NotBlank</code></td>
+        <td><code>null</code>, 空文字, 空白だけの文字列を拒否する</td>
+      </tr>
+      <tr>
+        <td><code>@Size(max = 15)</code></td>
+        <td>文字数の上限を指定する</td>
+      </tr>
+      <tr>
+        <td><code>@Pattern</code></td>
+        <td>正規表現に一致する文字列だけを許可する</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>8. Controller の役割と検索条件チェック</h2>
+  <p>
+    <code>UserController</code> は HTTP リクエストを受け取り、Service を呼び出して、HTTP レスポンスを返す層である。
+    今回、検索 API では「検索条件は 1 種類だけ指定できる」というルールを Controller でチェックしている。
+  </p>
+
+  <pre><code>@GetMapping("/search")
+public ResponseEntity&lt;List&lt;UserResponse&gt;&gt; searchUsers(
+    @RequestParam(required = false) List&lt;Long&gt; id,
+    @RequestParam(required = false) List&lt;String&gt; loginId,
+    @RequestParam(required = false) List&lt;String&gt; name,
+    @RequestParam(required = false) List&lt;String&gt; role
+) {
+    int conditionCount = 0;
+
+    if (hasValues(id)) conditionCount++;
+    if (hasValues(loginId)) conditionCount++;
+    if (hasValues(name)) conditionCount++;
+    if (hasValues(role)) conditionCount++;
+
+    if (conditionCount == 0) {
+        throw new BadRequestException("specify one search condition");
+    }
+
+    if (conditionCount &gt; 1) {
+        throw new BadRequestException("specify only one search condition");
+    }
+
+    ...
+}</code></pre>
+
+  <p>
+    <code>@RequestParam(required = false)</code> は、クエリパラメータが必須ではないことを表す。
+    例えば <code>/user/search?loginId=member1</code> の <code>loginId</code> を Java の引数に受け取る。
+    型を <code>List&lt;String&gt;</code> にしているため、<code>?loginId=a&amp;loginId=b</code> のような複数指定にも対応できる。
+  </p>
+
+  <pre><code>private boolean hasValues(List&lt;?&gt; values) {
+    return values != null &amp;&amp; !values.isEmpty();
+}</code></pre>
+
+  <p>
+    <code>List&lt;?&gt;</code> の <code>?</code> はワイルドカードである。
+    「要素の型は何でもよい List」を表す。<code>List&lt;Long&gt;</code>, <code>List&lt;String&gt;</code> のどちらも受け取れるため、
+    共通の空チェックメソッドとして使える。
+  </p>
+
+  <h2>9. HTTP ステータスと ResponseEntity</h2>
+  <p>
+    Controller では <code>ResponseEntity</code> を使って、レスポンスボディだけでなく HTTP ステータスも明示している。
+  </p>
+
+  <pre><code>return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userCreateRequest));</code></pre>
+
+  <p>
+    作成 API は <code>201 Created</code>、更新 API は既存方針に合わせて <code>202 Accepted</code>、削除 API は
+    <code>204 No Content</code> を返すようにした。
+  </p>
+
+  <pre><code>@DeleteMapping("/delete/{id}")
+public ResponseEntity&lt;Void&gt; deleteUser(@PathVariable Long id) {
+    userService.deleteUserById(id);
+    return ResponseEntity.noContent().build();
+}</code></pre>
+
+  <p>
+    <code>ResponseEntity&lt;Void&gt;</code> は、レスポンスボディがないことを型で表している。
+    <code>noContent()</code> は 204 を作るための便利メソッドである。
+  </p>
+
+  <h2>10. 独自例外と統一 JSON エラー</h2>
+  <p>
+    API では、エラー時にも一定の形式でレスポンスを返すことが重要である。
+    クライアントは形式が揃っていれば、画面表示やログ出力を共通処理にできる。
+  </p>
+
+  <h3>エラーレスポンス DTO</h3>
+  <pre><code>public record ApiErrorResponse(
+    Instant timestamp,
+    int status,
+    String error,
+    String message,
+    String path
+) {
+}</code></pre>
+
+  <p>
+    <code>Instant</code> は Java 標準の日時型で、UTC 基準の時刻を表す。
+    API エラーの発生時刻として利用している。
+  </p>
+
+  <h3>独自例外</h3>
+  <pre><code>public class ResourceNotFoundException extends RuntimeException {
+
+    public ResourceNotFoundException(String message) {
+        super(message);
+    }
+}</code></pre>
+
+  <p>
+    <code>RuntimeException</code> を継承した独自例外を作ることで、
+    Service から「これは 404 にしたい」「これは 409 にしたい」という意図を表現しやすくなる。
+    <code>super(message)</code> は親クラスのコンストラクタを呼び出す Java の構文である。
+  </p>
+
+  <h3>GlobalExceptionHandler</h3>
+  <pre><code>@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity&lt;ApiErrorResponse&gt; handleNotFound(
+        ResourceNotFoundException exception,
+        HttpServletRequest request
+    ) {
+        return buildResponse(HttpStatus.NOT_FOUND, exception.getMessage(), request);
+    }
+}</code></pre>
+
+  <p>
+    <code>@RestControllerAdvice</code> は、複数 Controller にまたがって例外処理を共通化するための Spring アノテーションである。
+    Controller や Service で例外が投げられたとき、該当する <code>@ExceptionHandler</code> メソッドが呼ばれる。
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>例外</th>
+        <th>HTTP ステータス</th>
+        <th>代表例</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>BadRequestException</code></td>
+        <td>400 Bad Request</td>
+        <td>検索条件なし、空更新、不正 role</td>
+      </tr>
+      <tr>
+        <td><code>ResourceNotFoundException</code></td>
+        <td>404 Not Found</td>
+        <td>存在しない ID の更新、削除</td>
+      </tr>
+      <tr>
+        <td><code>ConflictException</code></td>
+        <td>409 Conflict</td>
+        <td><code>loginId</code> 重複</td>
+      </tr>
+      <tr>
+        <td><code>MethodArgumentNotValidException</code></td>
+        <td>400 Bad Request</td>
+        <td>Bean Validation エラー</td>
+      </tr>
+      <tr>
+        <td><code>HttpMessageNotReadableException</code></td>
+        <td>400 Bad Request</td>
+        <td>壊れた JSON</td>
+      </tr>
+      <tr>
+        <td><code>DataIntegrityViolationException</code></td>
+        <td>409 Conflict</td>
+        <td>DB 制約違反</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>11. Repository の派生クエリメソッド</h2>
+  <p>
+    <code>UserRepository</code> は <code>JpaRepository&lt;User, Long&gt;</code> を継承している。
+    これにより、<code>findAll()</code>, <code>findById()</code>, <code>save()</code>, <code>delete()</code> などの基本操作が自動で使える。
+  </p>
+
+  <pre><code>public interface UserRepository extends JpaRepository&lt;User, Long&gt; {
+
+    List&lt;User&gt; findByLoginIdIn(List&lt;String&gt; loginIds);
+
+    List&lt;User&gt; findByNameIn(List&lt;String&gt; names);
+
+    List&lt;User&gt; findByRoleIn(List&lt;Role&gt; roles);
+
+    boolean existsByLoginId(String loginId);
+
+    boolean existsByLoginIdAndIdNot(String loginId, Long id);
+}</code></pre>
+
+  <p>
+    Spring Data JPA はメソッド名を解析して SQL 相当のクエリを自動生成する。
+    例えば <code>existsByLoginIdAndIdNot</code> は「指定された <code>loginId</code> を持ち、かつ ID が指定 ID ではないユーザーが存在するか」を調べる。
+    更新時に自分自身の <code>loginId</code> は許可しつつ、他ユーザーとの重複を拒否するために使っている。
+  </p>
+
+  <h2>12. @Transactional の意味</h2>
+  <p>
+    Service の各メソッドには <code>@Transactional</code> を付けた。
+    トランザクションは、DB 操作をひとまとまりとして扱う仕組みである。
+    途中で例外が発生した場合は、原則としてその処理内の DB 変更がロールバックされる。
+  </p>
+
+  <pre><code>@Override
+@Transactional
+public UserResponse updateUser(Long id, UserUpdateRequest userUpdateRequest) {
+    ...
+}</code></pre>
+
+  <p>
+    検索や一覧取得のように読み取りだけの処理には <code>@Transactional(readOnly = true)</code> を付けている。
+    これは「この処理では DB を更新しない」という意図を Spring や JPA に伝えるためである。
+  </p>
+
+  <pre><code>@Override
+@Transactional(readOnly = true)
+public List&lt;UserResponse&gt; getUserAll() {
+    return userRepository.findAll().stream().map(this::toResponse).toList();
+}</code></pre>
+
+  <p>
+    <code>stream().map(this::toResponse).toList()</code> は Java Stream API の書き方である。
+    <code>findAll()</code> で取得した <code>List&lt;User&gt;</code> の各要素を <code>UserResponse</code> に変換し、
+    新しいリストとして返している。
+    <code>this::toResponse</code> はメソッド参照で、<code>user -&gt; this.toResponse(user)</code> とほぼ同じ意味である。
+  </p>
+
+  <h2>13. テストの追加内容</h2>
+  <p>
+    以前のテストは Spring の起動確認だけだったが、今回は API の重要な挙動を <code>MockMvc</code> で検証するようにした。
+    <code>MockMvc</code> は実際の HTTP サーバーを起動せずに、Controller へ HTTP リクエスト相当のテストを実行できる仕組みである。
+  </p>
+
+  <pre><code>@SpringBootTest
+@AutoConfigureMockMvc
+class UserAppApplicationTests {
+
+    @Autowired
+    private MockMvc mockMvc;
+}</code></pre>
+
+  <table>
+    <thead>
+      <tr>
+        <th>テスト</th>
+        <th>確認していること</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>作成 API</td>
+        <td>レスポンスに password がなく、DB には BCrypt ハッシュが保存される</td>
+      </tr>
+      <tr>
+        <td>部分更新</td>
+        <td>指定した項目だけが変わり、未指定項目は維持される</td>
+      </tr>
+      <tr>
+        <td>パスワード更新</td>
+        <td>新しいパスワードがハッシュ化され、レスポンスには返らない</td>
+      </tr>
+      <tr>
+        <td>404</td>
+        <td>存在しない ID の更新、削除が 404 JSON を返す</td>
+      </tr>
+      <tr>
+        <td>400</td>
+        <td>不正 role、空文字、空更新が 400 JSON を返す</td>
+      </tr>
+      <tr>
+        <td>検索</td>
+        <td>条件なし、複数条件は 400。id/loginId/name/role 検索は成功</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>MockMvc の基本形</h3>
+  <pre><code>mockMvc.perform(post("/user/create")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content("""
+            {
+              "loginId": "member1",
+              "name": "Member One",
+              "role": "MEMBER",
+              "password": "secret"
+            }
+            """))
+    .andExpect(status().isCreated())
+    .andExpect(jsonPath("$.password").doesNotExist());</code></pre>
+
+  <p>
+    <code>""" ... """</code> は Java のテキストブロックである。
+    複数行文字列を読みやすく書けるため、JSON をテストに埋め込むときに便利である。
+  </p>
+
+  <p>
+    <code>jsonPath("$.password").doesNotExist()</code> は、レスポンス JSON に <code>password</code> という項目が存在しないことを検証している。
+    セキュリティ上重要な仕様なので、テストで明示的に固定している。
+  </p>
+
+  <h2>14. リクエストからレスポンスまでの流れ</h2>
+  <p>
+    例としてユーザー作成 API の流れを追う。
+  </p>
+
+  <ol>
+    <li>クライアントが <code>POST /user/create</code> に JSON を送る。</li>
+    <li>Spring が JSON を <code>UserCreateRequest</code> record に変換する。</li>
+    <li><code>@Valid</code> により <code>@NotBlank</code>, <code>@Size</code>, <code>@Pattern</code> が実行される。</li>
+    <li>Controller が <code>userService.createUser(...)</code> を呼び出す。</li>
+    <li>Service が <code>loginId</code> 重複を確認する。</li>
+    <li>Service が <code>role</code> 文字列を <code>Role</code> enum に変換する。</li>
+    <li>Service が <code>passwordEncoder.encode(...)</code> でパスワードをハッシュ化する。</li>
+    <li>Repository が Entity を DB に保存する。</li>
+    <li>Service が Entity を <code>UserResponse</code> に変換する。</li>
+    <li>Controller が <code>201 Created</code> と JSON を返す。</li>
+  </ol>
+
+  <p>
+    どこかで例外が発生した場合は、<code>GlobalExceptionHandler</code> が捕捉し、
+    <code>timestamp/status/error/message/path</code> の JSON に変換する。
+  </p>
+
+  <h2>15. 今回の設計判断まとめ</h2>
+  <ul>
+    <li>パスワードは「受け取るが返さない」。保存時は BCrypt でハッシュ化する。</li>
+    <li>レスポンス DTO は公開してよい情報だけを持つ。</li>
+    <li>更新は既存 Entity を取得してから、指定された項目だけを変更する。</li>
+    <li>Controller では HTTP 入力の形と検索条件ルールを確認する。</li>
+    <li>Service では重複確認、存在確認、ハッシュ化、Entity 更新を行う。</li>
+    <li>Repository は Spring Data JPA の派生クエリで DB アクセスを簡潔に書く。</li>
+    <li>例外は独自例外と <code>@RestControllerAdvice</code> で HTTP レスポンスへ変換する。</li>
+    <li>テストではセキュリティ仕様と異常系を明示的に検証する。</li>
+  </ul>
+
+  <div class="ok">
+    <strong>確認済み:</strong>
+    実装後に <code>mvn clean test</code> を実行し、7 件のテストがすべて成功した。
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task API Service 実装 学習記録</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.7;
+      color: #222;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+      background: #f7f7f4;
+    }
+
+    main {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 28px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-top: 0;
+      border-bottom: 3px solid #2f6f73;
+      padding-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      margin-top: 32px;
+      border-left: 5px solid #2f6f73;
+      padding-left: 10px;
+    }
+
+    h3 {
+      font-size: 1.05rem;
+      margin-top: 24px;
+    }
+
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      background: #f0f0ec;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+
+    pre {
+      background: #20242a;
+      color: #f3f3f3;
+      padding: 16px;
+      overflow-x: auto;
+      border-radius: 6px;
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+      border-radius: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      background: #fff;
+    }
+
+    th,
+    td {
+      border: 1px solid #d8d8d8;
+      padding: 10px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: #eef4f4;
+    }
+
+    .meta {
+      color: #666;
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+    }
+
+    .note {
+      background: #f1f6f6;
+      border-left: 5px solid #2f6f73;
+      padding: 12px 14px;
+      margin: 16px 0;
+    }
+
+    .warn {
+      background: #fff7e8;
+      border-left: 5px solid #c47a20;
+      padding: 12px 14px;
+      margin: 16px 0;
+    }
+
+    ul {
+      padding-left: 1.4rem;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Task API Service 実装 学習記録</h1>
+    <p class="meta">作成日: 2026-05-20 / 対象: <code>TaskService</code>, <code>TaskServiceImpl</code>, DTO, Entity, Repository</p>
+
+    <h2>今回学んだ結論</h2>
+    <ul>
+      <li><code>TaskService</code> をインターフェースにし、<code>TaskServiceImpl</code> で実装する形は標準的。</li>
+      <li>Controller は <code>TaskService</code> に依存し、実装クラスには直接依存しない。</li>
+      <li>Service は DTO と Entity の変換、Repository 呼び出し、存在チェック、業務ルールを担当する。</li>
+      <li>Entity の <code>id</code> は JPA が管理するため、通常は <code>setId()</code> を用意しない。</li>
+      <li><code>findById()</code> は存在しない可能性があるため <code>Optional&lt;Task&gt;</code> を返す。</li>
+    </ul>
+
+    <h2>Service インターフェースの考え方</h2>
+    <p>
+      <code>TaskService</code> は Controller から見た Service の入口を定義する。
+      Java のインターフェースメソッドは自動的に <code>public</code> なので、通常は <code>public</code> を省略する。
+    </p>
+
+    <pre><code class="language-java">public interface TaskService {
+    List&lt;TaskResponse&gt; findAll();
+    TaskResponse findById(Long id);
+    TaskResponse create(TaskCreateRequest taskCreateRequest);
+    TaskResponse update(Long id, TaskUpdateRequest taskUpdateRequest);
+    void delete(Long id);
+}</code></pre>
+
+    <div class="note">
+      面接での説明: Controller は HTTP の受け口に集中させ、Service に処理を委譲します。
+      Controller はインターフェースである <code>TaskService</code> に依存させ、実装は <code>@Service</code> を付けた <code>TaskServiceImpl</code> に任せます。
+    </div>
+
+    <h2>VS Code で実装クラスを作る操作</h2>
+    <ol>
+      <li><code>TaskServiceImpl.java</code> を作る。</li>
+      <li><code>public class TaskServiceImpl implements TaskService</code> と書く。</li>
+      <li>赤線が出たら <code>Ctrl + .</code> を押す。</li>
+      <li><code>Add unimplemented methods</code> を選ぶ。</li>
+      <li>Spring に Service として認識させるため <code>@Service</code> を付ける。</li>
+    </ol>
+
+    <pre><code class="language-java">@Service
+public class TaskServiceImpl implements TaskService {
+    private final TaskRepository taskRepository;
+
+    public TaskServiceImpl(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
+    }
+}</code></pre>
+
+    <h2>create() の基本パターン</h2>
+    <p>
+      <code>create()</code> は Request DTO から Entity を作り、Repository で保存し、Response DTO に変換して返す。
+      作成時のステータスをアプリ側で <code>TODO</code> に固定するなら、Request DTO から <code>taskStatus</code> を受け取らない設計が自然。
+    </p>
+
+    <pre><code class="language-java">@Override
+public TaskResponse create(TaskCreateRequest taskCreateRequest) {
+    LocalDateTime now = LocalDateTime.now();
+
+    Task task = new Task(
+        taskCreateRequest.title(),
+        taskCreateRequest.description(),
+        TaskStatus.TODO,
+        taskCreateRequest.dueTime()
+    );
+
+    task.setCreatedAt(now);
+    task.setUpdatedAt(now);
+
+    Task savedTask = taskRepository.save(task);
+
+    return new TaskResponse(
+        savedTask.getId(),
+        savedTask.getTitle(),
+        savedTask.getDescription(),
+        savedTask.getTaskStatus(),
+        savedTask.getDueTime(),
+        savedTask.getCreatedAt(),
+        savedTask.getUpdatedAt()
+    );
+}</code></pre>
+
+    <h3>入力値の考え方</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>項目</th>
+          <th>扱い</th>
+          <th>理由</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>title</code></td>
+          <td><code>@NotBlank</code></td>
+          <td>必須項目。空文字も許可しない。</td>
+        </tr>
+        <tr>
+          <td><code>description</code></td>
+          <td><code>@Size(max = 500)</code></td>
+          <td>任意項目なら <code>null</code> や空文字を許可してよい。</td>
+        </tr>
+        <tr>
+          <td><code>dueTime</code></td>
+          <td><code>@NotNull</code></td>
+          <td>期限を必須にするなら <code>null</code> を許可しない。</td>
+        </tr>
+        <tr>
+          <td><code>taskStatus</code></td>
+          <td>Service で <code>TaskStatus.TODO</code> を設定</td>
+          <td>作成時は必ず TODO から始める業務ルールにするため。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>delete() の2つのパターン</h2>
+    <h3>パターン1: 204 No Content</h3>
+    <p>
+      削除成功時にレスポンスボディを返さない。REST API では標準的で、面接でも説明しやすい。
+    </p>
+
+    <pre><code class="language-java">@DeleteMapping("/{id}")
+public ResponseEntity&lt;Void&gt; delete(@PathVariable Long id) {
+    taskService.delete(id);
+    return ResponseEntity.noContent().build();
+}</code></pre>
+
+    <pre><code class="language-java">@Override
+public void delete(Long id) {
+    Task task = taskRepository.findById(id)
+        .orElseThrow(() -&gt; new RuntimeException("Task not found"));
+
+    taskRepository.delete(task);
+}</code></pre>
+
+    <h3>パターン2: 削除したデータを返す</h3>
+    <p>
+      削除した内容をクライアントに返したい場合は <code>200 OK</code> と <code>TaskResponse</code> を返す。
+      <code>204 No Content</code> と body は組み合わせない。
+    </p>
+
+    <pre><code class="language-java">@DeleteMapping("/{id}")
+public ResponseEntity&lt;TaskResponse&gt; delete(@PathVariable Long id) {
+    return ResponseEntity.ok(taskService.delete(id));
+}</code></pre>
+
+    <div class="warn">
+      注意: <code>ResponseEntity.status(HttpStatus.NO_CONTENT).body(taskResponse)</code> は不自然。
+      <code>204</code> は「本文なし」を意味するため、body を返すなら <code>200</code> にする。
+    </div>
+
+    <h2>findAll() と stream()</h2>
+    <p>
+      <code>findAll()</code> は <code>List&lt;Task&gt;</code> を <code>List&lt;TaskResponse&gt;</code> に変換する処理。
+      現代的な書き方としては <code>stream().map().toList()</code> がよく使われる。
+    </p>
+
+    <pre><code class="language-java">@Override
+public List&lt;TaskResponse&gt; findAll() {
+    return taskRepository.findAll().stream()
+        .map(task -&gt; new TaskResponse(
+            task.getId(),
+            task.getTitle(),
+            task.getDescription(),
+            task.getTaskStatus(),
+            task.getDueTime(),
+            task.getCreatedAt(),
+            task.getUpdatedAt()
+        ))
+        .toList();
+}</code></pre>
+
+    <h3>ラムダ式の return</h3>
+    <p>
+      <code>task -&gt; new TaskResponse(...)</code> は省略形なので、<code>return</code> は書かない。
+      <code>return</code> を使う場合はブロック <code>{ }</code> が必要。
+    </p>
+
+    <pre><code class="language-java">// 標準的な省略形
+.map(task -&gt; new TaskResponse(...))
+
+// return を使うならブロックが必要
+.map(task -&gt; {
+    return new TaskResponse(...);
+})</code></pre>
+
+    <div class="warn">
+      これは構文エラー: <code>.map(task -&gt; return new TaskResponse(...))</code>
+    </div>
+
+    <h2>findById() と Optional</h2>
+    <p>
+      <code>taskRepository.findById(id)</code> は、ID に対応するデータが存在しない可能性があるため <code>Optional&lt;Task&gt;</code> を返す。
+      <code>Optional&lt;Task&gt;</code> 自体には <code>getId()</code> や <code>getTitle()</code> はない。
+      先に中の <code>Task</code> を取り出す必要がある。
+    </p>
+
+    <pre><code class="language-java">@Override
+public TaskResponse findById(Long id) {
+    Task task = taskRepository.findById(id)
+        .orElseThrow(() -&gt; new RuntimeException("Task not found"));
+
+    return new TaskResponse(
+        task.getId(),
+        task.getTitle(),
+        task.getDescription(),
+        task.getTaskStatus(),
+        task.getDueTime(),
+        task.getCreatedAt(),
+        task.getUpdatedAt()
+    );
+}</code></pre>
+
+    <div class="note">
+      面接での説明: <code>findById</code> は指定 ID のデータが存在しない可能性があるため、<code>null</code> ではなく <code>Optional</code> で返されます。
+      Service 側では <code>orElseThrow</code> を使い、存在しない場合は例外に変換します。
+    </div>
+
+    <h2>update() では setId() しない</h2>
+    <p>
+      更新処理では、新しい Entity を作って <code>setId(id)</code> するより、既存 Entity を取得して中身を書き換える方が標準的。
+      <code>id</code> は JPA が管理する値なので、通常は Entity に <code>setId()</code> を用意しない。
+    </p>
+
+    <pre><code class="language-java">@Override
+public TaskResponse update(Long id, TaskUpdateRequest taskUpdateRequest) {
+    Task task = taskRepository.findById(id)
+        .orElseThrow(() -&gt; new RuntimeException("Task not found"));
+
+    task.setTitle(taskUpdateRequest.title());
+    task.setDescription(taskUpdateRequest.description());
+    task.setTaskStatus(taskUpdateRequest.taskStatus());
+    task.setDueTime(taskUpdateRequest.dueTime());
+    task.setUpdatedAt(LocalDateTime.now());
+
+    Task updatedTask = taskRepository.save(task);
+
+    return new TaskResponse(
+        updatedTask.getId(),
+        updatedTask.getTitle(),
+        updatedTask.getDescription(),
+        updatedTask.getTaskStatus(),
+        updatedTask.getDueTime(),
+        updatedTask.getCreatedAt(),
+        updatedTask.getUpdatedAt()
+    );
+}</code></pre>
+
+    <h3>この形のメリット</h3>
+    <ul>
+      <li><code>createdAt</code> が消えない。</li>
+      <li>存在しない ID の更新を検知できる。</li>
+      <li>JPA が管理する <code>id</code> をアプリ側で無理に変更しない。</li>
+      <li>面接で説明しやすい標準的な更新処理になる。</li>
+    </ul>
+
+    <h2>今後の改善ポイント</h2>
+    <ul>
+      <li><code>RuntimeException</code> を <code>TaskNotFoundException</code> に置き換える。</li>
+      <li><code>@RestControllerAdvice</code> で 404 エラーを共通処理する。</li>
+      <li><code>TaskResponse</code> への変換処理が重複する場合、private メソッドに切り出す。</li>
+      <li><code>createdAt</code> / <code>updatedAt</code> は慣れてきたら <code>@PrePersist</code> / <code>@PreUpdate</code> も検討する。</li>
+      <li><code>deleteById(id)</code> は存在確認なしだと 404 を返しにくいため、まず <code>findById</code> で存在確認する形にする。</li>
+    </ul>
+
+    <h2>面接で説明できるようにすること</h2>
+    <ul>
+      <li>Controller / Service / Repository の責務分担。</li>
+      <li>DTO と Entity を分ける理由。</li>
+      <li><code>Optional</code> を使う理由。</li>
+      <li><code>DELETE</code> で <code>204 No Content</code> を返す理由。</li>
+      <li>更新時に <code>setId()</code> しない理由。</li>
+      <li><code>stream().map().toList()</code> の意味。</li>
+    </ul>
+
+    <h2>振り返りメモ</h2>
+    <table>
+      <tbody>
+        <tr>
+          <th>手が止まった箇所</th>
+          <td><code>Optional&lt;Task&gt;</code> から直接 <code>getId()</code> しようとした点。<code>orElseThrow</code> で <code>Task</code> を取り出す必要がある。</td>
+        </tr>
+        <tr>
+          <th>覚えるべき文法</th>
+          <td>record の値取得は <code>request.title()</code>。ラムダ式の省略形では <code>return</code> を書かない。</td>
+        </tr>
+        <tr>
+          <th>覚えるべき Spring / JPA の考え方</th>
+          <td><code>JpaRepository#save</code> は保存後の Entity を返す。<code>findById</code> は <code>Optional</code> を返す。<code>@Service</code> を付けると Spring の DI 対象になる。</td>
+        </tr>
+        <tr>
+          <th>次回自力で書けるようにすること</th>
+          <td><code>create</code>, <code>findAll</code>, <code>findById</code>, <code>update</code>, <code>delete</code> の Service 実装の流れ。</td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
+</body>
+</html>

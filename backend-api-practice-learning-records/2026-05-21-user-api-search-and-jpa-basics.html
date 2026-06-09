@@ -1,0 +1,353 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026-05-21 User API Search and JPA Basics</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.75;
+      color: #1f2937;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      background: #f8fafc;
+    }
+    main {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 32px;
+    }
+    h1, h2, h3 {
+      line-height: 1.35;
+      color: #111827;
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 1.9rem;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 12px;
+    }
+    h2 {
+      margin-top: 32px;
+      font-size: 1.35rem;
+      border-left: 4px solid #2563eb;
+      padding-left: 10px;
+    }
+    h3 {
+      margin-top: 24px;
+      font-size: 1.08rem;
+    }
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      background: #f3f4f6;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+    pre {
+      background: #111827;
+      color: #f9fafb;
+      padding: 16px;
+      border-radius: 6px;
+      overflow-x: auto;
+      line-height: 1.55;
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+      color: inherit;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      background: #ffffff;
+    }
+    th, td {
+      border: 1px solid #e5e7eb;
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #f3f4f6;
+    }
+    .note {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      padding: 12px 14px;
+    }
+    .warn {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 6px;
+      padding: 12px 14px;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>User API Search and JPA Basics</h1>
+  <p>日付: 2026-05-21</p>
+  <p>対象アプリ: <code>apps/user-app</code></p>
+
+  <h2>1. JPA Entity で final を避ける理由</h2>
+  <p>
+    JPA の Entity は、データベースから取得した値をもとにインスタンスを復元する。
+    そのため、Entity のフィールドは通常 <code>final</code> にしない。
+    <code>final</code> を付けると Java のルール上、コンストラクタで必ず初期化する必要がある。
+    しかし <code>@GeneratedValue</code> の <code>id</code> は DB 側で採番されるため、コンストラクタで値を入れられずコンパイルエラーになる。
+  </p>
+
+  <pre><code>@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+private Long id;</code></pre>
+
+  <p>
+    <code>final</code> を付けないことは「自由に変更してよい」という意味ではない。
+    アプリケーションコードから変更させたくない場合は、setter を作らず、必要な変更だけを業務メソッドとして用意する。
+  </p>
+
+  <pre><code>public void changeName(String name) {
+    this.name = name;
+}</code></pre>
+
+  <h2>2. JPA Entity に引数なしコンストラクタが必要な理由</h2>
+  <p>
+    JPA は DB の行から Entity を復元するとき、まず空のインスタンスを生成し、その後でフィールドへ値を設定する。
+    そのため Entity には引数なしコンストラクタが必要になる。
+  </p>
+
+  <pre><code>protected User() {
+}</code></pre>
+
+  <p>
+    <code>public</code> にするとアプリケーションコードから不完全な <code>User</code> を作れてしまうため、JPA 用には <code>protected</code> がよく使われる。
+  </p>
+
+  <h2>3. enum の valueOf() と name()</h2>
+  <p>
+    <code>Role</code> が enum の場合、リクエスト DTO では文字列、Entity では enum として扱うことがある。
+    その場合、保存前に <code>String</code> から <code>Role</code> へ変換し、レスポンス作成時に <code>Role</code> から <code>String</code> へ戻す。
+  </p>
+
+  <pre><code>Role role = Role.valueOf(userCreateRequest.role());</code></pre>
+
+  <p>
+    <code>valueOf()</code> は文字列を enum に変換する。例えば <code>"MEMBER"</code> は <code>Role.MEMBER</code> になる。
+    ただし完全一致が必要で、<code>"member"</code> や <code>"Member"</code> はそのままだと失敗する。
+  </p>
+
+  <pre><code>String roleName = saved.getRole().name();</code></pre>
+
+  <p>
+    <code>name()</code> は enum を文字列に変換する。例えば <code>Role.MEMBER.name()</code> は <code>"MEMBER"</code> になる。
+  </p>
+
+  <div class="warn">
+    <strong>注意:</strong> IDE の自動 import により、誤って <code>org.springframework.context.support.BeanDefinitionDsl.Role</code> を import すると、
+    自作の <code>ts.com.user_app.entity.Role</code> と型が合わずコンパイルエラーになる。
+  </div>
+
+  <pre><code>// 正しい import
+import ts.com.user_app.entity.Role;</code></pre>
+
+  <h2>4. 検索 API の設計</h2>
+  <p>
+    今回の検索 API は、戻り値をすべて <code>List&lt;UserResponse&gt;</code> に統一する方針にした。
+    <code>id</code>、<code>loginId</code>、<code>name</code> は結果が 0 件または 1 件になりやすいが、API としては配列で返すことで、複数値検索にも対応できる。
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>リクエスト例</th>
+        <th>意味</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>GET /user/search?id=1&amp;id=2</code></td>
+        <td>複数 ID で検索</td>
+      </tr>
+      <tr>
+        <td><code>GET /user/search?loginId=tanaka&amp;loginId=suzuki</code></td>
+        <td>複数 loginId で検索</td>
+      </tr>
+      <tr>
+        <td><code>GET /user/search?name=田中&amp;name=鈴木</code></td>
+        <td>複数 name で検索</td>
+      </tr>
+      <tr>
+        <td><code>GET /user/search?role=MEMBER</code></td>
+        <td>role で検索</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>
+    検索条件は「1種類だけ」許可する。ただし、その条件の値は複数指定できる。
+  </p>
+
+  <pre><code>// 許可
+GET /user/search?loginId=tanaka&amp;loginId=suzuki
+
+// 禁止
+GET /user/search?loginId=tanaka&amp;name=田中</code></pre>
+
+  <h2>5. Controller で行う制御</h2>
+  <p>
+    「検索条件が 1 種類だけ指定されているか」は HTTP リクエストの形の妥当性なので、Controller 側で制御するのが自然。
+    Service は、すでに意味が確定した検索処理を受け持つ。
+  </p>
+
+  <pre><code>@GetMapping("/search")
+public ResponseEntity&lt;List&lt;UserResponse&gt;&gt; searchUsers(
+        @RequestParam(required = false) List&lt;Long&gt; id,
+        @RequestParam(required = false) List&lt;String&gt; loginId,
+        @RequestParam(required = false) List&lt;String&gt; name,
+        @RequestParam(required = false) List&lt;String&gt; role
+) {
+    int conditionCount = 0;
+
+    if (id != null &amp;&amp; !id.isEmpty()) conditionCount++;
+    if (loginId != null &amp;&amp; !loginId.isEmpty()) conditionCount++;
+    if (name != null &amp;&amp; !name.isEmpty()) conditionCount++;
+    if (role != null &amp;&amp; !role.isEmpty()) conditionCount++;
+
+    if (conditionCount == 0) {
+        throw new IllegalArgumentException("検索条件を1種類指定してください。");
+    }
+
+    if (conditionCount &gt; 1) {
+        throw new IllegalArgumentException("検索条件は1種類だけ指定してください。");
+    }
+
+    if (id != null &amp;&amp; !id.isEmpty()) {
+        return ResponseEntity.ok(userService.searchUserById(id));
+    }
+
+    if (loginId != null &amp;&amp; !loginId.isEmpty()) {
+        return ResponseEntity.ok(userService.searchUserByLoginId(loginId));
+    }
+
+    if (name != null &amp;&amp; !name.isEmpty()) {
+        return ResponseEntity.ok(userService.searchUserByName(name));
+    }
+
+    return ResponseEntity.ok(userService.searchUserByRole(role));
+}</code></pre>
+
+  <div class="note">
+    <strong>ポイント:</strong> <code>/user/search</code> は検索条件ありの API として扱う。
+    全件取得は別 API の <code>/user/all</code> に分けるなら、検索条件なしの <code>/user/search</code> は 400 Bad Request 相当にする。
+  </div>
+
+  <h2>6. Repository の標準メソッドと独自検索メソッド</h2>
+  <p>
+    <code>JpaRepository</code> が最初から持っているメソッドは、Repository に書かなくても使える。
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>メソッド</th>
+        <th>Repository への記述</th>
+        <th>理由</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>findAll()</code></td>
+        <td>不要</td>
+        <td><code>JpaRepository</code> 標準</td>
+      </tr>
+      <tr>
+        <td><code>findById(Long id)</code></td>
+        <td>不要</td>
+        <td><code>JpaRepository</code> 標準</td>
+      </tr>
+      <tr>
+        <td><code>findAllById(Iterable&lt;Long&gt; ids)</code></td>
+        <td>不要</td>
+        <td><code>JpaRepository</code> 標準</td>
+      </tr>
+      <tr>
+        <td><code>save(User user)</code></td>
+        <td>不要</td>
+        <td><code>JpaRepository</code> 標準</td>
+      </tr>
+      <tr>
+        <td><code>deleteById(Long id)</code></td>
+        <td>不要</td>
+        <td><code>JpaRepository</code> 標準</td>
+      </tr>
+      <tr>
+        <td><code>findByLoginIdIn(...)</code></td>
+        <td>必要</td>
+        <td><code>User</code> 固有のフィールド検索</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>
+    <code>loginId</code> は <code>User</code> Entity 固有のフィールドなので、複数 loginId 検索をしたい場合は Repository に明示的に宣言する。
+  </p>
+
+  <pre><code>public interface UserRepository extends JpaRepository&lt;User, Long&gt; {
+
+    List&lt;User&gt; findByLoginIdIn(List&lt;String&gt; loginIds);
+
+    List&lt;User&gt; findByNameIn(List&lt;String&gt; names);
+
+    List&lt;User&gt; findByRoleIn(List&lt;Role&gt; roles);
+}</code></pre>
+
+  <p>
+    <code>findByLoginIdIn</code> は Spring Data JPA がメソッド名を解析し、実行時に次のような SQL 相当のクエリを生成する。
+  </p>
+
+  <pre><code>where login_id in (?, ?, ?)</code></pre>
+
+  <h2>7. Service 実装の例</h2>
+  <p>
+    複数 loginId 検索では、Repository の <code>findByLoginIdIn</code> を呼び出し、取得した <code>User</code> を <code>UserResponse</code> に変換する。
+  </p>
+
+  <pre><code>@Override
+public List&lt;UserResponse&gt; searchUserByLoginId(List&lt;String&gt; loginId) {
+    return userRepository.findByLoginIdIn(loginId)
+            .stream()
+            .map(user -&gt; new UserResponse(
+                    user.getId(),
+                    user.getLoginId(),
+                    user.getName(),
+                    user.getRole().name(),
+                    user.getPassword()
+            ))
+            .toList();
+}</code></pre>
+
+  <h2>8. 今回見つかった典型的なエラー</h2>
+  <ul>
+    <li><code>return</code> がない: 戻り値があるメソッドでは、すべての分岐で値を返す必要がある。</li>
+    <li>Interface と実装クラスの不一致: <code>UserService</code> に定義したメソッドは <code>UserServiceImpl</code> で実装する必要がある。</li>
+    <li>不要な <code>@Override</code>: Interface にないメソッドへ <code>@Override</code> を付けるとエラーになる。</li>
+    <li>誤った import: 自作の <code>Role</code> ではなく Spring 側の <code>Role</code> を import すると型不一致になる。</li>
+    <li>Repository メソッド未定義: <code>findByLoginIdIn</code> などの固有検索は Repository に宣言が必要。</li>
+    <li>Repository 呼び出しミス: <code>userRepository(updatedUser)</code> ではなく <code>userRepository.save(updatedUser)</code>。</li>
+  </ul>
+
+  <h2>9. 今後の改善ポイント</h2>
+  <ul>
+    <li><code>Role.valueOf(...)</code> に不正な値が来た場合、400 Bad Request として返す例外ハンドリングを追加する。</li>
+    <li><code>name</code> が本当に一意なら、DB 側にも unique 制約を付ける。</li>
+    <li><code>UserResponse</code> に password を含めるかは再検討する。通常、API レスポンスでは password を返さない。</li>
+    <li>Entity 名 <code>User</code> は DB の予約語と衝突する可能性があるため、<code>@Table(name = "users")</code> などを検討する。</li>
+  </ul>
+</main>
+</body>
+</html>
