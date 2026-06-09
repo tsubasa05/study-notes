@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="ソフトウェア開発の個人学習ノート一覧です。Spring Boot、JPA、Java、API設計、データシステム、LLM連携についてまとめています。">
+  <meta name="description" content="ソフトウェア開発の個人学習ノート一覧です。Spring Boot、JPA、Java、API設計、データシステム、LLM連携、技術面接対策についてまとめています。">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232358c5'/%3E%3Cpath d='M18 16h22a6 6 0 0 1 6 6v26H24a6 6 0 0 1-6-6V16Zm6 8v16a6 6 0 0 1 6-6h10V22H24a2 2 0 0 0-2 2Z' fill='white'/%3E%3C/svg%3E">
   <title>Study Notes | 学習記録</title>
   <style>
@@ -374,7 +374,7 @@
         <label for="search" class="visually-hidden">学習ノートを検索</label>
         <input id="search" type="search" placeholder="タイトルやキーワードで検索" autocomplete="off">
       </div>
-      <p class="count" aria-live="polite"><span id="visible-count">12</span> 件のノート</p>
+      <p class="count" aria-live="polite"><span id="visible-count">13</span> 件のノート</p>
     </div>
 
     <nav class="filters" aria-label="カテゴリで絞り込み">
@@ -384,9 +384,31 @@
       <button class="filter-button" type="button" data-filter="java-platform" aria-pressed="false">Java Web 基盤</button>
       <button class="filter-button" type="button" data-filter="data-systems" aria-pressed="false">データシステム</button>
       <button class="filter-button" type="button" data-filter="llm" aria-pressed="false">LLM 連携</button>
+      <button class="filter-button" type="button" data-filter="interview-prep" aria-pressed="false">面接対策</button>
     </nav>
 
     <section class="notes-grid" aria-label="学習ノート一覧">
+      <article class="note-card" data-category="interview-prep" data-search="web backend interview qa technical interview system design coding java spring aws ecs ci cd authentication authorization api database 面接 技術面接 質問 回答 バックエンド 認証 認可">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="category">面接対策</span>
+            <time datetime="2026-06-09">2026.06.09</time>
+          </div>
+          <h2>Web系バックエンド 技術面接 質問・回答集</h2>
+          <p class="description">
+            CS基礎、Java・Spring、認証認可、DB、AWS、システム設計など、バックエンド面接の頻出質問と回答例を整理。
+          </p>
+          <ul class="tags" aria-label="キーワード">
+            <li>Technical Interview</li>
+            <li>Java / Spring</li>
+            <li>System Design</li>
+            <li>AWS</li>
+          </ul>
+          <a class="card-link" href="interview-preparation/web_backend_interview_qa_2026.html">ノートを読む</a>
+        </div>
+      </article>
+
       <article class="note-card" data-category="llm spring-api" data-search="auth llm chat app jpa validation restclient openai エンティティ db 例外 json">
         <div class="card-accent"></div>
         <div class="card-body">
