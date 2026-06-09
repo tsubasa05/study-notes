@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DDIA Chapter 2：データモデルとクエリ言語</title>
+  <style>
+    :root {
+      --bg: #050816;
+      --paper: #0b1220;
+      --paper-2: #111827;
+      --ink: #e5e7eb;
+      --muted: #a7b0c0;
+      --line: #263244;
+      --accent: #60a5fa;
+      --accent-strong: #93c5fd;
+      --accent-bg: #0b2545;
+      --warn: #f59e0b;
+      --warn-bg: #2a1c06;
+      --good: #34d399;
+      --good-bg: #08261d;
+      --code-bg: #020617;
+      --code-ink: #dbeafe;
+      --shadow: rgba(0, 0, 0, 0.42);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans",
+        "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+      line-height: 1.85;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.18), transparent 34rem),
+        radial-gradient(circle at top right, rgba(14, 165, 233, 0.12), transparent 28rem),
+        linear-gradient(180deg, #020617 0%, #050816 42%, #080d1f 100%);
+    }
+
+    header {
+      padding: 38px 20px 30px;
+      background:
+        linear-gradient(135deg, rgba(2, 6, 23, 0.98) 0%, rgba(15, 23, 42, 0.96) 45%, rgba(30, 58, 138, 0.86) 100%);
+      color: #fff;
+      border-bottom: 1px solid rgba(147, 197, 253, 0.2);
+      box-shadow: 0 18px 44px var(--shadow);
+    }
+
+    .header-inner,
+    main,
+    footer {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: #93c5fd;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.74rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.65rem, 3vw, 2.45rem);
+      line-height: 1.24;
+      letter-spacing: -0.04em;
+      text-shadow: 0 3px 18px rgba(96, 165, 250, 0.18);
+    }
+
+    .subtitle {
+      max-width: 820px;
+      margin: 14px 0 0;
+      color: #cbd5e1;
+      font-size: 0.96rem;
+    }
+
+    main {
+      padding: 22px 20px 64px;
+    }
+
+    .notice {
+      margin: 0 0 20px;
+      padding: 13px 16px;
+      color: #dbeafe;
+      border: 1px solid rgba(96, 165, 250, 0.42);
+      border-left: 4px solid var(--accent);
+      background: rgba(11, 37, 69, 0.92);
+      border-radius: 12px;
+      box-shadow: 0 8px 22px var(--shadow);
+      font-size: 0.94rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    nav {
+      position: sticky;
+      top: 16px;
+      padding: 18px;
+      background: rgba(11, 18, 32, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 14px 34px var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    nav h2 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      color: #f8fafc;
+      border-bottom: 1px solid var(--line);
+    }
+
+    nav ol {
+      margin: 0;
+      padding-left: 1.2rem;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    nav li {
+      margin: 6px 0;
+    }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    nav a:hover {
+      color: var(--accent-strong);
+      text-decoration: underline;
+    }
+
+    article {
+      display: grid;
+      gap: 20px;
+    }
+
+    section {
+      padding: 28px;
+      background:
+        linear-gradient(180deg, rgba(17, 24, 39, 0.98), rgba(11, 18, 32, 0.98));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 14px 34px var(--shadow);
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+      font-size: 1.6rem;
+      line-height: 1.35;
+      letter-spacing: -0.02em;
+      color: #f8fafc;
+    }
+
+    h3 {
+      margin: 26px 0 10px;
+      font-size: 1.15rem;
+      color: #dbeafe;
+    }
+
+    p {
+      margin: 0 0 14px;
+    }
+
+    ul {
+      margin: 10px 0 18px;
+      padding-left: 1.35rem;
+    }
+
+    li {
+      margin: 5px 0;
+    }
+
+    strong {
+      color: #f8fafc;
+    }
+
+    .lead {
+      font-size: 1.05rem;
+      color: #d1d5db;
+    }
+
+    .key-point {
+      margin: 18px 0;
+      padding: 16px 18px;
+      color: #d1fae5;
+      background: rgba(8, 38, 29, 0.95);
+      border: 1px solid rgba(52, 211, 153, 0.28);
+      border-left: 5px solid var(--good);
+      border-radius: 12px;
+    }
+
+    .warning {
+      margin: 18px 0;
+      padding: 16px 18px;
+      color: #fde68a;
+      background: rgba(42, 28, 6, 0.95);
+      border: 1px solid rgba(245, 158, 11, 0.28);
+      border-left: 5px solid var(--warn);
+      border-radius: 12px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 16px 0 6px;
+    }
+
+    .mini-card {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.88);
+    }
+
+    .mini-card h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      color: var(--accent-strong);
+    }
+
+    .mini-card p {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 0.95rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      overflow: hidden;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      font-size: 0.95rem;
+      background: rgba(15, 23, 42, 0.88);
+    }
+
+    th,
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    th {
+      background: rgba(30, 41, 59, 0.95);
+      color: #f8fafc;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    td {
+      color: #d1d5db;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    code,
+    pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    pre {
+      overflow-x: auto;
+      padding: 16px;
+      color: var(--code-ink);
+      background: var(--code-bg);
+      border: 1px solid #1e293b;
+      border-radius: 14px;
+      line-height: 1.55;
+      font-size: 0.9rem;
+    }
+
+    .summary-list {
+      display: grid;
+      gap: 12px;
+      padding-left: 0;
+      list-style: none;
+    }
+
+    .summary-list li {
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.88);
+    }
+
+    .badge {
+      display: inline-block;
+      margin-right: 8px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      color: #dbeafe;
+      background: rgba(37, 99, 235, 0.46);
+      border: 1px solid rgba(147, 197, 253, 0.32);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    footer {
+      padding: 24px 20px 48px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      nav {
+        position: static;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      section {
+        padding: 22px;
+      }
+    }
+  </style>
+
+  <style id="top-size-fix">
+    /* 先頭部分だけを本文寄りのサイズ感に強制調整 */
+    header {
+      padding: 22px 20px 18px;
+    }
+
+    .eyebrow {
+      margin: 0 0 6px;
+      font-size: 0.72rem;
+      line-height: 1.5;
+      letter-spacing: 0.05em;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.12rem;
+      line-height: 1.7;
+      letter-spacing: 0;
+      text-shadow: none;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      max-width: 900px;
+      margin: 6px 0 0;
+      font-size: 0.95rem;
+      line-height: 1.85;
+    }
+
+    main {
+      padding-top: 16px;
+    }
+
+    .notice {
+      margin: 0 0 18px;
+      padding: 12px 14px;
+      border-left-width: 4px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      line-height: 1.85;
+      box-shadow: 0 6px 18px var(--shadow);
+    }
+
+    .notice strong {
+      font-size: 0.95rem;
+    }
+  </style>
+  <link rel="stylesheet" href="ddia-theme.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">Designing Data-Intensive Applications / Chapter 2</p>
+      <h1>データモデルとクエリ言語</h1>
+      <p class="subtitle">
+        Martin Kleppmann『Designing Data-Intensive Applications』Chapter 2 の内容を、学習用に日本語で再構成した整理版です。原文の逐語訳ではなく、章の主張・論点・意味関係を保つことを重視しています。
+      </p>
+    </div>
+  </header>
+
+  <main>
+    <div class="notice">
+      <strong>読み方：</strong>
+      この章は「RDBかNoSQLか」という製品選定の話ではなく、データの形・関係性・問い合わせ方に応じて、どのデータモデルが自然かを見極めるための章です。
+    </div>
+
+    <div class="layout">
+      <nav class="toc" aria-label="目次">
+        <h2>目次</h2>
+        <ol>
+          <li><a href="#s1">データモデルは考え方を決める</a></li>
+          <li><a href="#s2">リレーショナルモデルとドキュメントモデル</a></li>
+          <li><a href="#s3">オブジェクト指向とのずれ</a></li>
+          <li><a href="#s4">多対一・多対多の関係</a></li>
+          <li><a href="#s5">ドキュメントDBは歴史を繰り返すか</a></li>
+          <li><a href="#s6">現代の比較ポイント</a></li>
+          <li><a href="#s7">宣言型クエリ言語</a></li>
+          <li><a href="#s8">MapReduceクエリ</a></li>
+          <li><a href="#s9">グラフ型データモデル</a></li>
+          <li><a href="#s10">Chapter 2の結論</a></li>
+        </ol>
+      </nav>
+
+      <article>
+        <section id="s1">
+          <h2>1. データモデルは、単なる保存形式ではなく「考え方」を決める</h2>
+          <p class="lead">
+            ソフトウェア開発において、データモデルは極めて重要である。なぜなら、データモデルは単にデータの保存方法を決めるだけではなく、開発者が問題領域をどう捉えるか、どのようにアプリケーションを設計するかにまで影響するからである。
+          </p>
+          <p>
+            アプリケーションは、複数のデータモデルを層として重ねながら作られている。現実世界には人、組織、商品、取引、センサー、行動履歴などが存在する。開発者は、それらをオブジェクト、構造体、API、ドメインモデルとして表現する。さらに、それを永続化する段階では、リレーショナルテーブル、JSON/XMLドキュメント、グラフ構造など、汎用的なデータモデルに変換する。
+          </p>
+          <p>
+            データベース内部では、それらがメモリ・ディスク・ネットワーク上のバイト列として表現される。つまり、上位の層は下位の層の複雑さを隠蔽し、扱いやすい抽象化を提供している。
+          </p>
+          <div class="key-point">
+            <strong>重要な見方：</strong>
+            よいデータモデルは、開発者が問題を自然に表現できるようにする。一方で、合わないデータモデルを選ぶと、本来は単純なはずの操作が不自然になり、実装も複雑になる。
+          </div>
+          <p>
+            この章の中心的な問いは、<strong>「どのデータモデルが、どのようなアプリケーションに向いているのか」</strong>である。
+          </p>
+        </section>
+
+        <section id="s2">
+          <h2>2. リレーショナルモデルとドキュメントモデル</h2>
+          <p>
+            現在もっとも広く知られているデータモデルは、SQLで使われるリレーショナルモデルである。リレーショナルモデルでは、データはリレーション、SQLでいうテーブルとして表現され、各テーブルは行の集合として扱われる。
+          </p>
+          <p>
+            リレーショナルモデルは1970年にEdgar Coddによって提案された。当初は理論的な提案であり、効率的に実装できるのか疑問視されていた。しかし1980年代半ばには、RDBMSとSQLが、構造化されたデータを保存・検索するための標準的な手段になった。
+          </p>
+          <p>
+            もともとリレーショナルデータベースは、銀行取引、航空券予約、在庫管理、給与計算、請求処理など、企業の業務データ処理を主な対象としていた。だが、その後Webサービス、SNS、EC、ゲーム、SaaSなど、当初の想定を超えた幅広い用途にも適用され続けた。
+          </p>
+
+          <h3>NoSQLが登場した背景</h3>
+          <p>
+            2010年代に入ると、NoSQLという言葉が広まった。NoSQLは特定の技術を指す厳密な用語ではなく、もともとは非リレーショナルな分散データベースを扱うミートアップのハッシュタグとして使われた言葉である。その後、「Not Only SQL」と解釈されるようになった。
+          </p>
+          <ul>
+            <li>巨大データや高い書き込みスループットへの対応が必要になった</li>
+            <li>商用DBよりも、自由に使えるOSSを好む流れが強まった</li>
+            <li>リレーショナルモデルでは扱いづらい特殊な問い合わせが必要になった</li>
+            <li>固定的なスキーマへの不満から、より柔軟なデータモデルが求められた</li>
+          </ul>
+          <div class="warning">
+            <strong>誤解しやすい点：</strong>
+            NoSQLはRDBを完全に置き換えるものではない。アプリケーションごとに適したデータモデルは異なるため、リレーショナルDBと非リレーショナルDBは併存する。
+          </div>
+        </section>
+
+        <section id="s3">
+          <h2>3. オブジェクト指向とリレーショナルモデルのずれ</h2>
+          <p>
+            多くのアプリケーションはオブジェクト指向言語で書かれる。しかし、リレーショナルDBではデータをテーブル、行、列として扱う。このため、アプリケーション上のオブジェクト構造と、DB上のテーブル構造の間には変換が必要になる。このずれは、インピーダンスミスマッチと呼ばれる。
+          </p>
+          <p>
+            ORM、たとえばHibernateやActiveRecordは、この変換作業を軽減する。しかし、オブジェクトモデルとリレーショナルモデルの違いそのものを完全に消すことはできない。
+          </p>
+
+          <h3>LinkedInプロフィールの例</h3>
+          <p>
+            本章では、LinkedInのプロフィールのような履歴書データを例にしている。ユーザーの名前や概要のように一人につき一つだけ存在する情報は、usersテーブルの列として自然に表現できる。しかし、職歴、学歴、連絡先のように一人に対して複数存在する情報は、別テーブルに分けて外部キーで結びつける必要がある。
+          </p>
+          <p>
+            一方、同じプロフィールをJSONドキュメントとして表現すると、ユーザー情報、職歴、学歴、連絡先を一つのまとまった文書として保存できる。この場合、プロフィール全体を取得するときには一度の読み取りで済み、データの局所性が高い。
+          </p>
+
+          <pre><code>{
+  "user_id": 251,
+  "first_name": "Bill",
+  "last_name": "Gates",
+  "positions": [
+    { "job_title": "Co-chair", "organization": "Bill & Melinda Gates Foundation" },
+    { "job_title": "Co-founder, Chairman", "organization": "Microsoft" }
+  ],
+  "education": [
+    { "school_name": "Harvard University", "start": 1973, "end": 1975 }
+  ]
+}</code></pre>
+
+          <div class="key-point">
+            <strong>ドキュメントモデルが自然なケース：</strong>
+            一つの親データに複数の子データがぶら下がり、それらをまとめて読み書きするケース。職歴や学歴はユーザーにぶら下がる一対多のツリー構造なので、JSONドキュメントの入れ子構造と相性がよい。
+          </div>
+        </section>
+
+        <section id="s4">
+          <h2>4. 多対一・多対多の関係が出てくると話が変わる</h2>
+          <p>
+            ドキュメントモデルが得意なのは、基本的にツリー構造である。しかし、現実のアプリケーションでは、データは次第に相互接続されていく。
+          </p>
+          <p>
+            たとえば、プロフィールの地域や業界を単なる文字列として保存するのではなく、標準化された地域IDや業界IDとして保存したくなる。これは、表記ゆれを防ぐ、曖昧さを避ける、名称変更に対応しやすくする、多言語表示を可能にする、検索を改善する、といった利点があるからである。
+          </p>
+
+          <h3>正規化の意味</h3>
+          <p>
+            人間にとって意味のある文字列を各レコードに重複して保存すると、後で変更が必要になったときにすべてのコピーを更新しなければならない。更新漏れがあれば不整合が起きる。そこで、意味のある情報は一箇所に置き、それをIDで参照する。これが正規化の基本的な考え方である。
+          </p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>保存方法</th>
+                <th>特徴</th>
+                <th>リスク・注意点</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>文字列を直接保存</td>
+                <td>単純で読みやすい。JOIN不要。</td>
+                <td>表記ゆれ、重複、変更時の更新漏れが起きやすい。</td>
+              </tr>
+              <tr>
+                <td>IDで参照</td>
+                <td>意味のある情報を一箇所に集約できる。正規化しやすい。</td>
+                <td>参照先を引く必要があり、JOINまたはアプリ側の結合処理が必要になる。</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>
+            正規化すると、多対一や多対多の関係が増える。たとえば、多くのユーザーが一つの地域に属する。多くのユーザーが一つの業界に属する。さらに、会社や学校を単なる文字列ではなく独立したエンティティにしたり、ユーザー同士が推薦文を書けるようにしたりすると、データ同士のつながりはさらに複雑になる。
+          </p>
+          <div class="warning">
+            <strong>設計上の盲点：</strong>
+            初期段階ではドキュメントモデルにきれいに収まっていたデータでも、機能追加によって関係が増えると、徐々にドキュメントモデルだけでは扱いづらくなる。
+          </div>
+        </section>
+
+        <section id="s5">
+          <h2>5. ドキュメントDBは過去の歴史を繰り返しているのか</h2>
+          <p>
+            本章では、ドキュメントDBと過去の階層型データベースの類似性も論じられている。
+          </p>
+          <p>
+            1970年代には、IBMのIMSのような階層型データベースが使われていた。階層型モデルでは、データは親子関係を持つレコードのツリーとして表現される。これは、現代のJSONドキュメントの入れ子構造にかなり似ている。
+          </p>
+          <p>
+            階層型モデルは一対多の関係には向いていたが、多対多の関係やJOINには弱かった。そのため、開発者はデータを重複して持つか、参照をアプリケーション側でたどる必要があった。これは、現代のドキュメントDBで起こりがちな問題とよく似ている。
+          </p>
+
+          <h3>ネットワークモデルとリレーショナルモデル</h3>
+          <p>
+            この問題に対する歴史的な解決策として、ネットワークモデルとリレーショナルモデルが登場した。ネットワークモデルでは、レコードが複数の親を持つことができ、多対多を表現できた。しかし、データへアクセスするには、あらかじめ定義されたアクセスパスをアプリケーションがたどる必要があった。
+          </p>
+          <p>
+            これに対して、リレーショナルモデルの大きな進歩は、アクセスパスの指定をアプリケーションから切り離した点にある。開発者は「何を取得したいか」を宣言し、データベースのクエリオプティマイザが「どの順序で、どのインデックスを使って取得するか」を決める。
+          </p>
+          <div class="key-point">
+            <strong>リレーショナルモデルの本質：</strong>
+            単にテーブル形式であることではない。データの物理的な辿り方をアプリケーションから隠蔽し、クエリ最適化をDB側に任せられることにある。
+          </div>
+        </section>
+
+        <section id="s6">
+          <h2>6. 現代におけるリレーショナルDBとドキュメントDBの比較</h2>
+          <p>
+            リレーショナルDBとドキュメントDBの優劣は、単純には決められない。どちらが優れているかではなく、データの形とアクセスパターンに合っているかが重要である。
+          </p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>観点</th>
+                <th>ドキュメントモデル</th>
+                <th>リレーショナルモデル</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>得意なデータ構造</td>
+                <td>一対多のツリー構造。親子データをまとめて扱う構造。</td>
+                <td>多対一・多対多を含む相互参照の多い構造。</td>
+              </tr>
+              <tr>
+                <td>読み取り</td>
+                <td>関連情報を一つの文書にまとめられるため、局所性が高い。</td>
+                <td>JOINにより、必要な関係を柔軟に組み立てられる。</td>
+              </tr>
+              <tr>
+                <td>スキーマ</td>
+                <td>柔軟。ただし実際にはアプリケーション側が構造を期待している。</td>
+                <td>DBがスキーマを強制する。データ品質を保ちやすい。</td>
+              </tr>
+              <tr>
+                <td>複雑な関係</td>
+                <td>JOINが弱い場合、アプリ側で複数クエリを組み合わせる必要がある。</td>
+                <td>外部キーとJOINで自然に扱いやすい。</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>「スキーマレス」という表現への注意</h3>
+          <p>
+            ドキュメントDBでよく言われる「スキーマレス」という表現には注意が必要である。実際には、アプリケーションコードは何らかのデータ構造を期待している。つまり、スキーマが存在しないのではなく、DBが強制するスキーマではなく、アプリケーション側が読み取り時に解釈するスキーマになっている。
+          </p>
+          <p>
+            この違いは、<strong>schema-on-write</strong> と <strong>schema-on-read</strong> の違いとして理解できる。
+          </p>
+        </section>
+
+        <section id="s7">
+          <h2>7. クエリ言語：命令型より宣言型が強い理由</h2>
+          <p>
+            SQLは宣言型クエリ言語である。宣言型とは、「どのデータが欲しいか」を記述する形式であり、「どの順番で、どの手順でデータを取得するか」は直接指定しない。
+          </p>
+          <p>
+            これに対して、命令型のAPIでは、アプリケーション開発者がデータ取得の手順を細かく書く。どのレコードをたどるか、どの順番で処理するか、条件に合うかどうかをどう判定するかを、コードとして記述する必要がある。
+          </p>
+
+          <div class="grid">
+            <div class="mini-card">
+              <h3>宣言型</h3>
+              <p>何が欲しいかを書く。実行方法は処理系に任せる。</p>
+            </div>
+            <div class="mini-card">
+              <h3>命令型</h3>
+              <p>どう取得するか、どの順で処理するかを書く。</p>
+            </div>
+            <div class="mini-card">
+              <h3>利点</h3>
+              <p>DBが実行計画やインデックス利用を最適化できる。</p>
+            </div>
+          </div>
+
+          <p>
+            宣言型クエリの利点は、DBがクエリ最適化できる点にある。開発者がアクセスパスを固定してしまうと、インデックス追加や実行計画の改善を活かしづらい。一方、宣言型であれば、DB側が実行順序やインデックス選択を変更しても、クエリの意味は変わらない。
+          </p>
+          <p>
+            WebのCSSも宣言型の例として理解できる。CSSでは「この条件に合う要素にはこのスタイルを適用する」と宣言するだけでよい。JavaScriptでDOMを手続き的にたどってスタイルを変更するよりも、CSSのほうが短く、理解しやすく、ブラウザ側の最適化もしやすい。
+          </p>
+        </section>
+
+        <section id="s8">
+          <h2>8. MapReduceクエリ</h2>
+          <p>
+            NoSQLデータストアの一部では、MapReduceをクエリ手段として使うことがある。MapReduceは、大量のデータを複数マシンで分散処理するためのプログラミングモデルである。
+          </p>
+          <p>
+            MapReduceは完全な宣言型でも、完全な命令型でもない。map関数とreduce関数というコード片を開発者が書き、それを処理基盤が多数のデータに対して繰り返し適用する。
+          </p>
+          <p>
+            たとえば、観測データから「月ごとのサメの目撃数」を集計する場合、SQLならフィルタ、グループ化、合計を一つのクエリとして書ける。一方、MapReduceでは、各観測データから年月と個体数を取り出すmap関数と、同じ年月の個体数を合計するreduce関数を書く。
+          </p>
+          <div class="warning">
+            <strong>実務上の評価：</strong>
+            MapReduceは分散処理には有用だが、使いやすさという点ではSQLのような宣言型クエリに劣る。NoSQLシステムも、使いやすさを追求するとSQLに似た宣言型機能を再発明しがちである。
+          </div>
+        </section>
+
+        <section id="s9">
+          <h2>9. グラフ型データモデル</h2>
+          <p>
+            データの関係がさらに複雑になり、多対多の関係が中心になると、グラフモデルが自然になる。
+          </p>
+          <p>
+            グラフは、頂点と辺で構成される。頂点は人、場所、組織、Webページ、道路の交差点などを表す。辺は、それらの間の関係を表す。たとえば、SNSなら人が頂点で、友人関係が辺になる。Webならページが頂点で、リンクが辺になる。道路網なら交差点が頂点で、道路が辺になる。
+          </p>
+
+          <h3>property graph</h3>
+          <p>
+            property graphでは、各頂点と各辺がIDを持ち、さらにkey-value形式のプロパティを持つ。辺には向きがあり、どの頂点からどの頂点へ向かう関係なのかを表す。また、辺にはラベルがあり、関係の種類を表せる。
+          </p>
+
+          <h3>Cypher</h3>
+          <p>
+            Cypherは、property graph向けの宣言型クエリ言語である。ノードと辺のパターンを図式的に表すような構文を持ち、「このような関係パターンに一致するデータを探す」という書き方ができる。
+          </p>
+
+          <h3>triple-store / SPARQL / Datalog</h3>
+          <p>
+            triple-storeは、すべての情報を「主語・述語・目的語」の三つ組で表すモデルである。RDFやSPARQLはこの系統に属する。SPARQLは、この三つ組の集合に対してパターンマッチする宣言型クエリ言語である。
+          </p>
+          <p>
+            Datalogは古い言語だが、ルールに基づいてデータを問い合わせる強力な表現力を持っている。一般的なアプリケーション開発者には馴染みが薄いが、複雑な推論や関係探索に向いた考え方を持っている。
+          </p>
+        </section>
+
+        <section id="s10">
+          <h2>10. Chapter 2の結論</h2>
+          <p>
+            この章の結論は、データモデルに絶対的な正解はない、ということに尽きる。
+          </p>
+
+          <ul class="summary-list">
+            <li>
+              <span class="badge">Document</span>
+              データが一対多のツリー構造で、親データと子データをまとめて読み書きするなら、ドキュメントモデルは自然である。
+            </li>
+            <li>
+              <span class="badge">Relational</span>
+              データ同士の関係が多く、JOINや多対多の関係を頻繁に扱うなら、リレーショナルモデルが強い。
+            </li>
+            <li>
+              <span class="badge">Graph</span>
+              関係そのものが主要な関心事であり、データが密につながっているなら、グラフモデルが有力になる。
+            </li>
+          </ul>
+
+          <h3>設計時に先に問うべきこと</h3>
+          <ul>
+            <li>データはツリー状か、相互参照が多いか</li>
+            <li>一つの集約を丸ごと読むのか、部分的に多方向から検索するのか</li>
+            <li>重複を許容するのか、正規化して一貫性を保つのか</li>
+            <li>JOINをDBに任せるのか、アプリケーション側で解決するのか</li>
+            <li>将来、データ同士の関係が増える可能性は高いか</li>
+          </ul>
+
+          <div class="key-point">
+            <strong>バックエンド設計への示唆：</strong>
+            DB選定やテーブル設計を「なんとなくRDB」「なんとなくJSON」で決めると、後から機能追加で苦しくなる。Chapter 2は、データモデルを“保存形式”ではなく、“アプリケーションの拡張性・複雑性・問い合わせ能力を左右する設計判断”として捉え直す章である。
+          </div>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <footer>
+    <p>
+      作成物：Chapter 2「Data Models and Query Languages」の学習用再構成HTML。原文の逐語訳ではなく、内容理解のための日本語整理版。
+    </p>
+  </footer>
+</body>
+</html>

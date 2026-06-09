@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Designing Data-Intensive Applications Chapter 3: Storage and Retrieval 解説</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #111832;
+      --panel2: #151f3d;
+      --ink: #edf2ff;
+      --muted: #b7c2df;
+      --subtle: #8793b5;
+      --line: #273457;
+      --accent: #7dd3fc;
+      --accent2: #a78bfa;
+      --ok: #8bdc9e;
+      --warn: #facc15;
+      --bad: #fb7185;
+      --code: #07111f;
+      --card: #0f1730;
+      --shadow: 0 20px 60px rgba(0,0,0,.35);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: radial-gradient(circle at 20% 0%, #172554 0, rgba(23,37,84,.15) 36%, transparent 58%),
+                  radial-gradient(circle at 100% 0%, #3b0764 0, rgba(59,7,100,.18) 30%, transparent 55%),
+                  var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", "Hiragino Sans", Meiryo, sans-serif;
+      line-height: 1.75;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    header.hero {
+      padding: 56px 28px 34px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(135deg, rgba(125,211,252,.12), rgba(167,139,250,.08));
+    }
+    .hero-inner { max-width: 1180px; margin: 0 auto; }
+    .eyebrow {
+      display: inline-flex; gap: 8px; align-items: center;
+      color: var(--accent); font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+      font-size: 13px; margin-bottom: 10px;
+    }
+    h1 { margin: 0; font-size: clamp(30px, 5vw, 58px); line-height: 1.12; letter-spacing: -.03em; }
+    .subtitle { max-width: 980px; color: var(--muted); font-size: 18px; margin: 18px 0 0; }
+    .notice {
+      margin-top: 22px; padding: 14px 16px; border: 1px solid rgba(125,211,252,.35);
+      border-radius: 14px; background: rgba(125,211,252,.08); color: var(--muted);
+    }
+    .layout { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 28px; padding: 28px; }
+    nav.toc {
+      position: sticky; top: 18px; align-self: start; max-height: calc(100vh - 36px); overflow: auto;
+      padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: rgba(17,24,50,.92); box-shadow: var(--shadow);
+    }
+    nav.toc h2 { font-size: 16px; margin: 0 0 10px; color: var(--ink); }
+    nav.toc ol { margin: 0; padding-left: 20px; color: var(--subtle); }
+    nav.toc li { margin: 7px 0; }
+    nav.toc a { color: var(--muted); font-size: 14px; }
+    main { min-width: 0; }
+    section {
+      margin: 0 0 28px; padding: 26px; border: 1px solid var(--line); border-radius: 22px;
+      background: rgba(17,24,50,.86); box-shadow: var(--shadow);
+    }
+    section h2 { margin: 0 0 18px; font-size: 28px; line-height: 1.25; letter-spacing: -.02em; }
+    section h3 { margin: 28px 0 12px; font-size: 21px; color: #dbeafe; }
+    section h4 { margin: 22px 0 8px; font-size: 16px; color: var(--accent); }
+    p { margin: 10px 0; }
+    ul, ol { padding-left: 1.35em; }
+    li { margin: 6px 0; }
+    .lead { font-size: 17px; color: var(--muted); }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .card {
+      padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: rgba(15,23,48,.84);
+    }
+    .card h3, .card h4 { margin-top: 0; }
+    .tag { display: inline-block; border: 1px solid var(--line); color: var(--muted); border-radius: 999px; padding: 3px 10px; font-size: 12px; margin: 0 6px 6px 0; background: rgba(255,255,255,.03); }
+    .callout { border-left: 4px solid var(--accent); background: rgba(125,211,252,.08); padding: 12px 14px; border-radius: 12px; color: var(--muted); margin: 16px 0; }
+    .warning { border-left-color: var(--warn); background: rgba(250,204,21,.08); }
+    .danger { border-left-color: var(--bad); background: rgba(251,113,133,.08); }
+    .ok { border-left-color: var(--ok); background: rgba(139,220,158,.08); }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+    pre {
+      overflow: auto; background: var(--code); border: 1px solid #1d2a4a; border-radius: 16px; padding: 16px; color: #dbeafe; line-height: 1.55;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+    code { color: #bfdbfe; }
+    .caption { margin-top: 8px; color: var(--subtle); font-size: 13px; }
+    table { width: 100%; border-collapse: collapse; margin: 14px 0; overflow: hidden; border-radius: 14px; }
+    th, td { border: 1px solid var(--line); padding: 10px 12px; vertical-align: top; }
+    th { background: rgba(125,211,252,.12); color: #e0f2fe; text-align: left; }
+    td { background: rgba(15,23,48,.62); }
+    .figure {
+      margin: 18px 0; padding: 16px; border: 1px solid var(--line); border-radius: 18px; background: rgba(255,255,255,.035);
+    }
+    .diagram { overflow-x: auto; padding: 10px 4px 4px; }
+    .row { display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap; }
+    .box { border: 1px solid #40507a; background: rgba(15,23,48,.8); padding: 8px 10px; border-radius: 10px; min-width: 72px; text-align: center; }
+    .box.small { min-width: 44px; padding: 6px 8px; font-size: 13px; }
+    .box.dim { color: var(--muted); background: rgba(255,255,255,.04); }
+    .box.hot { border-color: rgba(125,211,252,.8); background: rgba(125,211,252,.13); }
+    .box.warn { border-color: rgba(250,204,21,.8); background: rgba(250,204,21,.10); }
+    .arrow { color: var(--accent); font-weight: 800; align-self: center; }
+    .stack { display: flex; flex-direction: column; gap: 8px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; border-radius: 999px; background: rgba(125,211,252,.12); color: #e0f2fe; font-size: 12px; border: 1px solid rgba(125,211,252,.28); }
+    .svg-wrap svg { width: 100%; min-width: 640px; height: auto; display: block; }
+    .svg-wrap text { fill: #e5edff; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .svg-wrap .muted { fill: #aab6d3; }
+    .svg-wrap .label { fill: #7dd3fc; font-weight: 700; }
+    .svg-wrap rect { fill: rgba(15,23,48,.8); stroke: #40507a; stroke-width: 1.4; rx: 8; }
+    .svg-wrap .hl { fill: rgba(125,211,252,.15); stroke: #7dd3fc; }
+    .svg-wrap .warn { fill: rgba(250,204,21,.12); stroke: #facc15; }
+    .svg-wrap path, .svg-wrap line { stroke: #7dd3fc; stroke-width: 2; fill: none; }
+    .mini-table { display: grid; grid-template-columns: repeat(4, auto); gap: 1px; width: max-content; border: 1px solid var(--line); background: var(--line); }
+    .mini-table span { background: rgba(15,23,48,.95); padding: 5px 8px; font-family: ui-monospace, monospace; font-size: 12px; }
+    .wide { overflow-x: auto; }
+    .source { font-size: 13px; color: var(--subtle); margin-top: 18px; }
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      nav.toc { position: static; max-height: none; }
+      .grid, .grid-3, .two-col { grid-template-columns: 1fr; }
+    }
+  </style>
+  <link rel="stylesheet" href="ddia-theme.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">DDIA Chapter 3 解説ノート</div>
+      <h1>Storage and Retrieval<br>ストレージエンジンは、なぜ速く読めるのか</h1>
+      <p class="subtitle">Martin Kleppmann『Designing Data-Intensive Applications』第3章を、バックエンドエンジニアの実務理解につながる形で再構成した日本語解説です。コード例、SQL例、図3-1〜図3-12に対応する再構成図を含めています。</p>
+      <div class="notice">注: 図は原書の図そのものの転載ではなく、原書の論点を理解するために作成した再構成図です。本文は原文の逐語訳ではなく、意味を崩さない範囲で日本語の説明として書き直しています。</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="toc">
+      <h2>目次</h2>
+      <ol>
+        <li><a href="#thesis">第3章の中心主張</a></li>
+        <li><a href="#simple-db">最小のDB: append-only log</a></li>
+        <li><a href="#hash-index">Hash Indexes</a></li>
+        <li><a href="#sstable-lsm">SSTables and LSM-Trees</a></li>
+        <li><a href="#btree">B-Trees</a></li>
+        <li><a href="#compare">B-tree と LSM-tree の比較</a></li>
+        <li><a href="#other-indexes">その他のインデックス</a></li>
+        <li><a href="#in-memory">インメモリDB</a></li>
+        <li><a href="#oltp-olap">OLTP と OLAP</a></li>
+        <li><a href="#warehouse">データウェアハウスとETL</a></li>
+        <li><a href="#star-schema">スター/スノーフレークスキーマ</a></li>
+        <li><a href="#column-storage">カラム指向ストレージ</a></li>
+        <li><a href="#column-compression">カラム圧縮</a></li>
+        <li><a href="#sort-order">カラムストアの並び順</a></li>
+        <li><a href="#column-write">カラムストアへの書き込み</a></li>
+        <li><a href="#cube">集計・データキューブ</a></li>
+        <li><a href="#practical">実務判断のチェックリスト</a></li>
+      </ol>
+    </nav>
+
+    <main>
+      <section id="thesis">
+        <h2>1. 第3章の中心主張</h2>
+        <p class="lead">第3章は「データベースが内部でデータをどう保存し、どう探し出しているのか」を扱います。アプリ開発者がストレージエンジンを自作する必要は通常ありませんが、DBの内部動作を知らないままでは、インデックス設計、SQLチューニング、DB選定、ログ/メトリクスの解釈を誤ります。</p>
+        <div class="grid">
+          <div class="card">
+            <h3>前半: OLTP向けストレージエンジン</h3>
+            <p>主に「少数レコードを高速に読み書きする」用途です。代表は <strong>hash index</strong>、<strong>SSTable/LSM-tree</strong>、<strong>B-tree</strong> です。バックエンドAPIが普段触るRDB/Key-Value Storeの多くは、この領域の理解が重要です。</p>
+          </div>
+          <div class="card">
+            <h3>後半: OLAP向けストレージエンジン</h3>
+            <p>主に「大量レコードをスキャンし、少数の列だけ読み、集計する」用途です。<strong>データウェアハウス</strong>、<strong>スター・スキーマ</strong>、<strong>カラム指向ストレージ</strong>、<strong>カラム圧縮</strong> が中心になります。</p>
+          </div>
+        </div>
+        <div class="callout warning">
+          <strong>この章の実務的な読み方:</strong> 「B-treeだから良い」「LSM-treeだから速い」という雑な理解は危険です。正しくは、<em>読み取りパターン、書き込み量、範囲検索の有無、集計クエリの比率、ディスクI/O、メモリ量、更新頻度</em> の組み合わせで適性が変わります。
+        </div>
+      </section>
+
+      <section id="simple-db">
+        <h2>2. 最小のDB: append-only log から始める</h2>
+        <p>章の冒頭では、世界で最も単純なDBとして Bash 関数の key-value store が示されます。ポイントは「書き込み時に既存データを上書きしないで、ファイル末尾に追記する」という設計です。</p>
+        <h3>原書に記載されているコード例</h3>
+        <pre><code>#!/bin/bash
+
+db_set () {
+    echo "$1,$2" &gt;&gt; database
+}
+
+db_get () {
+    grep "^$1," database | sed -e "s/^$1,//" | tail -n 1
+}</code></pre>
+        <p><code>db_set</code> は <code>database</code> というファイルの末尾へ <code>key,value</code> を追記します。<code>db_get</code> はファイル全体を先頭から検索し、最後に出てきた値を返します。更新が発生しても古い値を消さず、最新値を末尾に積む構造です。</p>
+        <pre><code>$ db_set 123456 '{"name":"London","attractions":["Big Ben","London Eye"]}'
+$ db_set 42 '{"name":"San Francisco","attractions":["Golden Gate Bridge"]}'
+$ db_get 42
+{"name":"San Francisco","attractions":["Golden Gate Bridge"]}
+
+$ db_set 42 '{"name":"San Francisco","attractions":["Exploratorium"]}'
+$ db_get 42
+{"name":"San Francisco","attractions":["Exploratorium"]}</code></pre>
+        <div class="figure">
+          <h3>図3-1相当: 追記ログとインメモリhash map</h3>
+          <div class="diagram two-col">
+            <div>
+              <div class="mini-table mono">
+                <span><strong>key</strong></span><span><strong>offset</strong></span><span><strong>説明</strong></span><span><strong>状態</strong></span>
+                <span>123456</span><span>0</span><span>Londonの開始位置</span><span>有効</span>
+                <span>42</span><span>68</span><span>最新San Francisco</span><span>有効</span>
+              </div>
+              <p class="caption">メモリ上のhash mapは「key → ファイル内のbyte offset」を保持する。</p>
+            </div>
+            <div class="stack mono">
+              <div class="box dim">offset 0: 123456,{"name":"London",...}</div>
+              <div class="box dim">offset 40: 42,{"name":"San Francisco", "Golden Gate Bridge"}</div>
+              <div class="box hot">offset 68: 42,{"name":"San Francisco", "Exploratorium"}</div>
+            </div>
+          </div>
+          <p class="caption">追記だけなら書き込みは非常に速い。一方で、インデックスがなければ読み取りは毎回フルスキャンになる。</p>
+        </div>
+        <h3>この単純DBから見える本質</h3>
+        <ul>
+          <li><strong>書き込みは速い:</strong> ファイル末尾への追記は、ディスクにとって最も単純な書き込みの一つです。</li>
+          <li><strong>読み取りは遅い:</strong> <code>db_get</code> は全行を走査するため、レコード数を <code>n</code> とすると検索コストは <code>O(n)</code> です。</li>
+          <li><strong>インデックスが必要:</strong> 読み取りを速くするため、主データとは別に「探すための補助構造」を持ちます。</li>
+          <li><strong>インデックスは無料ではない:</strong> 読み取りを速くする代わりに、書き込み時にはインデックス更新コストが増えます。</li>
+        </ul>
+        <div class="callout danger">
+          <strong>重要なトレードオフ:</strong> インデックスはクエリを速くしますが、全ての書き込みを遅くします。何でもインデックスを張るのは設計ではなく、将来の書き込み性能とストレージ容量を削る行為です。
+        </div>
+      </section>
+
+      <section id="hash-index">
+        <h2>3. Hash Indexes</h2>
+        <p>Hash index は、key-value store に対して非常に自然なインデックスです。メモリ上のhash mapに、各keyの最新値が存在するファイル位置を保持します。</p>
+        <h3>仕組み</h3>
+        <ol>
+          <li>値を書き込むとき、ログファイル末尾に <code>key,value</code> を追記する。</li>
+          <li>同時に、メモリ上のhash mapを <code>key → 最新レコードのoffset</code> に更新する。</li>
+          <li>読み取り時はhash mapでoffsetを得て、その位置へseekして値を読む。</li>
+        </ol>
+        <p>RiakのデフォルトストレージエンジンだったBitcaskは、この考え方に近い設計です。条件は、全keyがメモリに収まることです。value自体はディスク上に置けますが、keyとoffsetの対応表はRAMに置く必要があります。</p>
+        <h3>ログが肥大化する問題: segment と compaction</h3>
+        <p>追記だけでは古い値が永遠に残り、ディスクを使い切ります。そこでログを一定サイズの <strong>segment</strong> に分け、古いsegmentをバックグラウンドで <strong>compaction</strong> します。compactionは同じkeyの古い値を捨て、最新値だけを残す処理です。</p>
+        <div class="figure">
+          <h3>図3-2相当: compaction</h3>
+          <div class="diagram stack mono">
+            <div class="row"><span class="pill">古いsegment</span><div class="box">mew:1078</div><div class="box">purr:2103</div><div class="box dim">mew:1079</div><div class="box dim">purr:2106</div><div class="box hot">yawn:511</div><div class="box hot">purr:2108</div><div class="box hot">mew:1082</div></div>
+            <div class="arrow">↓ 古いkeyの重複を捨てる</div>
+            <div class="row"><span class="pill">圧縮後</span><div class="box hot">yawn:511</div><div class="box hot">purr:2108</div><div class="box hot">mew:1082</div></div>
+          </div>
+          <p class="caption">同じkeyが複数回出現している場合、最新の値だけを残せばよい。</p>
+        </div>
+        <div class="figure">
+          <h3>図3-3相当: compaction + segment merge</h3>
+          <div class="diagram stack mono">
+            <div class="row"><span class="pill">segment 1</span><div class="box">purr:2107</div><div class="box">yawn:511</div><div class="box">mew:1082</div></div>
+            <div class="row"><span class="pill">segment 2</span><div class="box">scratch:252</div><div class="box">mew:1087</div><div class="box">purr:2114</div></div>
+            <div class="arrow">↓ 複数segmentをまとめ、古い値を捨てる</div>
+            <div class="row"><span class="pill">merged</span><div class="box hot">yawn:511</div><div class="box hot">scratch:252</div><div class="box hot">mew:1087</div><div class="box hot">purr:2114</div></div>
+          </div>
+          <p class="caption">マージ中も古いsegmentで読み書きを継続できる。マージ完了後に新segmentへ切り替え、旧segmentを削除する。</p>
+        </div>
+        <h3>実装上の論点</h3>
+        <table>
+          <thead><tr><th>論点</th><th>説明</th></tr></thead>
+          <tbody>
+            <tr><td>ファイル形式</td><td>CSV風の文字列より、長さ付きバイナリ形式のほうが高速で曖昧さが少ない。</td></tr>
+            <tr><td>削除</td><td>実データをその場で消すのではなく、<strong>tombstone</strong> と呼ばれる削除マーカーを追記する。compaction時に過去値を破棄する。</td></tr>
+            <tr><td>クラッシュ復旧</td><td>メモリ上のhash mapは失われるため、segmentを読み直して再構築するか、hash mapのスナップショットをディスクに保存する。</td></tr>
+            <tr><td>部分書き込み</td><td>クラッシュで中途半端なレコードが残る可能性があるため、checksum等で壊れた部分を検出する。</td></tr>
+            <tr><td>並行制御</td><td>追記順序を単純化するため、書き込みは1スレッドに寄せ、読み取りは不変segmentを複数スレッドで読む構成が取りやすい。</td></tr>
+          </tbody>
+        </table>
+        <h3>長所と限界</h3>
+        <div class="grid">
+          <div class="card">
+            <h3>長所</h3>
+            <ul>
+              <li>追記とsegment mergeは順次書き込みになりやすく、ランダム書き込みより速い。</li>
+              <li>segmentが不変なので、クラッシュ復旧や並行読み取りが比較的単純。</li>
+              <li>更新頻度が高く、distinct key数がRAMに収まる場合に強い。</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>限界</h3>
+            <ul>
+              <li>key全体をメモリに置く必要がある。</li>
+              <li>範囲検索に弱い。<code>kitty00000</code>〜<code>kitty99999</code> を順に読む、といった処理には向かない。</li>
+              <li>ハッシュ衝突やリサイズをディスク上でうまく扱うのは難しい。</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="sstable-lsm">
+        <h2>4. SSTables and LSM-Trees</h2>
+        <p>Hash indexの限界を超えるために、segment内のkey-valueペアを <strong>key順にソート</strong> した形式にします。この形式が <strong>SSTable（Sorted String Table）</strong> です。SSTableはLSM-treeの基礎になります。</p>
+        <h3>SSTableの重要条件</h3>
+        <ul>
+          <li>segment内のkey-valueペアがkey順に並んでいる。</li>
+          <li>compaction後のmerged segmentでは、同じkeyは1回だけ出現する。</li>
+          <li>segmentは書き終わったら不変であり、後からその場更新しない。</li>
+        </ul>
+        <div class="figure">
+          <h3>図3-4相当: 複数SSTable segmentのmerge</h3>
+          <div class="diagram stack mono">
+            <div class="row"><span class="pill">segment 1</span><div class="box">handbag</div><div class="box">handful</div><div class="box">handicap</div><div class="box">handkerchief</div></div>
+            <div class="row"><span class="pill">segment 2</span><div class="box">handcuffs</div><div class="box">handful</div><div class="box">handiwork</div><div class="box">handkerchief</div></div>
+            <div class="row"><span class="pill">segment 3</span><div class="box">handful</div><div class="box">handicap</div><div class="box">handlebars</div><div class="box">handoff</div></div>
+            <div class="arrow">↓ sort済みリスト同士のmerge-sort</div>
+            <div class="row"><span class="pill">merged</span><div class="box hot">handbag</div><div class="box hot">handcuffs</div><div class="box hot">handful</div><div class="box hot">handicap</div><div class="box hot">handlebars</div><div class="box hot">handoff</div></div>
+          </div>
+          <p class="caption">複数のソート済みsegmentを先頭から比較し、小さいkeyから出力する。重複keyは新しいsegmentの値を優先する。</p>
+        </div>
+        <h3>なぜSSTableは強いのか</h3>
+        <ol>
+          <li><strong>mergeが効率的:</strong> 入力segmentがソート済みなので、merge sortのように順次読み取りで結合できます。</li>
+          <li><strong>疎なインデックスでよい:</strong> 全keyのoffsetをRAMに持つ必要がなく、数KBごとに代表keyのoffsetを持てばよい。</li>
+          <li><strong>圧縮しやすい:</strong> key順に近いデータが並ぶため、ブロック圧縮との相性が良い。</li>
+        </ol>
+        <div class="figure">
+          <h3>図3-5相当: sparse index によるSSTable検索</h3>
+          <div class="diagram two-col">
+            <div class="stack mono">
+              <div class="box hot">handbag → offset 120</div>
+              <div class="box hot">handsome → offset 520</div>
+              <div class="box hot">hangout → offset 840</div>
+            </div>
+            <div class="stack mono">
+              <div class="box dim">... handbag, handcuffs, handful ...</div>
+              <div class="box warn">handicap, handiwork, handkerchief</div>
+              <div class="box dim">handsome, handwaving, handwriting ...</div>
+            </div>
+          </div>
+          <p class="caption"><code>handiwork</code> を探す場合、<code>handbag</code> と <code>handsome</code> の間にあると分かるため、その範囲だけをスキャンする。</p>
+        </div>
+        <h3>SSTableをどう作るか: memtable</h3>
+        <p>ディスク上で常にソート済み構造を更新するのは高コストです。そこで、まずメモリ上の木構造に書き込みます。このメモリ上の構造を <strong>memtable</strong> と呼びます。</p>
+        <ol>
+          <li>書き込みが来たら、メモリ上のbalanced tree（例: red-black tree）に追加する。</li>
+          <li>memtableが一定サイズを超えたら、key順に走査してSSTableファイルとしてディスクに書き出す。</li>
+          <li>読み取り時は、まずmemtable、次に新しいSSTable、さらに古いSSTableの順で探す。</li>
+          <li>バックグラウンドでSSTable同士をmerge/compactionし、古い値や削除済み値を整理する。</li>
+        </ol>
+        <div class="callout ok">
+          <strong>クラッシュ対策:</strong> memtable上の最新書き込みはまだディスクSSTable化されていないため、別途append-only logへ即時追記します。DB再起動時にはこのログからmemtableを復元し、SSTable化が終わったログは破棄できます。
+        </div>
+        <h3>LSM-treeとは何か</h3>
+        <p>この「memtableに書く → SSTableへflush → SSTableをmerge/compactionする」という考え方が <strong>LSM-tree（Log-Structured Merge-Tree）</strong> です。LevelDB、RocksDB、Cassandra、HBaseなどの基礎思想として使われています。また全文検索エンジンのLuceneも、term dictionaryに似た発想を使います。</p>
+        <h3>性能最適化</h3>
+        <table>
+          <thead><tr><th>問題</th><th>対策</th><th>意味</th></tr></thead>
+          <tbody>
+            <tr><td>存在しないkeyの検索が遅い</td><td>Bloom filter</td><td>「このsegmentにはkeyが絶対にない」と高確率で判定し、不要なディスク読み取りを避ける。</td></tr>
+            <tr><td>compactionのタイミング</td><td>size-tiered compaction</td><td>同程度サイズのSSTableをまとめて大きなSSTableへmergeする。Cassandra/HBaseで見られる考え方。</td></tr>
+            <tr><td>書き込み/読み取り/容量のバランス</td><td>leveled compaction</td><td>key rangeをレベルに分け、重複を抑えながら段階的に整理する。LevelDB/RocksDBで重要。</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="btree">
+        <h2>5. B-Trees</h2>
+        <p>B-treeは、現在でも多くのリレーショナルDBで標準的に使われるインデックス構造です。SSTable/LSM-treeが「不変segmentを追記・mergeする」思想なのに対して、B-treeは「固定サイズのpageをその場で更新する」思想です。</p>
+        <h3>基本構造</h3>
+        <ul>
+          <li>DBファイルを固定サイズの <strong>page/block</strong> に分割する。典型的には4KB程度です。</li>
+          <li>各pageは、子pageへの参照とkey範囲の境界を持つ。</li>
+          <li>検索はroot pageから始まり、keyが属する範囲のchild pageへ降りていく。</li>
+          <li>最終的にleaf pageへ到達し、値そのもの、または値があるheap fileの位置を得る。</li>
+        </ul>
+        <div class="figure svg-wrap">
+          <h3>図3-6相当: B-treeによるkey検索</h3>
+          <svg id="btree-diagram" viewBox="0 0 900 420" role="img" aria-label="B-tree lookup diagram">
+            <defs><marker id="arrow-btree" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7dd3fc" stroke="none"/></marker></defs>
+            <text x="330" y="30" class="label">Lookup user_id = 251</text>
+            <rect x="250" y="55" width="400" height="54" class="hl"/>
+            <text x="275" y="88">ref</text><text x="330" y="88">100</text><text x="395" y="88">200</text><text x="462" y="88">300</text><text x="530" y="88">400</text><text x="595" y="88">500</text>
+            <rect x="95" y="190" width="320" height="54"/>
+            <text x="115" y="223">ref 111</text><text x="195" y="223">135</text><text x="255" y="223">152</text><text x="315" y="223">169</text>
+            <rect x="500" y="190" width="320" height="54" class="warn"/>
+            <text x="520" y="223">ref 210</text><text x="600" y="223">230</text><text x="660" y="223">250</text><text x="720" y="223">270</text>
+            <rect x="540" y="325" width="245" height="48" class="hl"/>
+            <text x="560" y="355">250 val | 251 val | 252 val</text>
+            <line x1="450" y1="109" x2="250" y2="190"/>
+            <line x1="480" y1="109" x2="650" y2="190"/>
+            <line x1="660" y1="244" x2="660" y2="325"/>
+            <text x="665" y="285" class="muted">250 ≤ key &lt; 270</text>
+          </svg>
+          <p class="caption">root page → internal page → leaf pageへ降りる。各pageのkey境界により、探索範囲が段階的に絞られる。</p>
+        </div>
+        <h3>分岐係数と深さ</h3>
+        <p>1つのpageが参照できる子page数を <strong>branching factor</strong> と呼びます。実際には数百になることもあり、そのためB-treeは非常に浅くなります。例えば4KB pageでbranching factorが500なら、4階層でも巨大な件数を扱えます。つまり、数回のpage参照で目的のkeyへ到達できます。</p>
+        <h3>挿入とpage split</h3>
+        <p>新しいkeyを挿入する場合、該当するleaf pageを探して追加します。pageに空きがなければ、pageを2つに分割し、親pageの境界情報を更新します。</p>
+        <div class="figure">
+          <h3>図3-7相当: page split</h3>
+          <div class="diagram stack mono">
+            <div class="row"><span class="pill">挿入前 leaf</span><div class="box">333</div><div class="box">335</div><div class="box">337</div><div class="box">340</div><div class="box">342</div><div class="box dim">spare</div></div>
+            <div class="arrow">↓ key=334 を追加。ページがいっぱいなら分割</div>
+            <div class="row"><span class="pill">left leaf</span><div class="box hot">333</div><div class="box hot">334</div><div class="box hot">335</div><div class="box dim">spare</div></div>
+            <div class="row"><span class="pill">right leaf</span><div class="box hot">337</div><div class="box hot">340</div><div class="box hot">342</div><div class="box dim">spare</div></div>
+            <div class="row"><span class="pill">parent更新</span><div class="box warn">境界: 337</div></div>
+          </div>
+          <p class="caption">分割により木のバランスを保つ。B-treeでは深さがO(log n)になる。</p>
+        </div>
+        <h3>信頼性: WAL が必要になる理由</h3>
+        <p>B-treeはpageを上書きします。page splitのような処理では、複数pageを整合的に更新しなければなりません。途中でクラッシュすると、親pageと子pageの参照関係が壊れる危険があります。そこで多くの実装では <strong>WAL（write-ahead log / redo log）</strong> を使います。</p>
+        <div class="callout">
+          WALの原則は、B-tree本体のpageを変更する前に「これから行う変更」をログへ書くことです。クラッシュ後はWALを再生し、B-treeを一貫した状態へ戻します。
+        </div>
+        <h3>B-tree最適化</h3>
+        <table>
+          <thead><tr><th>最適化</th><th>狙い</th></tr></thead>
+          <tbody>
+            <tr><td>copy-on-write</td><td>pageを上書きせず、新しい場所へ書き、親参照を差し替える。LMDBなどで使われる考え方。</td></tr>
+            <tr><td>keyの省略</td><td>page内に完全なkeyを置かず、境界判定に必要な最小情報にする。branching factorが上がり、階層が浅くなる。</td></tr>
+            <tr><td>leaf pageの連結</td><td>左右のleafへのポインタを持たせ、範囲スキャンを効率化する。</td></tr>
+            <tr><td>ディスク配置</td><td>近いkey範囲のpageを近いディスク位置に置き、範囲検索時のseekを減らす。</td></tr>
+            <tr><td>fractal tree等</td><td>一部log-structuredな発想を取り込み、ディスクseekを減らす。</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="compare">
+        <h2>6. B-tree と LSM-tree の比較</h2>
+        <p>B-treeとLSM-treeの性能比較は、単純な勝敗で決まりません。ベンチマークもワークロードや設定に強く依存します。第3章では一般論として、LSM-treeは書き込みに強い傾向、B-treeは読み取りの予測可能性や成熟度に強い傾向が説明されます。</p>
+        <table>
+          <thead><tr><th>観点</th><th>LSM-tree</th><th>B-tree</th></tr></thead>
+          <tbody>
+            <tr><td>基本思想</td><td>追記、SSTable化、compaction</td><td>固定pageのupdate-in-place</td></tr>
+            <tr><td>書き込み</td><td>順次書き込みに寄せられるため高スループットを出しやすい</td><td>page更新、WAL、page splitによりランダムI/Oが増えやすい</td></tr>
+            <tr><td>読み取り</td><td>複数SSTableを確認する場合があり、読み取りが遅くなることがある</td><td>keyは基本的に1箇所に存在し、読み取りが予測しやすい</td></tr>
+            <tr><td>容量効率</td><td>圧縮しやすく、断片化が少ない傾向</td><td>page split後の空き領域や断片化が発生しやすい</td></tr>
+            <tr><td>遅延のばらつき</td><td>compactionが高パーセンタイル遅延に影響しうる</td><td>比較的安定しやすいが、WALやpage splitの影響はある</td></tr>
+            <tr><td>トランザクション分離</td><td>複数バージョン/segmentを考える必要がある</td><td>key範囲にロックを結び付けやすく、RDBの文脈で成熟している</td></tr>
+          </tbody>
+        </table>
+        <h3>Write amplification</h3>
+        <p>書き込み1回が、内部的に何回もディスク書き込みを発生させる現象を <strong>write amplification</strong> と呼びます。B-treeはWALとpage更新で最低でも複数回書く場合があります。LSM-treeもcompactionで同じデータを繰り返し書くためwrite amplificationが発生します。</p>
+        <div class="callout warning">
+          <strong>実務判断:</strong> write-heavyだから常にLSM-tree、read-heavyだから常にB-tree、という短絡は危険です。読み取りの種類がpoint lookupなのかrange scanなのか、compaction設定、Bloom filter、メモリ、SSD特性、SLOのp99要件まで見ないと判断できません。
+        </div>
+      </section>
+
+      <section id="other-indexes">
+        <h2>7. その他のインデックス構造</h2>
+        <p>ここまで主にprimary key的なkey-value indexを見てきました。しかし実際のDBでは、join、検索、複数条件、地理検索、全文検索など、多様なアクセスパターンがあります。</p>
+        <h3>Secondary index</h3>
+        <p>主キー以外の列やフィールドに張るインデックスです。RDBでは <code>CREATE INDEX</code> で同じテーブルに複数作れます。例えば、ユーザーIDごとの注文を探す、メールアドレスでユーザーを探す、ステータスと作成日で一覧を絞る、といった用途です。</p>
+        <p>primary keyと違い、secondary indexのkeyは一意とは限りません。実装としては、index valueを「該当行IDのリスト」にする、または同じkeyに対して複数エントリを持つ、という方法があります。</p>
+        <h3>index内に何を保存するか</h3>
+        <table>
+          <thead><tr><th>方式</th><th>説明</th><th>長所/短所</th></tr></thead>
+          <tbody>
+            <tr><td>heap file参照</td><td>indexには実データの場所だけを持ち、実データはheap fileに置く。</td><td>複数indexでデータ重複が少ない。ただし読み取り時にindex→heapの追加アクセスが必要。</td></tr>
+            <tr><td>clustered index</td><td>indexのleafに行データそのものを置く。</td><td>読み取りが速い場合がある。MySQL InnoDBのprimary keyが代表例。</td></tr>
+            <tr><td>covering index</td><td>クエリに必要な一部列をindex内に含める。</td><td>indexだけでクエリを完結できる場合があるが、書き込みと容量の負担が増える。</td></tr>
+          </tbody>
+        </table>
+        <h3>Multi-column index</h3>
+        <p>複数列を1つのkeyとして結合するインデックスです。典型例は <code>(last_name, first_name)</code> のような連結インデックスです。この場合、<code>last_name</code> だけ、または <code>last_name + first_name</code> には効きますが、<code>first_name</code> だけの検索には効きにくい点に注意が必要です。</p>
+        <h3>Multi-dimensional index</h3>
+        <p>地理座標など、複数軸の範囲を同時に検索する場合、単純なB-tree/LSM-treeでは苦しくなります。例えば「現在表示している地図の矩形内にあるレストラン」を探すには、緯度と経度の範囲を同時に満たす必要があります。</p>
+        <h4>原書に記載されているSQL例</h4>
+        <pre><code>SELECT * FROM restaurants WHERE latitude  &gt; 51.4946 AND latitude  &lt; 51.5079
+                          AND longitude &gt; -0.1162 AND longitude &lt; -0.1004;</code></pre>
+        <p>このような用途では、空間充填曲線で2次元を1次元に変換して通常のB-treeを使う方法や、R-treeのような空間インデックスが使われます。PostGISのGiST indexは代表例です。</p>
+        <h3>Full-text search と fuzzy index</h3>
+        <p>これまでのindexは「完全一致」または「sort順の範囲検索」が中心でした。しかし全文検索では、類義語、語形変化、スペルミス、編集距離などを扱います。Luceneはterm dictionaryにSSTable的な構造を使いつつ、メモリ上には有限状態オートマトンなどを使い、近い単語の検索を効率化します。</p>
+      </section>
+
+      <section id="in-memory">
+        <h2>8. Keeping Everything in Memory</h2>
+        <p>ディスクはRAMに比べて扱いにくいものです。読み書き性能、データ構造の制約、ランダムアクセスのコストが問題になります。一方で、ディスクには「永続性」と「GBあたりの安さ」がありました。しかしRAMが安くなるにつれ、全データをメモリに置くDBも現実的になってきました。</p>
+        <h3>インメモリDBのポイント</h3>
+        <ul>
+          <li>Memcachedのようにキャッシュ専用で、失われてもよいものがある。</li>
+          <li>VoltDB、MemSQL、Oracle TimesTenのように、RDB的なモデルでインメモリを売りにするものがある。</li>
+          <li>RedisやCouchbaseのように、非同期にディスクへ書くことで弱い永続性を持つものがある。</li>
+          <li>パフォーマンス上の利点は「ディスクを読まない」ことだけではなく、ディスク向けのエンコード形式へ変換しなくてよい点にもある。</li>
+        </ul>
+        <div class="callout">
+          OSのページキャッシュにより、ディスクベースDBでも頻繁に読むデータがメモリに乗ることはあります。それでもインメモリDBは、メモリ上のデータ構造を直接扱えるため、より単純で高速な実装にできる場合があります。
+        </div>
+      </section>
+
+      <section id="oltp-olap">
+        <h2>9. Transaction Processing or Analytics?</h2>
+        <p>第3章後半は、ストレージエンジンの話をOLTPとOLAPの違いへ広げます。ここを理解しないと、「RDBで集計が遅い」「データウェアハウスがなぜ別にあるのか」「カラムナDBがなぜ分析に強いのか」が曖昧になります。</p>
+        <table>
+          <thead><tr><th>性質</th><th>OLTP: Transaction Processing</th><th>OLAP: Analytics</th></tr></thead>
+          <tbody>
+            <tr><td>主な読み取り</td><td>少数レコードをkeyで取得</td><td>大量レコードをスキャンして集計</td></tr>
+            <tr><td>主な書き込み</td><td>ユーザー操作による低遅延なランダム書き込み</td><td>ETLやイベントストリームによる一括投入</td></tr>
+            <tr><td>主な利用者</td><td>エンドユーザー、Webアプリ</td><td>社内アナリスト、意思決定支援</td></tr>
+            <tr><td>データの意味</td><td>現在時点の最新状態</td><td>過去に起きたイベントの履歴</td></tr>
+            <tr><td>典型的なデータ量</td><td>GB〜TB</td><td>TB〜PB</td></tr>
+          </tbody>
+        </table>
+        <div class="callout warning">
+          <strong>誤解注意:</strong> OLTPの「transaction」は必ずACID transactionを意味するわけではありません。ここでは「少数レコードを低遅延で読み書きする対話的処理」という意味が中心です。
+        </div>
+      </section>
+
+      <section id="warehouse">
+        <h2>10. Data Warehousing と ETL</h2>
+        <p>企業には、ECサイト、在庫管理、経路計画、従業員管理など複数のOLTPシステムがあります。これらは業務上重要なので、分析クエリで重くしたくありません。そこで、分析専用の別DBとして <strong>data warehouse</strong> を用意します。</p>
+        <div class="figure svg-wrap">
+          <h3>図3-8相当: OLTPシステムからデータウェアハウスへのETL</h3>
+          <svg id="etl-diagram" viewBox="0 0 900 430" role="img" aria-label="ETL to data warehouse">
+            <defs><marker id="arrow-etl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7dd3fc" stroke="none"/></marker></defs>
+            <text x="55" y="35" class="label">OLTP systems</text>
+            <rect x="80" y="70" width="180" height="70"/><text x="115" y="112">Ecommerce</text><text x="120" y="134" class="muted">Sales DB</text>
+            <rect x="360" y="70" width="180" height="70"/><text x="395" y="112">Inventory</text><text x="400" y="134" class="muted">Stock DB</text>
+            <rect x="640" y="70" width="180" height="70"/><text x="665" y="112">Route Planner</text><text x="685" y="134" class="muted">Geo DB</text>
+            <rect x="105" y="210" width="130" height="54" class="warn"/><text x="130" y="244">transform</text>
+            <rect x="385" y="210" width="130" height="54" class="warn"/><text x="410" y="244">transform</text>
+            <rect x="665" y="210" width="130" height="54" class="warn"/><text x="690" y="244">transform</text>
+            <rect x="330" y="330" width="240" height="65" class="hl"/><text x="380" y="370">Data warehouse</text>
+            <line x1="170" y1="140" x2="170" y2="210"/><line x1="450" y1="140" x2="450" y2="210"/><line x1="730" y1="140" x2="730" y2="210"/>
+            <line x1="235" y1="264" x2="390" y2="330"/><line x1="450" y1="264" x2="450" y2="330"/><line x1="665" y1="264" x2="510" y2="330"/>
+            <text x="145" y="180" class="muted">extract</text><text x="425" y="180" class="muted">extract</text><text x="705" y="180" class="muted">extract</text>
+            <text x="270" y="315" class="muted">load</text><text x="460" y="315" class="muted">load</text><text x="610" y="315" class="muted">load</text>
+            <text x="625" y="370" class="label">BI / analysts query</text>
+          </svg>
+          <p class="caption">ETLは Extract → Transform → Load。OLTP側からデータを取り出し、分析しやすい形に変換し、DWHへ投入する。</p>
+        </div>
+        <h3>なぜ分けるのか</h3>
+        <ul>
+          <li>OLTPは業務運用に直結するため、重い分析クエリで性能劣化させたくない。</li>
+          <li>DWHでは分析向けにスキーマ、インデックス、ストレージレイアウトを最適化できる。</li>
+          <li>複数業務システムのデータを統合・クレンジングできる。</li>
+        </ul>
+      </section>
+
+      <section id="star-schema">
+        <h2>11. Stars and Snowflakes: Schemas for Analytics</h2>
+        <p>DWHでは、多くの場合リレーショナルモデルが使われます。ただしOLTPの正規化設計とは異なり、分析しやすい定型パターンとして <strong>star schema</strong> がよく使われます。</p>
+        <h3>Star schema</h3>
+        <p>中心に <strong>fact table</strong> があり、その周囲に <strong>dimension table</strong> が並びます。factは「発生したイベント」、dimensionは「何を、いつ、どこで、誰が、どの販促で」といった分析軸です。</p>
+        <div class="figure svg-wrap">
+          <h3>図3-9相当: 小売データのstar schema</h3>
+          <svg id="star-schema-diagram" viewBox="0 0 900 470" role="img" aria-label="Star schema">
+            <defs><marker id="arrow-star-schema" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7dd3fc" stroke="none"/></marker></defs>
+            <rect x="335" y="170" width="230" height="120" class="hl"/><text x="372" y="200" class="label">fact_sales</text><text x="356" y="230">date_key</text><text x="356" y="252">product_sk</text><text x="356" y="274">store_sk / customer_sk</text>
+            <rect x="65" y="45" width="210" height="85"/><text x="100" y="80" class="label">dim_product</text><text x="88" y="110">sku, brand, category</text>
+            <rect x="625" y="45" width="210" height="85"/><text x="675" y="80" class="label">dim_store</text><text x="657" y="110">state, city</text>
+            <rect x="65" y="335" width="210" height="85"/><text x="117" y="370" class="label">dim_date</text><text x="86" y="400">year, month, weekday</text>
+            <rect x="625" y="335" width="210" height="85"/><text x="657" y="370" class="label">dim_customer</text><text x="656" y="400">name, birth date</text>
+            <rect x="344" y="360" width="210" height="70"/><text x="373" y="392" class="label">dim_promotion</text>
+            <line x1="275" y1="100" x2="335" y2="190"/><line x1="625" y1="100" x2="565" y2="190"/><line x1="275" y1="370" x2="335" y2="260"/><line x1="625" y1="370" x2="565" y2="260"/><line x1="450" y1="360" x2="450" y2="290"/>
+          </svg>
+          <p class="caption">中心のfact tableから周囲のdimension tableへ外部キーが伸び、星形に見える。</p>
+        </div>
+        <h3>Snowflake schema</h3>
+        <p>dimension tableをさらに正規化し、サブdimensionへ分解したものが <strong>snowflake schema</strong> です。例えば <code>dim_product</code> の中にbrand/category文字列を直接持つ代わりに、<code>dim_brand</code> や <code>dim_category</code> を参照させます。より正規化されますが、分析者にとってはstar schemaの方が扱いやすいことが多いです。</p>
+      </section>
+
+      <section id="column-storage">
+        <h2>12. Column-Oriented Storage</h2>
+        <p>DWHのfact tableは非常に大きく、列数も多いことがあります。しかし分析クエリは全列を読むことが少なく、数列だけを読んで集計することが多いです。そこで、行単位ではなく列単位で保存します。</p>
+        <h3>原書に記載されているSQL例: Example 3-1</h3>
+        <p>曜日ごとに、fresh fruitとcandyの販売数量を比較する分析クエリです。</p>
+        <pre><code>SELECT
+    dim_date.weekday, dim_product.category,
+    SUM(fact_sales.quantity) AS quantity_sold
+FROM fact_sales
+    JOIN dim_date    ON fact_sales.date_key   = dim_date.date_key
+    JOIN dim_product ON fact_sales.product_sk = dim_product.product_sk
+WHERE
+    dim_date.year = 2013 AND
+    dim_product.category IN ('Fresh fruit', 'Candy')
+GROUP BY
+    dim_date.weekday, dim_product.category;</code></pre>
+        <p>このクエリで必要なのは主に <code>date_key</code>、<code>product_sk</code>、<code>quantity</code> です。行指向ストレージでは、各行の100列以上を読み込んでから不要列を捨てることになります。カラム指向では、必要な列ファイルだけを読めます。</p>
+        <div class="figure">
+          <h3>図3-10相当: 行指向 vs カラム指向</h3>
+          <div class="diagram two-col">
+            <div class="card">
+              <h4>Row-oriented</h4>
+              <div class="stack mono">
+                <div class="box">row1: date, product, store, qty, price...</div>
+                <div class="box">row2: date, product, store, qty, price...</div>
+                <div class="box">row3: date, product, store, qty, price...</div>
+              </div>
+              <p class="caption">1行を構成する全列が近くに保存される。1件取得・更新に強い。</p>
+            </div>
+            <div class="card">
+              <h4>Column-oriented</h4>
+              <div class="stack mono">
+                <div class="box hot">date_key: 140102, 140102, 140103...</div>
+                <div class="box hot">product_sk: 69, 69, 31, 31...</div>
+                <div class="box hot">quantity: 1, 3, 1, 3...</div>
+                <div class="box dim">net_price: ...</div>
+                <div class="box dim">discount_price: ...</div>
+              </div>
+              <p class="caption">列ごとに保存される。分析クエリで必要列だけ読むのに強い。</p>
+            </div>
+          </div>
+        </div>
+        <div class="callout">
+          カラム指向というとRDBだけを想像しがちですが、Parquetのようなカラムナフォーマットはドキュメント的なデータモデルにも対応できます。
+        </div>
+      </section>
+
+      <section id="column-compression">
+        <h2>13. Column Compression</h2>
+        <p>カラム指向ストレージは、必要列だけを読むだけでなく、圧縮にも強いです。同じ列には似た値が連続しやすく、値の種類も少ないことが多いからです。</p>
+        <h3>Bitmap encoding</h3>
+        <p>ある列に登場する distinct value ごとにbitmapを作ります。各bitmapは「その行の値がこの値なら1、違えば0」というビット列です。</p>
+        <div class="figure">
+          <h3>図3-11相当: bitmap encoding と run-length encoding</h3>
+          <div class="diagram stack mono">
+            <div class="row"><span class="pill">product_sk列</span><div class="box small">69</div><div class="box small">69</div><div class="box small">74</div><div class="box small">31</div><div class="box small">31</div><div class="box small">30</div><div class="box small">31</div><div class="box small">68</div><div class="box small">69</div></div>
+            <div class="row"><span class="pill">product=31</span><div class="box small dim">0</div><div class="box small dim">0</div><div class="box small dim">0</div><div class="box small hot">1</div><div class="box small hot">1</div><div class="box small dim">0</div><div class="box small hot">1</div><div class="box small dim">0</div><div class="box small dim">0</div></div>
+            <div class="row"><span class="pill">product=69</span><div class="box small hot">1</div><div class="box small hot">1</div><div class="box small dim">0</div><div class="box small dim">0</div><div class="box small dim">0</div><div class="box small dim">0</div><div class="box small dim">0</div><div class="box small dim">0</div><div class="box small hot">1</div></div>
+            <div class="arrow">↓ 0や1の連続を run-length encoding で短く表現</div>
+            <div class="row"><span class="pill">product=31 RLE</span><div class="box warn">3 zeros</div><div class="box warn">2 ones</div><div class="box warn">1 zero</div><div class="box warn">1 one</div><div class="box warn">rest zeros</div></div>
+          </div>
+          <p class="caption">値の種類が少ない列ほど効果が出やすい。疎なbitmapはRLEでさらに小さくできる。</p>
+        </div>
+        <h3>bitmapが分析クエリに強い理由</h3>
+        <h4>原書に記載されている条件例</h4>
+        <pre><code>WHERE product_sk IN (30, 68, 69)</code></pre>
+        <p><code>product_sk = 30</code>、<code>68</code>、<code>69</code> の3つのbitmapを読み、bitwise ORを取れば該当行を高速に求められます。</p>
+        <pre><code>WHERE product_sk = 31 AND store_sk = 3</code></pre>
+        <p>この場合は <code>product_sk = 31</code> のbitmapと <code>store_sk = 3</code> のbitmapのbitwise ANDを取ります。各列ファイルの行順が揃っているため、同じ位置のbitは同じ行を指します。</p>
+        <h3>Memory bandwidth と vectorized processing</h3>
+        <p>分析クエリでは、ディスクI/Oだけでなく、メモリからCPU cacheへデータを移す帯域やCPU処理もボトルネックになります。カラム指向+圧縮では、CPUのL1 cacheに圧縮データの塊を載せ、分岐の少ないtight loopで処理できます。さらにSIMD命令を使って、複数値をまとめて処理できます。これが <strong>vectorized processing</strong> です。</p>
+      </section>
+
+      <section id="sort-order">
+        <h2>14. Sort Order in Column Storage</h2>
+        <p>カラムストアでも、行の順序は重要です。各列を独立にソートしてはいけません。各列のk番目の値が同じ行のk番目である、という対応が壊れるからです。ソートするなら、行全体を同じ順序で並べます。</p>
+        <h3>並び順が効く理由</h3>
+        <ul>
+          <li>クエリが日付範囲をよく指定するなら、<code>date_key</code> を第一ソートキーにすると直近月だけを効率よく読むことができます。</li>
+          <li>第一ソートキーが同じ行では、第二ソートキーで並べると、同じ商品や店舗の行がまとまり、集計が速くなる場合があります。</li>
+          <li>値が連続しやすくなるため、カラム圧縮も効きやすくなります。</li>
+        </ul>
+        <h3>複数のsort order</h3>
+        <p>C-StoreやVerticaのようなシステムでは、同じデータを複数の異なるsort orderで持つ考え方があります。これは行指向DBのsecondary indexに少し似ていますが、カラムストアでは「別の場所の行を指すポインタ」ではなく、値そのものを別の並びで持つ点が異なります。</p>
+      </section>
+
+      <section id="column-write">
+        <h2>15. Writing to Column-Oriented Storage</h2>
+        <p>カラム指向ストレージ、圧縮、ソートは読み取りを速くしますが、書き込みは難しくなります。圧縮済みの列ファイルの途中へ1行挿入するには、全列ファイルを整合的に書き換える必要があるからです。</p>
+        <p>ここでLSM-tree的な発想が再登場します。まず書き込みをメモリ上の構造に受け、十分たまったらソート済み・圧縮済みのカラムファイルとして一括書き出しします。クエリ実行時には、ディスク上のカラムデータとメモリ上の最近の書き込みを統合して見せます。</p>
+        <div class="figure">
+          <h3>カラムストア書き込みの再構成図</h3>
+          <div class="diagram stack mono">
+            <div class="row"><span class="pill">insert/update</span><div class="box hot">in-memory write buffer</div></div>
+            <div class="arrow">↓ 一定量たまる</div>
+            <div class="row"><span class="pill">flush</span><div class="box">sort</div><div class="box">column encode</div><div class="box">compress</div><div class="box">write new column files</div></div>
+            <div class="arrow">↓ query時</div>
+            <div class="row"><span class="pill">read path</span><div class="box warn">disk column files</div><div class="box warn">+</div><div class="box warn">recent memory writes</div></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="cube">
+        <h2>16. Aggregation: Data Cubes and Materialized Views</h2>
+        <p>DWHでは、<code>COUNT</code>、<code>SUM</code>、<code>AVG</code>、<code>MIN</code>、<code>MAX</code> などの集計が多く出ます。同じ集計を毎回raw dataから計算するのは無駄です。そのため、集計済み結果を保存する <strong>materialized view</strong> が使われることがあります。</p>
+        <h3>Materialized view</h3>
+        <p>通常のviewはクエリのショートカットであり、実体は保存されません。一方、materialized viewはクエリ結果の実体をディスクに保存します。読み取りは速くなりますが、元データ変更時にmaterialized viewも更新する必要があり、書き込みは重くなります。</p>
+        <h3>Data cube / OLAP cube</h3>
+        <p>data cubeは、複数のdimensionの組み合わせごとに集計値を事前計算したものです。例えば <code>date_key × product_sk</code> ごとに <code>SUM(net_price)</code> を持てば、「特定商品の特定日の売上」や「日付ごとの合計」「商品ごとの合計」を高速に答えられます。</p>
+        <div class="figure">
+          <h3>図3-12相当: 2次元data cube</h3>
+          <div class="wide">
+            <table class="mono">
+              <thead><tr><th>date \ product</th><th>32</th><th>33</th><th>34</th><th>35</th><th>date total</th></tr></thead>
+              <tbody>
+                <tr><th>140101</th><td>149.60</td><td>31.01</td><td>84.58</td><td>28.18</td><td class="box hot">40710.53</td></tr>
+                <tr><th>140102</th><td>132.18</td><td>19.78</td><td>82.91</td><td>10.96</td><td class="box hot">73091.28</td></tr>
+                <tr><th>140103</th><td>196.75</td><td>0.00</td><td>12.52</td><td>64.67</td><td class="box hot">54688.10</td></tr>
+                <tr><th>product total</th><td class="box hot">14967.09</td><td>5910.43</td><td>7328.85</td><td>6885.39</td><td class="box warn">lots</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="caption">各セルはdate/productの組み合わせの集計値。行合計・列合計も事前計算できる。</p>
+        </div>
+        <div class="callout warning">
+          <strong>弱点:</strong> data cubeは事前に決めたdimensionでは速い一方、raw dataほど柔軟ではありません。例えば「価格が100ドル超の商品だけ」など、cubeに含めていない条件には弱いです。そのため、多くのDWHではraw dataを保持しつつ、一部の頻出集計だけをmaterialized viewやcubeで高速化します。
+        </div>
+      </section>
+
+      <section id="practical">
+        <h2>17. 実務判断のチェックリスト</h2>
+        <p>第3章を実務に落とすなら、次の問いで考えるとよいです。</p>
+        <table>
+          <thead><tr><th>問い</th><th>見るべきポイント</th><th>判断の方向性</th></tr></thead>
+          <tbody>
+            <tr><td>クエリは少数行取得か、大量スキャンか</td><td>APIの詳細画面/更新系か、BI/集計か</td><td>少数行ならOLTP向け。大量スキャンならDWH/カラム指向を検討。</td></tr>
+            <tr><td>書き込みが多いか</td><td>イベント、ログ、時系列、頻繁な更新</td><td>append-only/LSM系が有利な可能性。ただしcompaction遅延を見る。</td></tr>
+            <tr><td>範囲検索が多いか</td><td>日付範囲、ID範囲、prefix検索</td><td>hash indexだけでは不足。B-tree、SSTable sparse index、sort orderが重要。</td></tr>
+            <tr><td>p99遅延が重要か</td><td>ユーザー向けAPI、SLO</td><td>LSMのcompaction影響、B-treeのpage split/WAL影響をメトリクスで見る。</td></tr>
+            <tr><td>インデックスを増やしすぎていないか</td><td>更新系の遅延、DBサイズ、VACUUM/compaction負荷</td><td>読み取り改善と書き込み悪化のバランスを測る。</td></tr>
+            <tr><td>集計にOLTP DBを使いすぎていないか</td><td>本番DBに重いGROUP BY/scanが走っているか</td><td>DWH、replica、ETL、materialized view、カラムナ形式を検討。</td></tr>
+          </tbody>
+        </table>
+        <h3>この章を一言で言うと</h3>
+        <p class="lead">データベースの性能は、単に「インデックスがあるか」では決まりません。<strong>データをどの順序で書くか、どの単位で読むか、どの補助構造をメモリに置くか、更新時に何を犠牲にするか</strong>で決まります。ストレージエンジンの設計は、読み取り・書き込み・容量の三者のトレードオフそのものです。</p>
+        <div class="source">Source: Martin Kleppmann, <em>Designing Data-Intensive Applications</em>, Chapter 3 “Storage and Retrieval”. This HTML is a Japanese explanatory reconstruction, not a verbatim translation.</div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

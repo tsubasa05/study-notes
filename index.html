@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ソフトウェア開発の個人学習ノート一覧です。Spring Boot、JPA、Java、API設計、データシステム、LLM連携についてまとめています。">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232358c5'/%3E%3Cpath d='M18 16h22a6 6 0 0 1 6 6v26H24a6 6 0 0 1-6-6V16Zm6 8v16a6 6 0 0 1 6-6h10V22H24a2 2 0 0 0-2 2Z' fill='white'/%3E%3C/svg%3E">
+  <title>Study Notes | 学習記録</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-soft: #eef4ff;
+      --text: #172033;
+      --muted: #647087;
+      --line: #dce3ee;
+      --accent: #2358c5;
+      --accent-dark: #173b85;
+      --accent-light: #dce8ff;
+      --tag-bg: #edf2f9;
+      --shadow: 0 14px 34px rgba(25, 43, 75, 0.09);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP",
+        "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+      line-height: 1.7;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .visually-hidden {
+      width: 1px;
+      height: 1px;
+      position: absolute;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .hero {
+      overflow: hidden;
+      position: relative;
+      background:
+        radial-gradient(circle at 85% 10%, rgba(111, 168, 255, 0.34), transparent 27rem),
+        linear-gradient(135deg, #102958 0%, #1e4da6 58%, #2f70d0 100%);
+      color: #ffffff;
+    }
+
+    .hero::after {
+      width: 360px;
+      height: 360px;
+      position: absolute;
+      right: -120px;
+      bottom: -240px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 50%;
+      content: "";
+    }
+
+    .hero-inner,
+    main,
+    footer {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .hero-inner {
+      padding: 72px 0 68px;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: #bdd5ff;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.25rem, 7vw, 4.4rem);
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+    }
+
+    .hero-copy {
+      max-width: 660px;
+      margin: 20px 0 0;
+      color: #e1ebff;
+      font-size: clamp(1rem, 2vw, 1.1rem);
+    }
+
+    main {
+      padding: 42px 0 72px;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    .search-wrap {
+      flex: 1;
+      position: relative;
+    }
+
+    .search-wrap svg {
+      width: 20px;
+      position: absolute;
+      top: 50%;
+      left: 17px;
+      color: var(--muted);
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    #search {
+      width: 100%;
+      min-height: 52px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+      color: var(--text);
+      padding: 0 18px 0 50px;
+      font: inherit;
+      box-shadow: 0 6px 18px rgba(25, 43, 75, 0.05);
+      outline: none;
+    }
+
+    #search:focus {
+      border-color: #7ca4ed;
+      box-shadow: 0 0 0 4px rgba(35, 88, 197, 0.12);
+    }
+
+    .count {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      white-space: nowrap;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin: 0 0 28px;
+    }
+
+    .filter-button {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      color: #46536a;
+      padding: 8px 15px;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 650;
+      cursor: pointer;
+    }
+
+    .filter-button:hover {
+      border-color: #9bb7ea;
+      color: var(--accent);
+    }
+
+    .filter-button[aria-pressed="true"] {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .note-card {
+      display: flex;
+      min-height: 290px;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+    }
+
+    .note-card:hover {
+      border-color: #b6c9ea;
+      box-shadow: 0 18px 42px rgba(25, 43, 75, 0.14);
+      transform: translateY(-3px);
+    }
+
+    .note-card[hidden] {
+      display: none;
+    }
+
+    .card-accent {
+      height: 5px;
+      background: linear-gradient(90deg, var(--accent-dark), #5591ed);
+    }
+
+    .card-body {
+      display: flex;
+      height: 100%;
+      flex-direction: column;
+      padding: 24px;
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 13px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 650;
+    }
+
+    .category {
+      color: var(--accent);
+      letter-spacing: 0.04em;
+    }
+
+    .note-card h2 {
+      margin: 0;
+      font-size: 1.28rem;
+      line-height: 1.45;
+      letter-spacing: -0.015em;
+    }
+
+    .description {
+      margin: 13px 0 20px;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin: auto 0 20px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .tags li {
+      border-radius: 6px;
+      background: var(--tag-bg);
+      color: #4a5870;
+      padding: 4px 9px;
+      font-size: 0.76rem;
+      font-weight: 650;
+    }
+
+    .card-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      align-self: flex-start;
+      color: var(--accent);
+      font-size: 0.92rem;
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .card-link::after {
+      content: "\2192";
+      transition: transform 160ms ease;
+    }
+
+    .note-card:hover .card-link::after {
+      transform: translateX(4px);
+    }
+
+    .empty-state {
+      display: none;
+      grid-column: 1 / -1;
+      border: 1px dashed #b9c4d6;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.55);
+      color: var(--muted);
+      padding: 46px 20px;
+      text-align: center;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      padding: 26px 0 34px;
+      font-size: 0.86rem;
+      text-align: center;
+    }
+
+    @media (max-width: 720px) {
+      .hero-inner {
+        padding: 54px 0 50px;
+      }
+
+      main {
+        padding-top: 30px;
+      }
+
+      .toolbar {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 9px;
+      }
+
+      .count {
+        align-self: flex-end;
+      }
+
+      .notes-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .note-card {
+        min-height: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">Personal Knowledge Base</p>
+      <h1>Study Notes</h1>
+      <p class="hero-copy">
+        バックエンド開発やデータシステムを中心に、実装と読書を通して学んだことを整理した個人学習ノートです。
+      </p>
+    </div>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m20 20-3.5-3.5"></path>
+        </svg>
+        <label for="search" class="visually-hidden">学習ノートを検索</label>
+        <input id="search" type="search" placeholder="タイトルやキーワードで検索" autocomplete="off">
+      </div>
+      <p class="count" aria-live="polite"><span id="visible-count">12</span> 件のノート</p>
+    </div>
+
+    <nav class="filters" aria-label="カテゴリで絞り込み">
+      <button class="filter-button" type="button" data-filter="all" aria-pressed="true">すべて</button>
+      <button class="filter-button" type="button" data-filter="spring-api" aria-pressed="false">Spring API</button>
+      <button class="filter-button" type="button" data-filter="java-basics" aria-pressed="false">Java 基礎</button>
+      <button class="filter-button" type="button" data-filter="java-platform" aria-pressed="false">Java Web 基盤</button>
+      <button class="filter-button" type="button" data-filter="data-systems" aria-pressed="false">データシステム</button>
+      <button class="filter-button" type="button" data-filter="llm" aria-pressed="false">LLM 連携</button>
+    </nav>
+
+    <section class="notes-grid" aria-label="学習ノート一覧">
+      <article class="note-card" data-category="llm spring-api" data-search="auth llm chat app jpa validation restclient openai エンティティ db 例外 json">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="category">LLM 連携 / Spring API</span>
+            <time datetime="2026-05-31">2026.05.31</time>
+          </div>
+          <h2>Auth LLM Chat App 学習記録</h2>
+          <p class="description">
+            JPAの関連設計、DTOとValidation、例外処理からRestClientを使ったOpenAI API連携までをまとめた記録。
+          </p>
+          <ul class="tags" aria-label="キーワード">
+            <li>JPA</li>
+            <li>Validation</li>
+            <li>RestClient</li>
+            <li>OpenAI API</li>
+          </ul>
+          <a class="card-link" href="backend-api-practice-learning-records/auth-llm-chat-app-learning-record.html">ノートを読む</a>
+        </div>
+      </article>
+
+      <article class="note-card" data-category="spring-api" data-search="user api security validation error handling bcrypt password entity 部分更新 role enum transactional テスト">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="category">Spring API</span>
+            <time datetime="2026-05-21">2026.05.21</time>
+          </div>
+          <h2>User API: Security, Validation, and Error Handling</h2>
+          <p class="description">
+            パスワードの安全な保存、入力検証、部分更新、独自例外、統一JSONエラーなどAPIの堅牢化を整理。
+          </p>
+          <ul class="tags" aria-label="キーワード">
+            <li>BCrypt</li>
+            <li>Bean Validation</li>
+            <li>Exception</li>
+            <li>Testing</li>
+          </ul>
+          <a class="card-link" href="backend-api-practice-learning-records/2026-05-21-user-api-security-validation-error-handling.html">ノートを読む</a>
+        </div>
+      </article>
+
+      <article class="note-card" data-category="spring-api" data-search="user api search jpa entity final constructor enum valueof name repository 検索 controller service">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="category">Spring API</span>
+            <time datetime="2026-05-21">2026.05.21</time>
+          </div>
+          <h2>User API: Search and JPA Basics</h2>
+          <p class="description">
+            JPA Entityの制約、enumの扱い、検索APIの設計、Repositoryの標準・独自メソッドについての学習記録。
+          </p>
+          <ul class="tags" aria-label="キーワード">
+            <li>JPA Entity</li>
+            <li>Search API</li>
+            <li>Repository</li>
+            <li>Enum</li>
+          </ul>
+          <a class="card-link" href="backend-api-practice-learning-records/2026-05-21-user-api-search-and-jpa-basics.html">ノートを読む</a>
+        </div>
+      </article>
+
+      <article class="note-card" data-category="spring-api" data-search="task api service implementation interface create delete findall stream findbyid optional update repository dto entity">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="category">Spring API</span>
+            <time datetime="2026-05-20">2026.05.20</time>
+          </div>
+          <h2>Task API Service 実装</h2>
+          <p class="description">
+            Serviceインターフェースと実装クラス、CRUD処理、OptionalやStreamを使ったデータ操作の基本。
+          </p>
+          <ul class="tags" aria-label="キーワード">
+            <li>Service</li>
+            <li>Optional</li>
+            <li>Stream</li>
+            <li>CRUD</li>
+          </ul>
+          <a class="card-link" href="backend-api-practice-learning-records/2026-05-20-task-service-implementation-basics.html">ノートを読む</a>
+        </div>
+      </article>
+
+      <article class="note-card" data-category="spring-api" data-search="task api entity jpa dto package repository save createdat updatedat enumerated enum delete">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="category">Spring API</span>
+            <time datetime="2026-05-19">2026.05.19</time>
+          </div>
+          <h2>Task API Entity / JPA 基礎</h2>
+          <p class="description">
+            EntityとDTOの役割、JPAを使う理由、Repositoryによる保存・削除、日時やenumの永続化を整理。
+          </p>
+          <ul class="tags" aria-label="キーワード">
+            <li>Entity</li>
+            <li>JPA</li>
+            <li>Repository</li>
+            <li>DTO</li>
+          </ul>
+          <a class="card-link" href="backend-api-practice-learning-records/2026-05-19-task-entity-jpa-basics.html">ノートを読む</a>
+        </div>
+      </article>
+
+      <article class="note-card" data-category="spring-api" data-search="task api controller spring annotation pathvariable requestparam responseentity status url dto record bean validation">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="category">Spring API</span>
+            <time datetime="2026-05-18">2026.05.18</time>
+          </div>
+          <h2>Task API Controller 基礎</h2>
+          <p class="description">
+            Controllerの役割、主要アノテーション、URL設計、ResponseEntity、DTOとBean Validationの基本。
+          </p>
+          <ul class="tags" aria-label="キーワード">
+            <li>Controller</li>
+            <li>ResponseEntity</li>
+            <li>DTO</li>
+            <li>Validation</li>
+          </ul>
+          <a class="card-link" href="backend-api-practice-learning-records/2026-05-18-task-controller-basics.html">ノートを読む</a>
+        </div>
+      </article>
+
+      <article class="note-card" data-category="java-basics" data-search="java resolveTags optional stream map orElseGet linkedhashset tag repository lambda ラムダ 重複 正規化">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="category">Java 基礎</span>
+            <span>コード読解</span>
+          </div>
+          <h2>resolveTags と Optional</h2>
+          <p class="description">
+            タグ名の正規化と重複除去、Streamのmap、OptionalとorElseGetによる取得・新規作成の流れを整理。
+          </p>
+          <ul class="tags" aria-label="キーワード">
+            <li>Optional</li>
+            <li>Stream</li>
+            <li>LinkedHashSet</li>
+            <li>orElseGet</li>
+          </ul>
+          <a class="card-link" href="backend-api-practice-learning-records/java-resolve-tags-optional.html">ノートを読む</a>
+        </div>
+      </article>
+
+      <article class="note-card" data-category="java-basics" data-search="java null empty blank isblank trim normalizeblank 空文字 空白文字列 三項演算子 入力 正規化">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="category">Java 基礎</span>
+            <span>コード読解</span>
+          </div>
+          <h2>null・空文字・空白文字列</h2>
+          <p class="description">
+            null、空文字、空白だけの文字列の違いと、isBlank・trimを使った入力値の正規化を整理。
+          </p>
+          <ul class="tags" aria-label="キーワード">
+            <li>null</li>
+            <li>isBlank</li>
+            <li>trim</li>
+            <li>正規化</li>
+          </ul>
+          <a class="card-link" href="backend-api-practice-learning-records/java-null-empty-blank.html">ノートを読む</a>
+        </div>
+      </article>
+
+      <article class="note-card" data-category="java-platform" data-search="jakarta ee spring di container tomcat api application server servlet war ear jar rest java web コンテナ">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="category">Java Web 基盤</span>
+            <span>技術整理</span>
+          </div>
+          <h2>Jakarta EE・Spring DI・Tomcat・APIの体系整理</h2>
+          <p class="description">
+            Jakarta EE仕様とコンテナ、Tomcat、Spring Boot、デプロイ形式、REST APIの関係を俯瞰して整理。
+          </p>
+          <ul class="tags" aria-label="キーワード">
+            <li>Jakarta EE</li>
+            <li>DI Container</li>
+            <li>Tomcat</li>
+            <li>WAR / JAR</li>
+          </ul>
+          <a class="card-link" href="backend-api-practice-learning-records/jakarta_ee_spring_container_overview.html">ノートを読む</a>
+        </div>
+      </article>
+
+      <article class="note-card" data-category="data-systems" data-search="ddia chapter 1 reliable scalable maintainable applications reliability scalability maintainability 信頼性 スケーラビリティ 保守性 負荷 性能 パーセンタイル">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="category">データシステム</span>
+            <span>Chapter 1</span>
+          </div>
+          <h2>DDIA Chapter 1：信頼性・スケーラビリティ・保守性</h2>
+          <p class="description">
+            良いデータシステムを考える土台として、障害への耐性、負荷と性能の測り方、長期的な運用と変更容易性を整理。
+          </p>
+          <ul class="tags" aria-label="キーワード">
+            <li>Reliability</li>
+            <li>Scalability</li>
+            <li>Maintainability</li>
+          </ul>
+          <a class="card-link" href="designing-data-Intensive-applications/ddia-chapter-01.html">ノートを読む</a>
+        </div>
+      </article>
+
+      <article class="note-card" data-category="data-systems" data-search="ddia chapter 2 data models query languages relational document graph nosql sql mapreduce データモデル クエリ言語 リレーショナル ドキュメント グラフ">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="category">データシステム</span>
+            <span>Chapter 2</span>
+          </div>
+          <h2>DDIA Chapter 2：データモデルとクエリ言語</h2>
+          <p class="description">
+            リレーショナル、ドキュメント、グラフの各モデルと、宣言型クエリやデータの関係性に応じた設計判断を整理。
+          </p>
+          <ul class="tags" aria-label="キーワード">
+            <li>Relational</li>
+            <li>Document DB</li>
+            <li>Graph</li>
+            <li>Query Language</li>
+          </ul>
+          <a class="card-link" href="designing-data-Intensive-applications/ddia-chapter-02.html">ノートを読む</a>
+        </div>
+      </article>
+
+      <article class="note-card" data-category="data-systems" data-search="ddia chapter 3 storage retrieval hash index sstable lsm tree b-tree oltp olap warehouse column storage ストレージ インデックス データウェアハウス カラム指向">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="category">データシステム</span>
+            <span>Chapter 3</span>
+          </div>
+          <h2>DDIA Chapter 3：Storage and Retrieval</h2>
+          <p class="description">
+            Hash Index、SSTable・LSM-tree、B-treeからOLTP・OLAP、カラム指向ストレージまでDB内部の読み書きを整理。
+          </p>
+          <ul class="tags" aria-label="キーワード">
+            <li>LSM-tree</li>
+            <li>B-tree</li>
+            <li>OLTP / OLAP</li>
+            <li>Column Storage</li>
+          </ul>
+          <a class="card-link" href="designing-data-Intensive-applications/ddia-chapter-03.html">ノートを読む</a>
+        </div>
+      </article>
+
+      <p class="empty-state" id="empty-state">条件に一致するノートがありません。</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Personal study notes for software development.</p>
+  </footer>
+
+  <script>
+    const searchInput = document.querySelector("#search");
+    const filterButtons = document.querySelectorAll(".filter-button");
+    const cards = document.querySelectorAll(".note-card");
+    const visibleCount = document.querySelector("#visible-count");
+    const emptyState = document.querySelector("#empty-state");
+    let activeFilter = "all";
+
+    function normalize(value) {
+      return value.toLocaleLowerCase("ja").trim();
+    }
+
+    function updateCards() {
+      const query = normalize(searchInput.value);
+      let count = 0;
+
+      cards.forEach((card) => {
+        const categories = card.dataset.category.split(" ");
+        const searchableText = normalize(`${card.textContent} ${card.dataset.search}`);
+        const matchesFilter = activeFilter === "all" || categories.includes(activeFilter);
+        const matchesQuery = !query || searchableText.includes(query);
+        const isVisible = matchesFilter && matchesQuery;
+
+        card.hidden = !isVisible;
+        if (isVisible) count += 1;
+      });
+
+      visibleCount.textContent = count;
+      emptyState.style.display = count === 0 ? "block" : "none";
+    }
+
+    filterButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        activeFilter = button.dataset.filter;
+        filterButtons.forEach((item) => {
+          item.setAttribute("aria-pressed", String(item === button));
+        });
+        updateCards();
+      });
+    });
+
+    searchInput.addEventListener("input", updateCards);
+  </script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java学習ノート: null・空文字・空白文字列</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.7;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+      color: #1f2937;
+      background: #f8fafc;
+    }
+
+    h1,
+    h2 {
+      color: #0f172a;
+    }
+
+    h1 {
+      border-bottom: 3px solid #2563eb;
+      padding-bottom: 8px;
+    }
+
+    section {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+
+    code,
+    pre {
+      font-family: "Consolas", "Courier New", monospace;
+    }
+
+    pre {
+      overflow-x: auto;
+      background: #111827;
+      color: #e5e7eb;
+      padding: 16px;
+      border-radius: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      background: #ffffff;
+    }
+
+    th,
+    td {
+      border: 1px solid #d1d5db;
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eff6ff;
+    }
+
+    .point {
+      border-left: 4px solid #2563eb;
+      padding-left: 12px;
+      background: #eff6ff;
+    }
+  </style>
+</head>
+<body>
+  <h1>Java学習ノート: null・空文字・空白文字列</h1>
+
+  <section>
+    <h2>対象コード</h2>
+    <pre><code>private String normalizeBlank(String value) {
+  return value == null || value.isBlank() ? null : value.trim();
+}</code></pre>
+    <p>
+      このメソッドは、入力値が未入力扱いであれば <code>null</code> を返し、
+      値が入っていれば前後の空白を削除して返すための補助メソッドです。
+    </p>
+  </section>
+
+  <section>
+    <h2>null・空文字・空白文字列の違い</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>種類</th>
+          <th>例</th>
+          <th>意味</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>null</td>
+          <td><code>String value = null;</code></td>
+          <td>文字列オブジェクト自体が存在しない状態。</td>
+        </tr>
+        <tr>
+          <td>空文字</td>
+          <td><code>String value = "";</code></td>
+          <td>文字列オブジェクトは存在するが、文字数が 0 の状態。</td>
+        </tr>
+        <tr>
+          <td>空白文字列</td>
+          <td><code>String value = "   ";</code></td>
+          <td>文字列オブジェクトは存在し、スペースなどの空白文字だけが入っている状態。</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      「空」という言葉は曖昧なので、Java の学習では
+      <code>null</code>、<code>""</code>、<code>"   "</code> を分けて理解することが重要です。
+    </p>
+  </section>
+
+  <section>
+    <h2>メソッドの文法</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>コード</th>
+          <th>意味</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>private</code></td>
+          <td>同じクラスの中からだけ呼び出せるメソッドであることを表す。</td>
+        </tr>
+        <tr>
+          <td><code>String</code></td>
+          <td>戻り値の型。文字列、または <code>null</code> を返す。</td>
+        </tr>
+        <tr>
+          <td><code>normalizeBlank</code></td>
+          <td>メソッド名。空白扱いの値を正規化する意図がある。</td>
+        </tr>
+        <tr>
+          <td><code>String value</code></td>
+          <td>呼び出し元から受け取る文字列の引数。</td>
+        </tr>
+        <tr>
+          <td><code>value == null</code></td>
+          <td>値が <code>null</code> かどうかを判定する。</td>
+        </tr>
+        <tr>
+          <td><code>||</code></td>
+          <td>OR 条件。左か右のどちらかが true なら全体が true になる。</td>
+        </tr>
+        <tr>
+          <td><code>value.isBlank()</code></td>
+          <td>空文字、または空白文字だけの文字列かどうかを判定する。</td>
+        </tr>
+        <tr>
+          <td><code>? null : value.trim()</code></td>
+          <td>三項演算子。条件が true なら <code>null</code>、false なら <code>value.trim()</code> を返す。</td>
+        </tr>
+        <tr>
+          <td><code>value.trim()</code></td>
+          <td>文字列の前後にある空白を削除する。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>処理結果</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>入力値</th>
+          <th>判定</th>
+          <th>戻り値</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>null</code></td>
+          <td><code>value == null</code> が true</td>
+          <td><code>null</code></td>
+        </tr>
+        <tr>
+          <td><code>""</code></td>
+          <td><code>value.isBlank()</code> が true</td>
+          <td><code>null</code></td>
+        </tr>
+        <tr>
+          <td><code>"   "</code></td>
+          <td><code>value.isBlank()</code> が true</td>
+          <td><code>null</code></td>
+        </tr>
+        <tr>
+          <td><code>" Java "</code></td>
+          <td>未入力扱いではない</td>
+          <td><code>"Java"</code></td>
+        </tr>
+        <tr>
+          <td><code>"abc"</code></td>
+          <td>未入力扱いではない</td>
+          <td><code>"abc"</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>この処理を行うメリット</h2>
+    <ul>
+      <li>未入力を <code>null</code> に統一できる。</li>
+      <li>DB に <code>NULL</code>、空文字、空白文字列が混在しにくくなる。</li>
+      <li>後続処理で「値なし」を判定しやすくなる。</li>
+      <li>検索条件を単純にできる。</li>
+      <li>画面上は空に見えるのに、プログラム上は値ありと判定されるズレを避けやすい。</li>
+      <li>入力値の前後に入った不要な空白を保存前に削除できる。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>メソッドの意図</h2>
+    <p class="point">
+      このメソッドの主な意図は、「未入力」を表す値を <code>null</code> にそろえ、
+      意味のある入力値だけを整えた状態で扱えるようにすることです。
+    </p>
+    <p>
+      つまり、<code>null</code>、空文字、空白文字列を別々に扱うのではなく、
+      アプリケーション内では「値なし」として統一するための処理です。
+    </p>
+  </section>
+
+  <section>
+    <h2>if 文で書き換えた場合</h2>
+    <p>三項演算子を使わずに書くと、次のようになります。</p>
+    <pre><code>private String normalizeBlank(String value) {
+  if (value == null || value.isBlank()) {
+    return null;
+  }
+
+  return value.trim();
+}</code></pre>
+  </section>
+</body>
+</html>

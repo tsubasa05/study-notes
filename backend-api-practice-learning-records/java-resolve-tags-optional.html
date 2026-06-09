@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java学習ノート: resolveTags と Optional</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.7;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+      color: #1f2937;
+      background: #f8fafc;
+    }
+
+    h1,
+    h2 {
+      color: #0f172a;
+    }
+
+    h1 {
+      border-bottom: 3px solid #2563eb;
+      padding-bottom: 8px;
+    }
+
+    section {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+
+    code,
+    pre {
+      font-family: "Consolas", "Courier New", monospace;
+    }
+
+    pre {
+      overflow-x: auto;
+      background: #111827;
+      color: #e5e7eb;
+      padding: 16px;
+      border-radius: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      background: #ffffff;
+    }
+
+    th,
+    td {
+      border: 1px solid #d1d5db;
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eff6ff;
+    }
+
+    .point {
+      border-left: 4px solid #2563eb;
+      padding-left: 12px;
+      background: #eff6ff;
+    }
+  </style>
+</head>
+<body>
+  <h1>Java学習ノート: resolveTags と Optional</h1>
+
+  <section>
+    <h2>対象コード</h2>
+    <pre><code>private List&lt;Tag&gt; resolveTags(UUID userId, List&lt;String&gt; tagNames) {
+  if (tagNames == null || tagNames.isEmpty()) {
+    return List.of();
+  }
+  LinkedHashSet&lt;String&gt; normalizedNames = new LinkedHashSet&lt;&gt;();
+  for (String tagName : tagNames) {
+    String normalizedName = normalizeBlank(tagName);
+    if (normalizedName != null) {
+      normalizedNames.add(normalizedName);
+    }
+  }
+  return normalizedNames.stream()
+      .map(name -&gt; tagRepository.findByNameAndUserId(name, userId)
+          .orElseGet(() -&gt; tagRepository.save(Tag.create(userId, name))))
+      .toList();
+}</code></pre>
+    <p>
+      このメソッドは、タグ名の一覧を受け取り、未入力値を除外し、重複をなくし、
+      既存タグを取得または新規作成して <code>List&lt;Tag&gt;</code> として返します。
+    </p>
+  </section>
+
+  <section>
+    <h2>メソッド宣言</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>コード</th>
+          <th>意味</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>private</code></td>
+          <td>同じクラスの中からだけ呼び出せるメソッドであることを表します。</td>
+        </tr>
+        <tr>
+          <td><code>List&lt;Tag&gt;</code></td>
+          <td>戻り値の型です。<code>Tag</code> オブジェクトのリストを返します。</td>
+        </tr>
+        <tr>
+          <td><code>UUID userId</code></td>
+          <td>対象ユーザーを識別する ID です。</td>
+        </tr>
+        <tr>
+          <td><code>List&lt;String&gt; tagNames</code></td>
+          <td>タグ名の文字列リストです。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>null または空リストの判定</h2>
+    <pre><code>if (tagNames == null || tagNames.isEmpty()) {
+  return List.of();
+}</code></pre>
+    <table>
+      <thead>
+        <tr>
+          <th>条件</th>
+          <th>意味</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>tagNames == null</code></td>
+          <td>リスト自体が存在しない状態です。</td>
+        </tr>
+        <tr>
+          <td><code>tagNames.isEmpty()</code></td>
+          <td>リストは存在するが、要素数が 0 の状態です。</td>
+        </tr>
+        <tr>
+          <td><code>List.of()</code></td>
+          <td>空のリストを作って返します。</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      ここでは、タグ名が渡されていない場合に処理を続けず、空の <code>List&lt;Tag&gt;</code> を返します。
+    </p>
+  </section>
+
+  <section>
+    <h2>LinkedHashSet の役割</h2>
+    <pre><code>LinkedHashSet&lt;String&gt; normalizedNames = new LinkedHashSet&lt;&gt;();</code></pre>
+    <p>
+      <code>LinkedHashSet</code> は、重複を許さず、追加した順番を保持するコレクションです。
+      タグ名の重複を取り除きつつ、ユーザーが入力した順番を保つために使われています。
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>入力</th>
+          <th>LinkedHashSet に追加後</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>["Java", "Spring", "Java"]</code></td>
+          <td><code>["Java", "Spring"]</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>拡張 for 文と正規化</h2>
+    <pre><code>for (String tagName : tagNames) {
+  String normalizedName = normalizeBlank(tagName);
+  if (normalizedName != null) {
+    normalizedNames.add(normalizedName);
+  }
+}</code></pre>
+    <p>
+      <code>for (String tagName : tagNames)</code> は、<code>tagNames</code> の要素を
+      1 件ずつ <code>tagName</code> に取り出して繰り返す書き方です。
+    </p>
+    <p>
+      <code>normalizeBlank(tagName)</code> により、<code>null</code>、空文字、空白だけの文字列を
+      <code>null</code> にそろえ、値がある場合は前後の空白を削ります。
+      その結果が <code>null</code> でないものだけを <code>normalizedNames</code> に追加します。
+    </p>
+  </section>
+
+  <section>
+    <h2>Stream と map</h2>
+    <pre><code>return normalizedNames.stream()
+    .map(name -&gt; tagRepository.findByNameAndUserId(name, userId)
+        .orElseGet(() -&gt; tagRepository.save(Tag.create(userId, name))))
+    .toList();</code></pre>
+    <table>
+      <thead>
+        <tr>
+          <th>コード</th>
+          <th>意味</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>normalizedNames.stream()</code></td>
+          <td>タグ名の集合を Stream に変換します。</td>
+        </tr>
+        <tr>
+          <td><code>.map(name -&gt; ...)</code></td>
+          <td>各タグ名 <code>name</code> を別の値に変換します。ここでは <code>String</code> を <code>Tag</code> に変換します。</td>
+        </tr>
+        <tr>
+          <td><code>.toList()</code></td>
+          <td>Stream の処理結果を <code>List</code> に戻します。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>map() の詳しい仕組み</h2>
+    <p>
+      <code>map()</code> は、Stream の中に流れている要素を 1 件ずつ受け取り、
+      別の値に変換して次の Stream に流すメソッドです。
+      今回は <code>String</code> のタグ名を <code>Tag</code> オブジェクトに変換しています。
+    </p>
+    <pre><code>normalizedNames.stream()
+    .map(name -&gt; ...)
+    .toList();</code></pre>
+    <table>
+      <thead>
+        <tr>
+          <th>段階</th>
+          <th>Stream の中身</th>
+          <th>型のイメージ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>normalizedNames</code></td>
+          <td><code>["Java", "Spring"]</code></td>
+          <td><code>LinkedHashSet&lt;String&gt;</code></td>
+        </tr>
+        <tr>
+          <td><code>stream()</code> 後</td>
+          <td><code>"Java"</code>、<code>"Spring"</code> が 1 件ずつ流れる</td>
+          <td><code>Stream&lt;String&gt;</code></td>
+        </tr>
+        <tr>
+          <td><code>map(...)</code> 後</td>
+          <td><code>Tag(Java)</code>、<code>Tag(Spring)</code> に変換される</td>
+          <td><code>Stream&lt;Tag&gt;</code></td>
+        </tr>
+        <tr>
+          <td><code>toList()</code> 後</td>
+          <td>変換後の <code>Tag</code> をリストにまとめる</td>
+          <td><code>List&lt;Tag&gt;</code></td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      <code>map(name -&gt; ...)</code> の <code>name</code> には、
+      Stream から取り出されたタグ名が 1 件ずつ入ります。
+      たとえば最初の処理では <code>name = "Java"</code>、
+      次の処理では <code>name = "Spring"</code> というイメージです。
+    </p>
+  </section>
+
+  <section>
+    <h2>map() の中で Optional が Tag になる流れ</h2>
+    <p>
+      疑問になりやすい点は、次の部分です。
+    </p>
+    <pre><code>.map(name -&gt; tagRepository.findByNameAndUserId(name, userId)
+    .orElseGet(() -&gt; tagRepository.save(Tag.create(userId, name))))</code></pre>
+    <p>
+      <code>tagRepository.findByNameAndUserId(name, userId)</code> だけを見ると、
+      これは <code>Optional&lt;Tag&gt;</code> を返す処理です。
+      しかし、<code>map()</code> が最終的に受け取っている戻り値は <code>Optional&lt;Tag&gt;</code> ではなく
+      <code>Tag</code> です。
+    </p>
+    <p>
+      理由は、<code>findByNameAndUserId(...)</code> の戻り値に対して、
+      すぐ後ろで <code>.orElseGet(...)</code> を呼び出しているからです。
+    </p>
+    <pre><code>Optional&lt;Tag&gt; optionalTag =
+    tagRepository.findByNameAndUserId(name, userId);
+
+Tag tag =
+    optionalTag.orElseGet(() -&gt; tagRepository.save(Tag.create(userId, name)));</code></pre>
+    <p>
+      つまり、ラムダ式の中では次の 2 段階の処理が行われています。
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>処理</th>
+          <th>戻り値の型</th>
+          <th>意味</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>findByNameAndUserId(name, userId)</code></td>
+          <td><code>Optional&lt;Tag&gt;</code></td>
+          <td>既存タグがあるかもしれない、ないかもしれない状態を返します。</td>
+        </tr>
+        <tr>
+          <td><code>.orElseGet(...)</code></td>
+          <td><code>Tag</code></td>
+          <td>中身があればその <code>Tag</code>、なければ新規作成して保存した <code>Tag</code> を返します。</td>
+        </tr>
+        <tr>
+          <td><code>map(name -&gt; ...)</code> 全体</td>
+          <td><code>Tag</code></td>
+          <td>各 <code>String</code> のタグ名を、最終的に <code>Tag</code> へ変換します。</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="point">
+      <code>map()</code> の戻り値の型は、ラムダ式の右側が最終的に返す型で決まります。
+      今回の右側は <code>findByNameAndUserId(...)</code> で終わっておらず、
+      <code>.orElseGet(...)</code> まで実行した結果を返しているため、
+      <code>Stream&lt;Optional&lt;Tag&gt;&gt;</code> ではなく <code>Stream&lt;Tag&gt;</code> になります。
+    </p>
+  </section>
+
+  <section>
+    <h2>もし orElseGet() がなかったら</h2>
+    <p>
+      仮に <code>orElseGet()</code> を書かず、次のようにした場合を考えます。
+    </p>
+    <pre><code>normalizedNames.stream()
+    .map(name -&gt; tagRepository.findByNameAndUserId(name, userId))
+    .toList();</code></pre>
+    <p>
+      この場合、<code>map()</code> の右側が返すのは <code>Optional&lt;Tag&gt;</code> です。
+      そのため、全体の結果は <code>List&lt;Tag&gt;</code> ではなく
+      <code>List&lt;Optional&lt;Tag&gt;&gt;</code> になります。
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>コード</th>
+          <th>map() の右側の戻り値</th>
+          <th>toList() 後の型</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>.map(name -&gt; findByNameAndUserId(...))</code></td>
+          <td><code>Optional&lt;Tag&gt;</code></td>
+          <td><code>List&lt;Optional&lt;Tag&gt;&gt;</code></td>
+        </tr>
+        <tr>
+          <td><code>.map(name -&gt; findByNameAndUserId(...).orElseGet(...))</code></td>
+          <td><code>Tag</code></td>
+          <td><code>List&lt;Tag&gt;</code></td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      現在のコードでは、<code>orElseGet()</code> によって
+      「見つかった <code>Tag</code>」または「新しく保存した <code>Tag</code>」のどちらかが必ず得られるため、
+      <code>map()</code> は各タグ名を <code>Tag</code> に変換できます。
+    </p>
+  </section>
+
+  <section>
+    <h2>Optional とは</h2>
+    <p>
+      <code>Optional</code> は、値が存在するかもしれないし、存在しないかもしれないことを表す Java の型です。
+      たとえば <code>Optional&lt;Tag&gt;</code> は、「<code>Tag</code> が入っているかもしれない箱」と考えると理解しやすいです。
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>状態</th>
+          <th>例</th>
+          <th>意味</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>値がある</td>
+          <td><code>Optional.of(tag)</code></td>
+          <td><code>Tag</code> が見つかった状態です。</td>
+        </tr>
+        <tr>
+          <td>値がない</td>
+          <td><code>Optional.empty()</code></td>
+          <td>該当する <code>Tag</code> が存在しない状態です。</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      今回の <code>tagRepository.findByNameAndUserId(name, userId)</code> は、
+      既存タグが見つかれば <code>Optional&lt;Tag&gt;</code> に入れて返し、
+      見つからなければ空の <code>Optional</code> を返す処理だと考えられます。
+    </p>
+  </section>
+
+  <section>
+    <h2>orElseGet() の意味</h2>
+    <pre><code>tagRepository.findByNameAndUserId(name, userId)
+    .orElseGet(() -&gt; tagRepository.save(Tag.create(userId, name)))</code></pre>
+    <p>
+      <code>orElseGet()</code> は <code>Optional</code> のメソッドです。
+      <code>Optional</code> の中に値があればその値を返し、空の場合だけ引数の処理を実行して値を作ります。
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Optional の状態</th>
+          <th>orElseGet() の動き</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>既存タグが見つかった</td>
+          <td>その <code>Tag</code> を返します。新規保存処理は実行されません。</td>
+        </tr>
+        <tr>
+          <td>既存タグが見つからなかった</td>
+          <td><code>Tag.create(userId, name)</code> で作成し、<code>tagRepository.save(...)</code> で保存した結果を返します。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>if 文で書いた場合のイメージ</h2>
+    <p>
+      <code>orElseGet()</code> を使った処理を、イメージしやすいように <code>if</code> 文で書くと次のようになります。
+    </p>
+    <pre><code>Optional&lt;Tag&gt; optionalTag = tagRepository.findByNameAndUserId(name, userId);
+
+Tag tag;
+if (optionalTag.isPresent()) {
+  tag = optionalTag.get();
+} else {
+  tag = tagRepository.save(Tag.create(userId, name));
+}</code></pre>
+    <p>
+      実際のコードでは、この流れを <code>orElseGet()</code> によって短く表現しています。
+    </p>
+  </section>
+
+  <section>
+    <h2>QAまとめ</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>質問</th>
+          <th>答え</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>Optional</code> とは何か</td>
+          <td>値があるかもしれないし、ないかもしれないことを表す型です。<code>null</code> を直接返すより、値の有無を明示できます。</td>
+        </tr>
+        <tr>
+          <td><code>orElseGet()</code> は <code>Optional</code> 専用か</td>
+          <td>はい。<code>orElseGet()</code> は <code>Optional</code> クラスのメソッドです。通常の <code>String</code>、<code>List</code>、<code>Tag</code> にはありません。</td>
+        </tr>
+        <tr>
+          <td><code>orElseGet()</code> の右側はいつ実行されるか</td>
+          <td><code>Optional</code> が空のときだけ実行されます。今回なら、既存タグが見つからなかった場合だけ新規作成と保存が行われます。</td>
+        </tr>
+        <tr>
+          <td><code>map()</code> は何をしているのか</td>
+          <td>Stream の要素を 1 件ずつ受け取り、ラムダ式の結果に変換します。今回なら <code>String</code> のタグ名を <code>Tag</code> に変換しています。</td>
+        </tr>
+        <tr>
+          <td><code>findByNameAndUserId(...)</code> は <code>Optional</code> を返すのに、なぜ <code>map()</code> の結果は <code>Tag</code> になるのか</td>
+          <td><code>findByNameAndUserId(...)</code> の直後に <code>.orElseGet(...)</code> を呼んでいるためです。<code>orElseGet()</code> が <code>Optional&lt;Tag&gt;</code> から最終的な <code>Tag</code> を取り出す、または作成して返します。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>今回理解できた6点の整理</h2>
+    <p>
+      今回のコードを理解するうえでは、次の 6 点に分けて考えると整理しやすくなります。
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>項目</th>
+          <th>理解</th>
+          <th>今回のコードでの見方</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1. <code>Function</code> とは何か</td>
+          <td>
+            <code>Function&lt;T, R&gt;</code> は、<code>T</code> 型の値を受け取り、
+            <code>R</code> 型の値を返す関数型インターフェースです。
+            中心となるメソッドは <code>R apply(T value)</code> です。
+          </td>
+          <td>
+            今回は <code>String</code> のタグ名を受け取り、<code>Tag</code> を返すため、
+            <code>Function&lt;String, Tag&gt;</code> と考えられます。
+          </td>
+        </tr>
+        <tr>
+          <td>2. <code>map()</code> は <code>Function</code> を引数に取る</td>
+          <td>
+            <code>map()</code> の定義は
+            <code>&lt;R&gt; Stream&lt;R&gt; map(Function&lt;? super T, ? extends R&gt; mapper)</code>
+            です。つまり、値を変換するための <code>Function</code> を受け取ります。
+          </td>
+          <td>
+            <code>.map(name -&gt; ...)</code> のラムダ式が、
+            <code>Function</code> として <code>map()</code> に渡されています。
+          </td>
+        </tr>
+        <tr>
+          <td>3. <code>stream().map()</code> は要素を <code>apply()</code> に渡す</td>
+          <td>
+            <code>map()</code> は Stream の要素を 1 件ずつ取り出し、
+            渡された <code>Function</code> の <code>apply()</code> メソッドの引数として渡します。
+          </td>
+          <td>
+            <code>normalizedNames</code> が <code>["Java", "Spring"]</code> なら、
+            内部的には <code>mapper.apply("Java")</code>、
+            <code>mapper.apply("Spring")</code> のように呼ばれるイメージです。
+            その引数がラムダ式の <code>name</code> です。
+          </td>
+        </tr>
+        <tr>
+          <td>4. <code>map()</code> は処理後の値を要素にした新しい Stream を返す</td>
+          <td>
+            <code>map()</code> は、受け取った値に処理を行い、
+            その戻り値を新しい Stream の要素にします。
+            「処理した値そのものを 1 個返す」のではなく、
+            「処理した値たちを要素にした新しい Stream」を返します。
+          </td>
+          <td>
+            今回は <code>Stream&lt;String&gt;</code> の各要素を <code>Tag</code> に変換するため、
+            <code>map()</code> 後は <code>Stream&lt;Tag&gt;</code> になります。
+            最後に <code>toList()</code> で <code>List&lt;Tag&gt;</code> になります。
+          </td>
+        </tr>
+        <tr>
+          <td>5. <code>orElseGet()</code> は <code>Optional</code> のメソッド</td>
+          <td>
+            <code>orElseGet()</code> は <code>Optional</code> に対して呼び出すメソッドです。
+            <code>Optional</code> が値を持っていればその値を返し、
+            空なら引数に渡された <code>Supplier</code> を実行します。
+          </td>
+          <td>
+            <code>findByNameAndUserId(...)</code> が返す
+            <code>Optional&lt;Tag&gt;</code> に対して <code>.orElseGet(...)</code> を呼び出しています。
+          </td>
+        </tr>
+        <tr>
+          <td>6. <code>orElseGet()</code> の戻り値の型は <code>Optional</code> が持つ型に制限される</td>
+          <td>
+            <code>Optional&lt;Tag&gt;</code> に対して <code>orElseGet()</code> を呼ぶ場合、
+            戻り値は <code>Tag</code> です。
+            空の場合に実行される <code>Supplier</code> も、
+            <code>Tag</code> または <code>Tag</code> として扱える型を返す必要があります。
+          </td>
+          <td>
+            <code>tagRepository.save(Tag.create(userId, name))</code> は <code>Tag</code> を返します。
+            そのため <code>Optional&lt;Tag&gt;.orElseGet(...)</code> の戻り値として成立します。
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="point">
+      この 6 点をまとめると、今回の <code>map()</code> は
+      <code>String</code> を受け取って <code>Tag</code> を返す
+      <code>Function</code> を使っており、
+      その結果として <code>Stream&lt;String&gt;</code> が
+      <code>Stream&lt;Tag&gt;</code> に変換されている、と理解できます。
+    </p>
+  </section>
+
+  <section>
+    <h2>最終的に学んだこと</h2>
+    <p class="point">
+      このコードでは、タグ名の入力を正規化し、重複を除去したうえで、
+      <code>Optional</code> と <code>orElseGet()</code> を使って
+      「既存タグがあれば使う、なければ作る」という処理を簡潔に表現しています。
+      <code>map()</code> はその処理をタグ名 1 件ずつに適用し、
+      最終的に <code>Stream&lt;String&gt;</code> を <code>Stream&lt;Tag&gt;</code> に変換しています。
+    </p>
+  </section>
+</body>
+</html>

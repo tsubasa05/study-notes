@@ -1,0 +1,4 @@
+interface:
+  display_name: "Update Study Notes Index"
+  short_description: "Keep note cards, filters, counts, and links synchronized"
+  default_prompt: "Use $update-study-notes-index to synchronize index.html with all current study-note HTML files and validate the result."
