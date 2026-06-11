@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Effective Java Chapter 10 | Exceptions</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121a2f;
+      --panel-2: #18223b;
+      --text: #e7ecf7;
+      --muted: #aab6cf;
+      --accent: #80b7ff;
+      --accent-2: #9ff0d0;
+      --warn: #ffd37a;
+      --danger: #ff9d9d;
+      --border: rgba(255,255,255,.12);
+      --code: #070b14;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", Helvetica, Arial, sans-serif;
+      line-height: 1.75;
+      color: var(--text);
+      background: radial-gradient(circle at top left, #17234a 0, var(--bg) 42%, #070a13 100%);
+    }
+    a { color: var(--accent); }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    nav {
+      position: sticky; top: 0; height: 100vh; overflow-y: auto;
+      padding: 28px 20px; background: rgba(7,10,19,.78); border-right: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+    }
+    nav h2 { font-size: 15px; margin: 0 0 16px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+    nav a { display: block; padding: 8px 10px; margin: 2px 0; border-radius: 10px; text-decoration: none; color: var(--text); font-size: 14px; }
+    nav a:hover { background: rgba(128,183,255,.14); }
+    main { max-width: 1080px; width: 100%; margin: 0 auto; padding: 36px 28px 80px; }
+    .section {
+      background: linear-gradient(180deg, rgba(18,26,47,.94), rgba(14,20,36,.94));
+      border: 1px solid var(--border); border-radius: 24px; padding: 34px; margin: 0 0 26px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.28);
+    }
+    .hero { padding: 46px 38px; }
+    .eyebrow { color: var(--accent-2); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 10px; }
+    h1 { font-size: clamp(34px, 5vw, 58px); line-height: 1.08; margin: 0 0 20px; }
+    h2 { font-size: 28px; line-height: 1.35; margin: 0 0 18px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+    h3 { font-size: 20px; margin-top: 28px; margin-bottom: 10px; color: #dce8ff; }
+    p { margin: 0 0 16px; }
+    .lead { font-size: 18px; color: #dbe6fb; }
+    .item-label { display: inline-block; margin: 0 0 12px; padding: 4px 10px; border-radius: 999px; background: rgba(128,183,255,.18); color: var(--accent); font-weight: 700; }
+    .grid.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 22px; }
+    .card { background: var(--panel-2); border: 1px solid var(--border); border-radius: 18px; padding: 18px; }
+    .card h3 { margin-top: 0; }
+    .callout, .principle, .spring-note { border-radius: 16px; padding: 16px 18px; margin: 18px 0; border: 1px solid var(--border); }
+    .callout { background: rgba(128,183,255,.10); }
+    .principle { background: rgba(159,240,208,.10); border-color: rgba(159,240,208,.28); }
+    .spring-note { background: rgba(255,211,122,.10); border-color: rgba(255,211,122,.28); }
+    .blunt { background: rgba(255,157,157,.10); border-color: rgba(255,157,157,.28); }
+    table { width: 100%; border-collapse: collapse; margin: 18px 0; overflow: hidden; border-radius: 14px; }
+    th, td { border: 1px solid var(--border); padding: 12px 14px; vertical-align: top; }
+    th { background: rgba(128,183,255,.16); color: #eaf2ff; text-align: left; }
+    td { background: rgba(255,255,255,.03); }
+    code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; color: #d8e7ff; background: rgba(255,255,255,.08); padding: 1px 5px; border-radius: 6px; }
+    pre { background: var(--code); border: 1px solid rgba(128,183,255,.22); border-radius: 16px; padding: 18px; overflow-x: auto; margin: 16px 0 22px; line-height: 1.55; }
+    pre code { background: transparent; padding: 0; color: #d8e7ff; }
+    ul, ol { padding-left: 24px; }
+    li { margin: 6px 0; }
+    .checklist { display: grid; gap: 10px; }
+    .checklist label { display: block; background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; }
+    input[type="checkbox"] { margin-right: 8px; transform: scale(1.12); }
+    .footer { color: var(--muted); font-size: 13px; text-align: center; padding: 30px 0; }
+    @media (max-width: 960px) {
+      .layout { display: block; }
+      nav { position: relative; height: auto; }
+      .grid.cards { grid-template-columns: 1fr; }
+      main { padding: 20px 14px 60px; }
+      .section { padding: 22px; border-radius: 18px; }
+    }
+    @media print {
+      body { background: #fff; color: #111; }
+      .layout { display: block; } nav { display: none; }
+      .section { background: #fff; color: #111; box-shadow: none; page-break-inside: avoid; }
+      code, pre code { color: #111; } pre { background: #f6f8fa; }
+    }
+  </style>
+  <link rel="stylesheet" href="effective-java-theme.css">
+</head>
+<body class="effective-java-note">
+  <div class="layout">
+    <nav>
+      <h2>Contents</h2>
+      <a href="#overview">概要</a>
+      <a href="#toc">Chapter 10 全体像</a>
+      <a href="#item69">Item 69: 例外は例外的状況だけ</a>
+      <a href="#item70">Item 70: checked/runtimeの使い分け</a>
+      <a href="#item71">Item 71: checked例外を乱用しない</a>
+      <a href="#item72">Item 72: 標準例外を使う</a>
+      <a href="#item73">Item 73: 抽象に合う例外</a>
+      <a href="#item74">Item 74: 例外を文書化する</a>
+      <a href="#item75">Item 75: 失敗情報を含める</a>
+      <a href="#item76">Item 76: 失敗原子性</a>
+      <a href="#item77">Item 77: 例外を無視しない</a>
+      <a href="#spring">Spring Bootへの接続</a>
+      <a href="#checklist">レビュー用チェックリスト</a>
+      <a href="#summary">まとめ</a>
+    </nav>
+    <main>
+
+<section id="overview" class="section hero">
+  <p class="eyebrow">Effective Java 3rd Edition / Chapter 10</p>
+  <h1>Exceptions<br>例外</h1>
+  <p class="lead">このHTMLは、<strong>Chapter 10「Exceptions」</strong>の9項目を、Java/Spring Bootで実装するときに使える判断基準として再構成したものです。原文の丸写しではなく、主張・設計意図・実装上の使い方を日本語で整理し、短い本書由来の例と学習用の追加コードを含めています。</p>
+  <div class="callout blunt">
+    <strong>結論：</strong> 例外処理は「エラーが起きたらtry-catchを書く技術」ではありません。APIの契約、失敗時の状態、呼び出し側に回復を強制するか、下位層の詳細を漏らさないか、デバッグ情報を残せるか、という<strong>設計問題</strong>です。
+  </div>
+  <div class="grid cards">
+    <div class="card"><h3>中心テーマ</h3><p>例外は通常処理ではなく、異常系・契約違反・回復可能な失敗を表現するために使う。</p></div>
+    <div class="card"><h3>API設計</h3><p>呼び出し側がどう扱うべきかを、例外型・throws・Javadoc・メッセージで伝える。</p></div>
+    <div class="card"><h3>実務接続</h3><p>Spring Bootでは、ドメイン例外、アプリケーション例外、HTTPレスポンス変換を分ける。</p></div>
+  </div>
+</section>
+
+<section id="toc" class="section">
+  <h2>Chapter 10 の全体像</h2>
+  <table>
+    <thead><tr><th>Item</th><th>主題</th><th>実装時の問い</th></tr></thead>
+    <tbody>
+      <tr><td>69</td><td>Use exceptions only for exceptional conditions</td><td>例外を通常の分岐やループ制御に使っていないか？</td></tr>
+      <tr><td>70</td><td>Use checked exceptions for recoverable conditions and runtime exceptions for programming errors</td><td>呼び出し側が本当に回復できる失敗か？それとも契約違反か？</td></tr>
+      <tr><td>71</td><td>Avoid unnecessary use of checked exceptions</td><td>checked例外でAPI利用者に無駄な負担をかけていないか？</td></tr>
+      <tr><td>72</td><td>Favor the use of standard exceptions</td><td>独自例外を作る前に標準例外で十分ではないか？</td></tr>
+      <tr><td>73</td><td>Throw exceptions appropriate to the abstraction</td><td>下位層の例外を上位層のAPIに漏らしていないか？</td></tr>
+      <tr><td>74</td><td>Document all exceptions thrown by each method</td><td>例外がAPI契約として文書化されているか？</td></tr>
+      <tr><td>75</td><td>Include failure-capture information in detail messages</td><td>障害調査に必要な値が例外メッセージに入っているか？</td></tr>
+      <tr><td>76</td><td>Strive for failure atomicity</td><td>例外発生後にオブジェクトが壊れた状態で残らないか？</td></tr>
+      <tr><td>77</td><td>Don’t ignore exceptions</td><td>catchして握りつぶしていないか？無視する理由を残しているか？</td></tr>
+    </tbody>
+  </table>
+</section>
+
+
+<section id="item69" class="section item">
+  <p class="item-label">Item 69</p>
+  <h2>例外は「例外的状況」にだけ使う</h2>
+  <p>この項目の主張は単純ですが、例外処理設計の土台です。<strong>例外を通常の制御フローに使ってはいけません。</strong>例外は「通常の分岐」ではなく、「通常の前提が崩れたこと」を表すための仕組みです。</p>
+
+  <h3>本書の代表例：配列の終端を例外で検出する</h3>
+  <p>本書では、配列を走査するときに <code>ArrayIndexOutOfBoundsException</code> を発生させ、それを捕まえてループ終了とみなす悪い例が示されます。これは「境界チェックを省略できて速そう」に見えますが、実際には読みづらく、遅く、バグを隠しやすいコードです。</p>
+  <pre><code>// 悪い例: 例外で通常のループ終了を表現している
+try {
+    int i = 0;
+    while (true) {
+        range[i++].climb();
+    }
+} catch (ArrayIndexOutOfBoundsException e) {
+    // 配列の終端に達した、という意味で握りつぶしている
+}</code></pre>
+
+  <h3>文法レベルの解説</h3>
+  <table>
+    <thead><tr><th>コード要素</th><th>意味</th><th>問題点</th></tr></thead>
+    <tbody>
+      <tr><td><code>try { ... }</code></td><td>このブロック内で発生した例外を、後続の <code>catch</code> で捕捉できるようにする。</td><td>本来は異常時の処理を書くための構文なのに、ここでは通常のループ終了に使っている。</td></tr>
+      <tr><td><code>while (true)</code></td><td>条件式が常に <code>true</code> なので、自力では終了しない無限ループ。</td><td>ループ終了条件がコード上に見えない。読み手は「どこで終わるのか」を <code>catch</code> まで追う必要がある。</td></tr>
+      <tr><td><code>range[i++]</code></td><td><code>i</code> の現在値で配列要素にアクセスし、その後 <code>i</code> を1増やす。後置インクリメント。</td><td><code>i</code> が配列長以上になると <code>ArrayIndexOutOfBoundsException</code> が発生する。その失敗を終了条件として利用している。</td></tr>
+      <tr><td><code>catch (ArrayIndexOutOfBoundsException e)</code></td><td>配列の範囲外アクセス例外を捕捉する。</td><td>配列終端だけでなく、ループ内部のバグで同じ例外が出ても握りつぶしてしまう。</td></tr>
+    </tbody>
+  </table>
+
+  <h3>なぜ悪いコードなのか</h3>
+  <ul>
+    <li><strong>終了条件が隠れている：</strong>通常のループなら <code>i &lt; range.length</code> や <code>hasNext()</code> のように終了条件が見えるべきです。このコードは「例外が出たら終わる」という暗黙ルールに依存しています。</li>
+    <li><strong>例外の意味を歪めている：</strong><code>ArrayIndexOutOfBoundsException</code> は「配列アクセスの契約違反」を表す例外です。「配列の最後まで処理した」という正常な事実を表すものではありません。</li>
+    <li><strong>バグを隠す：</strong><code>range[i++].climb()</code> の内部で別の配列アクセスミスが発生しても、同じ <code>catch</code> に吸い込まれ、正常終了したように見える可能性があります。</li>
+    <li><strong>性能上も不利になりやすい：</strong>例外生成にはスタックトレース構築などのコストがあり、JVMの最適化も通常のループほど期待しにくくなります。</li>
+  </ul>
+
+  <h3>良いコード：通常の制御フローは通常の構文で書く</h3>
+  <pre><code>// 良い例: 拡張for文で「全要素を処理する」という意図を直接表現する
+for (Mountain mountain : range) {
+    mountain.climb();
+}</code></pre>
+  <p>このコードでは、<code>range</code> の各要素を順番に <code>mountain</code> に代入し、要素数分だけ処理します。配列や <code>Iterable</code> の走査という通常処理を、Javaの通常のループ構文で表現しています。</p>
+  <ul>
+    <li><code>for (Mountain mountain : range)</code> は、<code>range</code> に含まれる要素を1つずつ取り出すという意味です。</li>
+    <li>終了条件はJavaの拡張for文が自然に扱います。配列の範囲外アクセスを意図的に起こす必要がありません。</li>
+    <li><code>climb()</code> 内部で本当のバグが起きた場合、例外は握りつぶされず、異常として表面化します。</li>
+  </ul>
+
+  <h3>Iteratorの例：状態検査メソッドを用意する</h3>
+  <p>本書は、API設計側にも責任があると説明します。利用者に「例外が出るまで呼び続ける」使い方を強制するAPIは悪いAPIです。<code>Iterator</code> はこの点でよくできています。</p>
+  <pre><code>// 良いAPI利用: hasNext() で事前に状態を確認できる
+Iterator&lt;Foo&gt; iterator = collection.iterator();
+while (iterator.hasNext()) {
+    Foo foo = iterator.next();
+    process(foo);
+}</code></pre>
+  <table>
+    <thead><tr><th>メソッド</th><th>役割</th><th>設計上の意味</th></tr></thead>
+    <tbody>
+      <tr><td><code>hasNext()</code></td><td>次の要素が存在するかを <code>true</code>/<code>false</code> で返す。</td><td>通常の分岐に使うための状態検査メソッド。</td></tr>
+      <tr><td><code>next()</code></td><td>次の要素を返し、イテレータを次へ進める。</td><td>次の要素があるという前提で呼ぶ状態依存メソッド。</td></tr>
+      <tr><td><code>NoSuchElementException</code></td><td>次の要素がないのに <code>next()</code> を呼んだ場合の例外。</td><td>通常終了ではなく、APIの使い方を誤ったことを表す。</td></tr>
+    </tbody>
+  </table>
+  <pre><code>// 悪いAPI利用: next() が失敗するまで回す
+try {
+    Iterator&lt;Foo&gt; iterator = collection.iterator();
+    while (true) {
+        Foo foo = iterator.next();
+        process(foo);
+    }
+} catch (NoSuchElementException ignored) {
+    // 終端を例外で表現している
+}</code></pre>
+
+  <h3>状態検査メソッド vs Optional / null</h3>
+  <p>本書は、状態依存メソッドに対して次の選択肢を示します。ここは Item 71 ともつながります。</p>
+  <table>
+    <thead><tr><th>選択肢</th><th>向いている場面</th><th>注意点</th></tr></thead>
+    <tbody>
+      <tr><td>状態検査メソッド</td><td><code>hasNext()</code> のように、状態確認と実行の間に状態が変わらない場面</td><td>並行実行や外部要因で状態が変わる場合はTOCTOU問題になる</td></tr>
+      <tr><td><code>Optional</code></td><td>結果がないことが自然で、呼び出し側に明示的に扱わせたい場面</td><td>失敗理由の詳細を持たせにくい</td></tr>
+      <tr><td>特別値 / null</td><td>性能上 <code>Optional</code> を避けたい低レイヤー処理など</td><td>チェック漏れがバグになりやすい</td></tr>
+    </tbody>
+  </table>
+  <div class="spring-note"><strong>Spring Bootでの接続：</strong>Repositoryの <code>findById</code> が <code>Optional&lt;T&gt;</code> を返すのは、存在しないことを通常ケースとして扱えるからです。一方、認可違反、不正な状態遷移、API契約違反は例外として扱う価値があります。</div>
+</section>
+
+
+<section id="item70" class="section item">
+  <p class="item-label">Item 70</p>
+  <h2>checked例外は回復可能な状況、runtime例外はプログラミングエラーに使う</h2>
+  <p>Javaの例外設計で最も迷いやすいのが、<strong>checked exception</strong> と <strong>unchecked exception/runtime exception</strong> の使い分けです。本書の判断軸は明確です。</p>
+  <div class="principle"><strong>判断基準：</strong>呼び出し側に「その失敗を想定し、具体的な回復処理を書く責任」を負わせるべきなら checked 例外。API契約違反・事前条件違反・プログラミングミスなら runtime 例外。</div>
+
+  <h3>分類</h3>
+  <table>
+    <thead><tr><th>種類</th><th>代表クラス</th><th>意味</th><th>呼び出し側の扱い</th></tr></thead>
+    <tbody>
+      <tr><td>Checked exception</td><td><code>IOException</code>, 独自の <code>InsufficientFundsException</code></td><td>呼び出し側が回復可能な失敗</td><td><code>catch</code> するか <code>throws</code> で伝播させる必要がある</td></tr>
+      <tr><td>Runtime exception</td><td><code>IllegalArgumentException</code>, <code>IllegalStateException</code></td><td>API契約違反、事前条件違反、プログラミングミス</td><td>基本的に捕まえず、コードまたは呼び出し条件を修正すべき</td></tr>
+      <tr><td>Error</td><td><code>OutOfMemoryError</code>, <code>StackOverflowError</code></td><td>JVMや実行環境レベルの重大問題</td><td>通常はアプリケーションで回復しようとしない</td></tr>
+    </tbody>
+  </table>
+
+  <h3>checked例外が向く例：ただし「回復」の意味を誤解しない</h3>
+  <p>本書では、ギフトカード残高不足のように、呼び出し側が不足額を知ることで購入者に不足額を伝えられるケースが checked 例外の例として示されます。ただし、ここは誤解しやすいです。</p>
+  <div class="callout blunt"><strong>補足：</strong>「別の支払い手段を促せる」とは、必ずしもプログラムが自動で別決済を選ぶという意味ではありません。呼び出し側のプログラム、たとえばアプリケーションサービスやUI層が、例外から不足額などの構造化情報を取得し、ユーザに再選択を促せる、という意味です。</div>
+
+  <pre><code>// 学習用に再構成した例: 回復に必要な情報を持つ checked exception
+public class InsufficientBalanceException extends Exception {
+    private final int shortageYen;
+
+    public InsufficientBalanceException(int shortageYen) {
+        super("Insufficient balance. shortageYen=" + shortageYen);
+        this.shortageYen = shortageYen;
+    }
+
+    public int shortageYen() {
+        return shortageYen;
+    }
+}
+
+public void purchase(GiftCard card, int priceYen)
+        throws InsufficientBalanceException {
+    int shortage = priceYen - card.balanceYen();
+    if (shortage &gt; 0) {
+        throw new InsufficientBalanceException(shortage);
+    }
+    card.debit(priceYen);
+}</code></pre>
+
+  <h3>支払い例をどう判断すべきか</h3>
+  <p>あなたの疑問は正しいです。「ユーザが別の支払い手段を選ぶだけで、プログラム内で解決しないなら checked 例外として不適切では？」という観点はかなり重要です。結論は、<strong>API境界によって変わります</strong>。</p>
+  <table>
+    <thead><tr><th>状況</th><th>checked例外が妥当か</th><th>理由</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>決済ライブラリのような低〜中レイヤーAPIで、呼び出し側が不足額を使って画面表示・再入力・別手段選択フローへ進める</td>
+        <td>妥当になり得る</td>
+        <td>呼び出し側に「この失敗は想定済みなので、処理方針を決めろ」と強制する価値がある。例外に <code>shortageYen()</code> のようなアクセサを持たせる意味もある。</td>
+      </tr>
+      <tr>
+        <td>Web APIのService内部で、最終的にはHTTP 400/409などに変換してフロントへ返すだけ</td>
+        <td>runtime例外の方が実務上自然なことが多い</td>
+        <td>Javaの呼び出し側がその場で業務処理を継続するというより、リクエストを失敗レスポンスに変換するだけだから。Springでは <code>@ControllerAdvice</code> で扱う設計と相性がよい。</td>
+      </tr>
+      <tr>
+        <td>呼び出し側ができることがログ出力、エラー終了、上位へ丸投げだけ</td>
+        <td>不適切</td>
+        <td>checked例外にしても有用な回復処理がない。Item 71の「不要なchecked例外」に該当しやすい。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>つまり、「ユーザに選ばせるから checked 例外として絶対に不適切」とまでは言い切れません。プログラムの回復処理には、<strong>自動的に代替処理を実行する</strong>だけでなく、<strong>ユーザに判断材料を提示して正常な次アクションへ誘導する</strong>ことも含められます。ただし、Spring Bootの一般的なWeb APIでは、checked例外よりもドメイン上のruntime例外として表し、HTTPレスポンスや画面表示に変換する方が扱いやすい場面が多いです。</p>
+
+  <h3>runtime例外が向く例：API契約違反</h3>
+  <pre><code>public void repeat(int times) {
+    if (times &lt; 0) {
+        throw new IllegalArgumentException("times must be &gt;= 0: " + times);
+    }
+    for (int i = 0; i &lt; times; i++) {
+        runOnce();
+    }
+}</code></pre>
+  <p>この例では、<code>times</code> に負数を渡すこと自体がメソッド契約違反です。呼び出し側が <code>catch</code> して回復するというより、そもそも負数を渡さないように呼び出しコードを修正すべきです。したがって runtime例外が適切です。</p>
+
+  <h3>実務上の注意</h3>
+  <ul>
+    <li><code>Error</code> のサブクラスを独自に作るべきではありません。通常、独自に作る unchecked throwable は <code>RuntimeException</code> のサブクラスにします。</li>
+    <li>checked例外には、回復に使えるアクセサを持たせる価値があります。例外メッセージの文字列をパースさせる設計は脆いです。</li>
+    <li>判断に迷うなら unchecked 例外寄りにする、というのが本書の実践的な立場です。理由は Item 71 で扱います。</li>
+  </ul>
+  <div class="spring-note"><strong>Spring Bootでの接続：</strong>Web APIでは、入力不正・存在しないID・不正な状態遷移を runtime 例外として投げ、<code>@ControllerAdvice</code> でHTTP 400/404/409などに変換する設計が多いです。Java APIとして呼び出し側に回復処理を強制したい明確な理由がないなら、checked例外は慎重に使うべきです。</div>
+</section>
+
+
+<section id="item71" class="section item">
+  <p class="item-label">Item 71</p>
+  <h2>checked例外の不要な使用を避ける</h2>
+  <p>checked例外は、正しく使えば信頼性を高めます。しかし乱用すると、API利用者に <code>try-catch</code> や <code>throws</code> を強制し、コードを扱いにくくします。Java 8以降では、checked例外を投げるメソッドがStream APIと相性が悪い点も重くなっています。</p>
+
+  <h3>checked例外を使う条件</h3>
+  <div class="principle">checked例外が正当化されるのは、<strong>適切にAPIを使っても防げない失敗</strong>であり、かつ<strong>呼び出し側が有用な回復処理を実行できる</strong>場合です。</div>
+  <p>呼び出し側が結局こう書くしかないなら、checked例外にする意味は弱いです。</p>
+  <pre><code>// 悪い兆候1: 起こらない前提でAssertionErrorにするだけ
+try {
+    obj.action();
+} catch (TheCheckedException e) {
+    throw new AssertionError(e); // Can't happen
+}</code></pre>
+  <pre><code>// 悪い兆候2: 出力して終了するしかない
+try {
+    obj.action();
+} catch (TheCheckedException e) {
+    e.printStackTrace();
+    System.exit(1);
+}</code></pre>
+
+  <h3>代替案1：Optionalを返すメリット</h3>
+  <p><code>Optional</code> は、「結果が存在しない」ことを例外ではなく戻り値の型で表現します。これは、失敗というより「見つからないことも普通にあり得る」ケースに向いています。</p>
+  <pre><code>// checked例外を使わず、見つからないことを通常ケースとして表現する
+public Optional&lt;User&gt; findUser(UserId id) {
+    return userRepository.findById(id);
+}
+
+findUser(id).ifPresentOrElse(
+    user -&gt; use(user),
+    () -&gt; handleNotFound(id)
+);</code></pre>
+  <table>
+    <thead><tr><th>メリット</th><th>意味</th></tr></thead>
+    <tbody>
+      <tr><td>例外制御にならない</td><td>「存在しない」ことを通常の戻り値として扱えるため、<code>try-catch</code> が不要になる。</td></tr>
+      <tr><td>呼び出し側に不在ケースを意識させる</td><td>戻り値が <code>Optional&lt;User&gt;</code> なので、利用者は「ない場合」を考えざるを得ない。</td></tr>
+      <tr><td>メソッドの意味が明確になる</td><td><code>findUser</code> は「見つからない可能性がある検索」、<code>getRequiredUser</code> は「存在しなければ異常」といった区別を型と名前で表しやすい。</td></tr>
+      <tr><td>Streamや関数型APIと組み合わせやすい</td><td>checked例外を投げるメソッドより、ラムダ式やStream処理に載せやすい。</td></tr>
+    </tbody>
+  </table>
+  <div class="callout"><strong>注意：</strong><code>Optional</code> が向くのは「失敗理由の詳細が不要」または「不在そのものが主要な情報」の場合です。残高不足額、失敗した制約、リトライ可能時刻など、回復に必要な詳細情報が多いなら、Optionalだけでは情報不足になります。</div>
+
+  <h3>代替案2：状態検査メソッドに分けるメリット</h3>
+  <p>状態検査メソッドとは、「実行できるか」を事前に確認するメソッドです。代表例は <code>Iterator.hasNext()</code> と <code>Iterator.next()</code> の組み合わせです。</p>
+  <pre><code>// checked例外版: confirm() を呼ぶまで失敗するか分からない
+try {
+    reservation.confirm();
+} catch (CannotConfirmReservationException e) {
+    handle(e);
+}
+
+// 状態検査メソッド版: 通常のif文で分岐できる
+if (reservation.canConfirm()) {
+    reservation.confirm();
+} else {
+    handleCannotConfirm(reservation);
+}</code></pre>
+  <table>
+    <thead><tr><th>メリット</th><th>意味</th></tr></thead>
+    <tbody>
+      <tr><td>通常の分岐として読める</td><td><code>if (reservation.canConfirm())</code> は、業務ルール上の分岐として読みやすい。例外を読まないと通常ケースが分からない、という状態を避けられる。</td></tr>
+      <tr><td>APIの使い方を明示できる</td><td><code>canConfirm()</code> があることで、「confirm前に確認できる状態がある」と利用者に伝わる。</td></tr>
+      <tr><td>例外を本当の異常に残せる</td><td><code>canConfirm()</code> が <code>false</code> の状態で <code>confirm()</code> を呼んだ場合は、プログラム側の呼び出しミスとして <code>IllegalStateException</code> を投げられる。</td></tr>
+      <tr><td>UI制御に使いやすい</td><td>ボタンの活性/非活性、確認メッセージ表示など、実行前に状態を見たい場面で扱いやすい。</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Optionalと状態検査メソッドの使い分け</h3>
+  <table>
+    <thead><tr><th>観点</th><th>Optionalが向く</th><th>状態検査メソッドが向く</th></tr></thead>
+    <tbody>
+      <tr><td>代表例</td><td><code>findById(id)</code>, <code>tryParse(text)</code>, <code>poll()</code></td><td><code>hasNext()</code> + <code>next()</code>, <code>canConfirm()</code> + <code>confirm()</code></td></tr>
+      <tr><td>結果がない場合</td><td>戻り値として <code>Optional.empty()</code> を返す。</td><td><code>canXxx()</code> が <code>false</code> を返し、呼び出し側が <code>xxx()</code> を呼ばない。</td></tr>
+      <tr><td>並行実行への強さ</td><td>比較的強い。確認と取得が1メソッド内で完結するため、確認後に状態が変わる問題を避けやすい。</td><td>弱い場合がある。<code>canXxx()</code> と <code>xxx()</code> の間に状態が変わると危険。</td></tr>
+      <tr><td>読みやすさ</td><td>「ないかもしれない値」を型で表せる。</td><td>業務上の可能/不可能を <code>if</code> で明示できる。</td></tr>
+      <tr><td>失敗理由の表現</td><td>弱い。<code>empty</code> だけでは理由を持てない。</td><td>理由を別メソッドや状態オブジェクトで表現すれば強くできるが、設計はやや増える。</td></tr>
+    </tbody>
+  </table>
+
+  <h3>ただし状態検査メソッドには限界がある</h3>
+  <ul>
+    <li>並行実行で、<code>canConfirm()</code> と <code>confirm()</code> の間に状態が変わるなら危険。</li>
+    <li>確認処理と実行処理で同じ重い計算が必要なら、性能上不利。</li>
+    <li>呼び出し側が常に回復処理を書くべきケースなら、checked例外のままでもよい。</li>
+  </ul>
+
+  <h3>より実務的な代替：結果型を返す</h3>
+  <p>Java標準の話からは少し外れますが、業務アプリでは <code>Optional</code> だけでは理由が足りず、checked例外は重すぎることがあります。その場合、成功/失敗と理由を持つ結果型を返す設計もあります。</p>
+  <pre><code>public sealed interface ConfirmResult {
+    record Success(Reservation reservation) implements ConfirmResult {}
+    record Failure(String reasonCode, String message) implements ConfirmResult {}
+}
+
+public ConfirmResult tryConfirm(Reservation reservation) {
+    if (!reservation.canConfirm()) {
+        return new ConfirmResult.Failure("CANNOT_CONFIRM", "予約を確定できない状態です");
+    }
+    reservation.confirm();
+    return new ConfirmResult.Success(reservation);
+}</code></pre>
+  <p>これは「例外にするほど異常ではないが、<code>Optional.empty()</code> だけでは情報が足りない」場合の現実的な逃げ道です。</p>
+
+  <div class="blunt callout"><strong>厳しめに言うと：</strong>「なんとなく業務例外だからchecked」という設計は弱いです。呼び出し側が何を回復できるのか説明できないchecked例外は、API利用者への負債です。</div>
+</section>
+
+
+<section id="item72" class="section item">
+  <p class="item-label">Item 72</p>
+  <h2>標準例外を優先して使う</h2>
+  <p>独自例外を作る前に、Java標準の例外で意味を表せないかを検討します。標準例外を再利用すると、API利用者が意味を理解しやすく、コードも読みやすくなります。</p>
+
+  <h3>よく使う標準例外</h3>
+  <table>
+    <thead><tr><th>例外</th><th>使う場面</th><th>例</th></tr></thead>
+    <tbody>
+      <tr><td><code>IllegalArgumentException</code></td><td>null以外の引数値が不適切</td><td>回数に負数が渡された</td></tr>
+      <tr><td><code>IllegalStateException</code></td><td>オブジェクト状態がメソッド呼び出しに不適切</td><td>初期化前に実行された、既に確定済みの予約を変更しようとした</td></tr>
+      <tr><td><code>NullPointerException</code></td><td>null禁止の引数にnullが渡された</td><td><code>Objects.requireNonNull(name)</code></td></tr>
+      <tr><td><code>IndexOutOfBoundsException</code></td><td>インデックス値が範囲外</td><td><code>list.get(-1)</code></td></tr>
+      <tr><td><code>ConcurrentModificationException</code></td><td>禁止された並行変更を検出</td><td>イテレーション中にコレクションが変更された</td></tr>
+      <tr><td><code>UnsupportedOperationException</code></td><td>そのオブジェクトが操作をサポートしない</td><td>読み取り専用Listに <code>add</code> する</td></tr>
+    </tbody>
+  </table>
+
+  <h3><code>Objects.requireNonNull()</code> の意味</h3>
+  <p><code>Objects.requireNonNull(x, "x")</code> は、引数 <code>x</code> が <code>null</code> ではないことをチェックするための標準メソッドです。<code>null</code> なら <code>NullPointerException</code> を投げ、<code>null</code> でなければその値をそのまま返します。</p>
+  <pre><code>this.name = Objects.requireNonNull(name, "name");</code></pre>
+  <p>上のコードは、概念的には次のコードとほぼ同じです。</p>
+  <pre><code>if (name == null) {
+    throw new NullPointerException("name");
+}
+this.name = name;</code></pre>
+  <p><code>requireNonNull</code> の利点は、<strong>nullチェックと代入を1行で書ける</strong>こと、そして「この引数はnull禁止である」という意図が標準的な形で伝わることです。</p>
+  <table>
+    <thead><tr><th>書き方</th><th>動作</th></tr></thead>
+    <tbody>
+      <tr><td><code>Objects.requireNonNull(id)</code></td><td><code>id</code> が <code>null</code> なら <code>NullPointerException</code>。メッセージは簡素。</td></tr>
+      <tr><td><code>Objects.requireNonNull(id, "id")</code></td><td><code>id</code> が <code>null</code> なら、メッセージ付きの <code>NullPointerException</code>。</td></tr>
+      <tr><td><code>this.id = Objects.requireNonNull(id, "id")</code></td><td>nullチェック後、問題なければ戻り値をそのままフィールドに代入する。</td></tr>
+    </tbody>
+  </table>
+
+  <h3>コード例</h3>
+  <pre><code>public User findRequired(UserId id) {
+    Objects.requireNonNull(id, "id"); // idがnullならNullPointerException
+
+    return userRepository.findById(id)
+        .orElseThrow(() -&gt; new IllegalArgumentException("unknown userId: " + id));
+}
+
+public void ship(Order order) {
+    Objects.requireNonNull(order, "order"); // orderがnullならNullPointerException
+    if (!order.isPaid()) {
+        throw new IllegalStateException("order is not paid: orderId=" + order.id());
+    }
+    order.ship();
+}</code></pre>
+
+  <h3><code>IllegalArgumentException</code> とは何か</h3>
+  <p><code>IllegalArgumentException</code> は、<strong>メソッドに渡された引数の値が不正</strong>であることを表す runtime例外です。ポイントは、オブジェクトの状態ではなく、呼び出し時に渡した値がメソッド契約に反していることです。</p>
+  <pre><code>public void setRetryCount(int retryCount) {
+    if (retryCount &lt; 0) {
+        throw new IllegalArgumentException(
+            "retryCount must be &gt;= 0: " + retryCount);
+    }
+    this.retryCount = retryCount;
+}</code></pre>
+  <p>この例では、<code>retryCount</code> は0以上であるべきです。負数を渡すのは呼び出し側の契約違反なので、<code>IllegalArgumentException</code> が自然です。</p>
+
+  <h3><code>IllegalStateException</code> とは何か</h3>
+  <p><code>IllegalStateException</code> は、<strong>オブジェクトの現在状態が、そのメソッド呼び出しを許さない</strong>ことを表す runtime例外です。引数そのものが悪いというより、「今この状態でその操作を呼んではいけない」という意味です。</p>
+  <pre><code>public void ship(Order order) {
+    Objects.requireNonNull(order, "order");
+    if (!order.isPaid()) {
+        throw new IllegalStateException(
+            "Cannot ship unpaid order: orderId=" + order.id());
+    }
+    order.ship();
+}</code></pre>
+  <p>この例では、<code>order</code> という引数がnullではない限り、引数の型自体は正しいです。しかし注文が未払いという<strong>状態</strong>では出荷できません。そのため <code>IllegalStateException</code> が自然です。</p>
+
+  <h3><code>IllegalArgumentException</code> と <code>IllegalStateException</code> の境界</h3>
+  <p>本書は、カードデッキから手札を配る例で境界の難しさを説明します。要求された手札サイズが残カード数より大きい場合、引数が悪いとも、デッキ状態が悪いとも言えます。判断基準はこうです。</p>
+  <div class="principle">どんな引数でも成功しない状態なら <code>IllegalStateException</code>。別の引数なら成功したなら <code>IllegalArgumentException</code>。</div>
+  <pre><code>public List&lt;Card&gt; deal(int handSize) {
+    if (handSize &lt; 0) {
+        throw new IllegalArgumentException("handSize must be &gt;= 0: " + handSize);
+    }
+    if (deck.isEmpty()) {
+        throw new IllegalStateException("deck is empty");
+    }
+    if (handSize &gt; deck.size()) {
+        throw new IllegalArgumentException(
+            "handSize exceeds remaining cards: handSize=" + handSize
+                + ", remaining=" + deck.size());
+    }
+    return draw(handSize);
+}</code></pre>
+  <table>
+    <thead><tr><th>ケース</th><th>選ぶ例外</th><th>理由</th></tr></thead>
+    <tbody>
+      <tr><td><code>handSize == -1</code></td><td><code>IllegalArgumentException</code></td><td>負の枚数を配るという引数値が不正。</td></tr>
+      <tr><td>デッキが空</td><td><code>IllegalStateException</code></td><td>どんな正の枚数を指定しても配れない。デッキの状態が不正。</td></tr>
+      <tr><td>残り3枚なのに5枚要求</td><td><code>IllegalArgumentException</code> または設計次第</td><td>2枚なら成功するため、引数が現在状態に対して大きすぎると見るなら <code>IllegalArgumentException</code>。API仕様で「残枚数不足」を状態問題として扱うなら専用例外や <code>IllegalStateException</code> もあり得る。</td></tr>
+    </tbody>
+  </table>
+
+  <h3>避けるべき例外</h3>
+  <p><code>Exception</code>, <code>RuntimeException</code>, <code>Throwable</code>, <code>Error</code> を直接投げる設計は避けます。抽象的すぎて、呼び出し側が意味に応じた処理を書けません。</p>
+  <pre><code>// 悪い例: 何が悪いのか型から分からない
+throw new RuntimeException("bad request");
+
+// 良い例: 引数が不正だと型から分かる
+throw new IllegalArgumentException("userId must be positive: " + userId);</code></pre>
+</section>
+
+<section id="item73" class="section item">
+  <p class="item-label">Item 73</p>
+  <h2>抽象化に適した例外を投げる</h2>
+  <p>上位層のメソッドが、下位層の実装詳細に依存した例外をそのまま投げると、APIが汚染されます。利用者から見て「なぜこの処理でその例外が出るのか」が分からない状態は、抽象化の破綻です。</p>
+  <h3>例外翻訳</h3>
+  <p>下位層の例外を捕まえ、上位層の抽象度で説明できる例外に変換します。</p>
+  <pre><code>// 例外翻訳の基本形
+try {
+    lowerLevelOperation();
+} catch (LowerLevelException e) {
+    throw new HigherLevelException(&quot;failed to perform business operation&quot;, e);
+}</code></pre>
+  <h3>本書の代表例：List#get の抽象に合わせる</h3>
+  <p>本書では、<code>List</code> の <code>get(index)</code> が、内部のイテレータ由来の <code>NoSuchElementException</code> をそのまま漏らすのではなく、<code>IndexOutOfBoundsException</code> に変換する例が示されます。</p>
+  <pre><code>public E get(int index) {
+    ListIterator&lt;E&gt; iterator = listIterator(index);
+    try {
+        return iterator.next();
+    } catch (NoSuchElementException e) {
+        throw new IndexOutOfBoundsException(&quot;Index: &quot; + index);
+    }
+}</code></pre>
+  <h3>例外チェイニング</h3>
+  <p>下位層の原因がデバッグに役立つ場合は、原因例外を <code>cause</code> として保持します。これにより、上位層には適切な例外を見せつつ、障害調査では根本原因を追えます。</p>
+  <pre><code>public class OrderImportException extends RuntimeException {
+    public OrderImportException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}
+
+public void importOrders(Path csv) {
+    try {
+        csvReader.read(csv);
+    } catch (IOException e) {
+        throw new OrderImportException(&quot;failed to import orders: file=&quot; + csv, e);
+    }
+}</code></pre>
+  <h3>Spring Bootでの層別例外設計</h3>
+  <pre><code>// Infrastructure層: JDBCや外部APIの低レベル例外を扱う
+class UserRepositoryAdapter implements UserRepository {
+    public User findById(UserId id) {
+        try {
+            return jdbcTemplate.queryForObject(...);
+        } catch (DataAccessException e) {
+            throw new UserRepositoryException(&quot;failed to load user: id=&quot; + id, e);
+        }
+    }
+}
+
+// Application層: ユースケースとして意味のある例外に変換する
+class GetUserUseCase {
+    public UserDto execute(UserId id) {
+        try {
+            return repository.findById(id).toDto();
+        } catch (UserRepositoryException e) {
+            throw new UserQueryFailedException(&quot;failed to get user: id=&quot; + id, e);
+        }
+    }
+}</code></pre>
+  <div class="callout"><strong>注意：</strong>例外翻訳は万能ではありません。そもそも下位層の例外を避けられるなら、先に入力検証や事前条件チェックをすべきです。翻訳しすぎると、逆に原因が追いにくくなります。</div>
+</section>
+
+<section id="item74" class="section item">
+  <p class="item-label">Item 74</p>
+  <h2>各メソッドが投げる例外を文書化する</h2>
+  <p>例外はAPI契約の一部です。どの条件でどの例外が出るのかが文書化されていないAPIは、呼び出し側にとって安全に使えません。</p>
+  <h3>checked例外は個別に宣言し、Javadocにも書く</h3>
+  <pre><code>/**
+ * 指定したファイルから設定を読み込む。
+ *
+ * @param path 設定ファイルのパス
+ * @return 読み込んだ設定
+ * @throws IOException ファイルを開けない、または読み取りに失敗した場合
+ * @throws ConfigFormatException 設定ファイルの形式が不正な場合
+ */
+public Config load(Path path) throws IOException, ConfigFormatException {
+    ...
+}</code></pre>
+  <h3>悪い例：広すぎるthrows</h3>
+  <pre><code>// 悪い例: 何が起こるのか利用者に伝わらない
+public Config load(Path path) throws Exception {
+    ...
+}</code></pre>
+  <h3>unchecked例外もJavadocに書く。ただしthrows句には書かない</h3>
+  <p>unchecked例外は、呼び出し側がcatchを強制されるものではありません。しかし、多くの場合は「メソッドの事前条件」を表します。つまり、Javadocに書く価値があります。</p>
+  <pre><code>/**
+ * 注文を出荷済みにする。
+ *
+ * @param orderId 注文ID
+ * @throws NullPointerException orderId が null の場合
+ * @throws IllegalStateException 注文が支払い済みでない場合、または既にキャンセル済みの場合
+ */
+public void ship(OrderId orderId) {
+    ...
+}</code></pre>
+  <h3>クラス全体で共通する例外はクラスコメントにまとめてもよい</h3>
+  <pre><code>/**
+ * ユーザー管理サービス。
+ *
+ * &lt;p&gt;このクラスの全publicメソッドは、null禁止の引数にnullが渡された場合、
+ * NullPointerExceptionを投げる。&lt;/p&gt;
+ */
+public class UserService {
+    ...
+}</code></pre>
+  <div class="spring-note"><strong>Spring Bootでの接続：</strong>Controllerのメソッド単位ではなく、ServiceやDomainのpublicメソッドに「どの前提条件を破るとどの例外が出るか」を書く方が設計資料として価値があります。ControllerではそれをHTTPエラー仕様に接続します。</div>
+</section>
+
+<section id="item75" class="section item">
+  <p class="item-label">Item 75</p>
+  <h2>詳細メッセージには失敗を捕捉する情報を含める</h2>
+  <p>本番障害では、開発者が再現環境を持てないことがあります。そのとき頼れるのは、ログとスタックトレースです。例外メッセージに失敗時の値が入っていないと、調査コストが一気に上がります。</p>
+  <h3>入れるべき情報</h3>
+  <ul>
+    <li>失敗に関与したパラメータ値</li>
+    <li>不変条件を破ったフィールド値</li>
+    <li>期待された範囲・実際の値</li>
+    <li>業務識別子：<code>userId</code>, <code>orderId</code>, <code>requestId</code> など</li>
+  </ul>
+  <h3>本書の例の考え方：IndexOutOfBoundsException</h3>
+  <p>範囲外インデックスなら、単に「範囲外」ではなく、下限・上限・実際のindexがあると原因を絞れます。</p>
+  <pre><code>public class DetailedIndexOutOfBoundsException extends IndexOutOfBoundsException {
+    private final int lowerBound;
+    private final int upperBound;
+    private final int index;
+
+    public DetailedIndexOutOfBoundsException(int lowerBound, int upperBound, int index) {
+        super(&quot;lowerBound=&quot; + lowerBound + &quot;, upperBound=&quot; + upperBound + &quot;, index=&quot; + index);
+        this.lowerBound = lowerBound;
+        this.upperBound = upperBound;
+        this.index = index;
+    }
+
+    public int lowerBound() { return lowerBound; }
+    public int upperBound() { return upperBound; }
+    public int index() { return index; }
+}</code></pre>
+  <h3>悪い例と良い例</h3>
+  <pre><code>// 悪い例: 情報が足りない
+throw new IllegalArgumentException(&quot;invalid amount&quot;);
+
+// 良い例: 調査に必要な値がある
+throw new IllegalArgumentException(
+    &quot;amount must be positive: amount=&quot; + amount + &quot;, orderId=&quot; + orderId);
+
+// さらに良い例: 例外型にフィールドとして保持する
+throw new InvalidPaymentAmountException(orderId, amount);</code></pre>
+  <h3>セキュリティ上の注意</h3>
+  <p>パスワード、アクセストークン、秘密鍵、個人情報などを例外メッセージに含めてはいけません。スタックトレースはログ、監視、SRE、サポートなど多くの人が見る可能性があります。</p>
+  <pre><code>// 悪い例: tokenをログやスタックトレースに出してしまう
+throw new AuthenticationException(&quot;invalid token: &quot; + accessToken);
+
+// 良い例: 識別に必要な安全な情報だけ出す
+throw new AuthenticationException(&quot;invalid token: tokenId=&quot; + tokenId + &quot;, userId=&quot; + userId);</code></pre>
+  <div class="blunt callout"><strong>実務ではここが効きます：</strong>例外メッセージが雑なコードは、障害対応で確実に時間を失います。「何がダメだったか」ではなく「どの値が、どの期待条件を、どう外れたか」を残してください。</div>
+</section>
+
+<section id="item76" class="section item">
+  <p class="item-label">Item 76</p>
+  <h2>失敗原子性を保つ</h2>
+  <p><strong>失敗原子性</strong>とは、メソッドが例外を投げたとき、オブジェクトが呼び出し前と同じ状態に保たれる性質です。特にchecked例外では、呼び出し側が回復する前提なので、失敗後もオブジェクトが使えることが重要です。</p>
+  <h3>本書の代表例：Stack.pop</h3>
+  <p>空スタックをpopする場合、先にサイズを検査すれば、状態を壊さずに適切な例外を投げられます。</p>
+  <pre><code>public Object pop() {
+    if (size == 0) {
+        throw new EmptyStackException();
+    }
+    Object result = elements[--size];
+    elements[size] = null; // 古い参照を消す
+    return result;
+}</code></pre>
+  <p>もし先頭の検査なしに <code>--size</code> してから配列アクセスし、そこで例外が出ると、<code>size</code> が負数になるなど、オブジェクトが壊れた状態になり得ます。</p>
+  <h3>失敗原子性を実現する方法</h3>
+  <table>
+    <thead><tr><th>方法</th><th>説明</th><th>例</th></tr></thead>
+    <tbody>
+      <tr><td>不変オブジェクトにする</td><td>既存状態を変更しないため、失敗しても既存インスタンスは壊れない</td><td><code>record</code>, value object</td></tr>
+      <tr><td>変更前に検証する</td><td>パラメータや状態の検査を先に済ませる</td><td><code>if (size == 0) throw ...</code></td></tr>
+      <tr><td>失敗し得る処理を先に行う</td><td>オブジェクト変更前に、型チェック・計算・外部検証を済ませる</td><td><code>TreeMap</code> に追加前に比較で失敗する</td></tr>
+      <tr><td>一時コピーで処理する</td><td>コピー上で処理し、成功後に本体へ反映する</td><td>ソート、バッチ更新</td></tr>
+      <tr><td>ロールバックする</td><td>途中失敗を捕捉して変更前に戻す</td><td>永続データ構造、トランザクション</td></tr>
+    </tbody>
+  </table>
+  <h3>悪い例：途中まで変更してから失敗する</h3>
+  <pre><code>// 悪い例: 途中で例外が出るとtagsが一部だけ変更される
+public void replaceTags(List&lt;String&gt; newTags) {
+    tags.clear();
+    for (String tag : newTags) {
+        if (tag.isBlank()) {
+            throw new IllegalArgumentException(&quot;blank tag&quot;);
+        }
+        tags.add(tag);
+    }
+}</code></pre>
+  <h3>良い例：検証してから変更する</h3>
+  <pre><code>public void replaceTags(List&lt;String&gt; newTags) {
+    Objects.requireNonNull(newTags, &quot;newTags&quot;);
+    List&lt;String&gt; copy = new ArrayList&lt;&gt;(newTags);
+    for (String tag : copy) {
+        if (tag == null || tag.isBlank()) {
+            throw new IllegalArgumentException(&quot;tag must not be blank: &quot; + tag);
+        }
+    }
+
+    tags.clear();
+    tags.addAll(copy);
+}</code></pre>
+  <div class="spring-note"><strong>Spring Bootでの接続：</strong>DB更新ではトランザクションが失敗原子性を担います。ただし、メモリ上のドメインオブジェクトや集約の状態変更は、トランザクション以前に壊れる可能性があります。ドメインメソッド内でも「検証してから変更」を徹底してください。</div>
+</section>
+
+<section id="item77" class="section item">
+  <p class="item-label">Item 77</p>
+  <h2>例外を無視しない</h2>
+  <p>空の <code>catch</code> ブロックは、例外処理の目的を破壊します。API設計者が例外を宣言しているのは、呼び出し側に何かを伝えたいからです。</p>
+  <h3>悪い例：空catch</h3>
+  <pre><code>// 悪い例: 例外を完全に握りつぶしている
+try {
+    sendNotification(user);
+} catch (NotificationException e) {
+}</code></pre>
+  <h3>最低限やるべきこと</h3>
+  <ul>
+    <li>回復できるなら回復処理を書く。</li>
+    <li>回復できないなら伝播させる。</li>
+    <li>無視するなら、なぜ無視できるのかコメントを書く。</li>
+    <li>変数名を <code>ignored</code> にして、意図的であることを示す。</li>
+    <li>必要ならログに残す。</li>
+  </ul>
+  <h3>本書の代表例：タイムアウトしたらデフォルト値を使う</h3>
+  <p>本書では、計算結果が望ましいが必須ではない場合に、タイムアウトや実行失敗を意図的に無視し、デフォルト値を使う例が示されます。</p>
+  <pre><code>Future&lt;Integer&gt; future = exec.submit(planarMap::chromaticNumber);
+int numColors = 4; // デフォルト値
+try {
+    numColors = future.get(1L, TimeUnit.SECONDS);
+} catch (TimeoutException | ExecutionException ignored) {
+    // デフォルト値を使う。最小色数は望ましいが必須ではない。
+}</code></pre>
+  <h3>ログに残す例</h3>
+  <pre><code>try {
+    cache.refresh();
+} catch (CacheRefreshException e) {
+    logger.warn(&quot;cache refresh failed; continue with stale cache&quot;, e);
+}</code></pre>
+  <div class="blunt callout"><strong>率直に：</strong>空catchは、ほぼバグです。レビューで見つけたら止めるべきです。例外を無視してよいケースはありますが、その場合こそ理由をコードに残す必要があります。</div>
+</section>
+
+<section id="spring" class="section">
+  <h2>Spring BootでChapter 10を実装に落とすなら</h2>
+  <p>本書はJava一般のAPI設計の本なので、Spring Boot特有の <code>@ControllerAdvice</code> やHTTPステータス設計を直接深く扱うわけではありません。ですが、Chapter 10の原則はSpringアプリの例外設計にもそのまま効きます。</p>
+  <h3>推奨レイヤー構成</h3>
+  <table>
+    <thead><tr><th>層</th><th>例外設計</th><th>例</th></tr></thead>
+    <tbody>
+      <tr><td>Controller</td><td>原則として例外を直接作り込まず、入力バリデーションとレスポンス変換を担当</td><td><code>@Valid</code>, <code>@ControllerAdvice</code></td></tr>
+      <tr><td>Application Service</td><td>ユースケースとして意味のある例外を投げる</td><td><code>UserRegistrationFailedException</code></td></tr>
+      <tr><td>Domain</td><td>業務ルール違反・状態遷移違反を表現する</td><td><code>IllegalStateException</code> または <code>CannotCancelOrderException</code></td></tr>
+      <tr><td>Infrastructure</td><td>DB・外部API・ファイルなどの低レベル例外をラップ/翻訳する</td><td><code>DataAccessException</code> → <code>UserRepositoryException</code></td></tr>
+    </tbody>
+  </table>
+  <h3>ControllerAdviceの例</h3>
+<pre><code>@RestControllerAdvice
+public class ApiExceptionHandler {
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    ResponseEntity&lt;ErrorResponse&gt; handleIllegalArgument(IllegalArgumentException e) {
+        return ResponseEntity.badRequest()
+            .body(new ErrorResponse(&quot;BAD_REQUEST&quot;, e.getMessage()));
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    ResponseEntity&lt;ErrorResponse&gt; handleIllegalState(IllegalStateException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+            .body(new ErrorResponse(&quot;CONFLICT&quot;, e.getMessage()));
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    ResponseEntity&lt;ErrorResponse&gt; handleUserNotFound(UserNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(new ErrorResponse(&quot;USER_NOT_FOUND&quot;, e.getMessage()));
+    }
+}</code></pre>
+  <h3>実務判断表</h3>
+  <table>
+    <thead><tr><th>状況</th><th>推奨</th><th>理由</th></tr></thead>
+    <tbody>
+      <tr><td>リクエストDTOの項目不正</td><td>Bean Validation + 400</td><td>クライアント入力の契約違反</td></tr>
+      <tr><td>IDに対応するリソースがない</td><td><code>NotFoundException</code> + 404</td><td>Web APIとして意味のある失敗</td></tr>
+      <tr><td>現在状態では操作できない</td><td><code>IllegalStateException</code> または業務例外 + 409</td><td>状態遷移違反</td></tr>
+      <tr><td>DB接続失敗</td><td>Infrastructure例外にラップ + 500</td><td>低レベル例外を上位APIに漏らさない</td></tr>
+      <tr><td>外部APIタイムアウト</td><td>例外チェイニングしてアプリ例外 + 502/504</td><td>原因保持とHTTP表現の分離</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="checklist" class="section">
+  <h2>例外処理レビュー用チェックリスト</h2>
+  <div class="checklist">
+    <label><input type="checkbox"> 例外を通常のループ・分岐・検索失敗に使っていない</label>
+    <label><input type="checkbox"> checked例外は、呼び出し側が具体的に回復できる場合に限定している</label>
+    <label><input type="checkbox"> 独自例外を作る前に標準例外で表現できないか検討している</label>
+    <label><input type="checkbox"> 下位層の例外を上位層のAPIにそのまま漏らしていない</label>
+    <label><input type="checkbox"> 例外メッセージに、失敗に関与した値・識別子・期待条件が含まれている</label>
+    <label><input type="checkbox"> パスワード、トークン、秘密鍵、過剰な個人情報を例外メッセージに含めていない</label>
+    <label><input type="checkbox"> publicメソッドの例外条件がJavadocまたはAPI仕様に書かれている</label>
+    <label><input type="checkbox"> 例外が発生しても、オブジェクトや集約が壊れた中間状態で残らない</label>
+    <label><input type="checkbox"> 空catchが存在しない。無視する場合は <code>ignored</code> とコメントがある</label>
+    <label><input type="checkbox"> ログ出力とユーザー向けエラーメッセージを混同していない</label>
+  </div>
+</section>
+
+<section id="summary" class="section conclusion">
+  <h2>まとめ</h2>
+  <p>Chapter 10は、例外処理を「try-catch構文」ではなく、<strong>失敗をどうAPI契約として表現するか</strong>の章として読むべきです。</p>
+  <ol>
+    <li>通常フローに例外を使わない。</li>
+    <li>checked例外は、呼び出し側が本当に回復できる場合に限定する。</li>
+    <li>標準例外を優先する。</li>
+    <li>下位層の例外を上位層の抽象度に翻訳する。</li>
+    <li>例外は文書化し、メッセージには調査に必要な情報を入れる。</li>
+    <li>失敗時にも状態を壊さない。</li>
+    <li>例外を握りつぶさない。</li>
+  </ol>
+  <div class="callout blunt"><strong>あなたの現在の学習に対する優先順位：</strong>まず Item 70, 72, 73, 75, 76 を重点的に読むべきです。Spring Bootの実装では、特に「runtime例外で業務エラーを表し、ControllerAdviceでHTTPレスポンスに変換する」「Repositoryなど下位層の例外をService/UseCaseの抽象に翻訳する」感覚を身につけるのが効果的です。</div>
+</section>
+
+      <p class="footer">Created as a study aid based on Effective Java, 3rd Edition, Chapter 10. Explanations and additional examples are original/reconstructed for learning.</p>
+    </main>
+  </div>
+</body>
+</html>

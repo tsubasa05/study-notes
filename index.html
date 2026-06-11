@@ -374,13 +374,14 @@
         <label for="search" class="visually-hidden">学習ノートを検索</label>
         <input id="search" type="search" placeholder="タイトルやキーワードで検索" autocomplete="off">
       </div>
-      <p class="count" aria-live="polite"><span id="visible-count">13</span> 件のノート</p>
+      <p class="count" aria-live="polite"><span id="visible-count">16</span> 件のノート</p>
     </div>
 
     <nav class="filters" aria-label="カテゴリで絞り込み">
       <button class="filter-button" type="button" data-filter="all" aria-pressed="true">すべて</button>
       <button class="filter-button" type="button" data-filter="spring-api" aria-pressed="false">Spring API</button>
       <button class="filter-button" type="button" data-filter="java-basics" aria-pressed="false">Java 基礎</button>
+      <button class="filter-button" type="button" data-filter="effective-java" aria-pressed="false">Effective Java</button>
       <button class="filter-button" type="button" data-filter="java-platform" aria-pressed="false">Java Web 基盤</button>
       <button class="filter-button" type="button" data-filter="data-systems" aria-pressed="false">データシステム</button>
       <button class="filter-button" type="button" data-filter="llm" aria-pressed="false">LLM 連携</button>
@@ -574,6 +575,69 @@
             <li>正規化</li>
           </ul>
           <a class="card-link" href="backend-api-practice-learning-records/java-null-empty-blank.html">ノートを読む</a>
+        </div>
+      </article>
+
+      <article class="note-card" data-category="effective-java java-basics" data-search="effective java chapter 2 creating destroying objects オブジェクト 生成 破棄 static factory method builder singleton dependency injection try with resources">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="category">Effective Java / Java 基礎</span>
+            <span>Chapter 2</span>
+          </div>
+          <h2>Effective Java Chapter 2: オブジェクトの生成と破棄</h2>
+          <p class="description">
+            static factory method、Builder、Singleton、依存性注入、不要な生成の回避、リソース管理まで、オブジェクトのライフサイクル設計を整理。
+          </p>
+          <ul class="tags" aria-label="キーワード">
+            <li>Static Factory</li>
+            <li>Builder</li>
+            <li>Dependency Injection</li>
+            <li>Resource Management</li>
+          </ul>
+          <a class="card-link" href="effective-java/effective-java-chapter-02.html">ノートを読む</a>
+        </div>
+      </article>
+
+      <article class="note-card" data-category="effective-java java-basics" data-search="effective java chapter 8 methods メソッド api design parameter validation defensive copy signature overload varargs optional javadoc">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="category">Effective Java / Java 基礎</span>
+            <span>Chapter 8</span>
+          </div>
+          <h2>Effective Java Chapter 8: メソッド</h2>
+          <p class="description">
+            パラメータ検証、防御的コピー、シグネチャ、オーバーロード、可変長引数、Optional、Javadocからメソッド境界の設計を整理。
+          </p>
+          <ul class="tags" aria-label="キーワード">
+            <li>Parameter Validation</li>
+            <li>Defensive Copy</li>
+            <li>Optional</li>
+            <li>Javadoc</li>
+          </ul>
+          <a class="card-link" href="effective-java/effective-java-chapter-08.html">ノートを読む</a>
+        </div>
+      </article>
+
+      <article class="note-card" data-category="effective-java java-basics" data-search="effective java chapter 10 exceptions 例外 checked runtime standard exception abstraction failure atomicity controlleradvice spring boot">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="category">Effective Java / Java 基礎</span>
+            <span>Chapter 10</span>
+          </div>
+          <h2>Effective Java Chapter 10: 例外</h2>
+          <p class="description">
+            例外を使う条件、checked例外とruntime例外、抽象度に合う例外、失敗原子性、Spring Bootでの変換方針を整理。
+          </p>
+          <ul class="tags" aria-label="キーワード">
+            <li>Exceptions</li>
+            <li>API Design</li>
+            <li>Failure Atomicity</li>
+            <li>ControllerAdvice</li>
+          </ul>
+          <a class="card-link" href="effective-java/effective-java-chapter-10.html">ノートを読む</a>
         </div>
       </article>
 

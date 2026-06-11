@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Effective Java Chapter 2 | Creating and Destroying Objects</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #111827;
+      --panel: #172033;
+      --panel-2: #1e293b;
+      --text: #e5e7eb;
+      --muted: #a7b0c0;
+      --accent: #60a5fa;
+      --accent-2: #34d399;
+      --warn: #fbbf24;
+      --bad: #fb7185;
+      --good: #86efac;
+      --border: rgba(148, 163, 184, 0.25);
+      --code-bg: #020617;
+      --shadow: 0 18px 45px rgba(0,0,0,0.30);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+      line-height: 1.8;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(96,165,250,.18), transparent 35%),
+        radial-gradient(circle at top right, rgba(52,211,153,.12), transparent 28%),
+        var(--bg);
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    header {
+      padding: 56px 28px 36px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(15,23,42,0.92), rgba(15,23,42,0.70));
+    }
+
+    .header-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 4px 10px;
+      border: 1px solid rgba(96,165,250,.35);
+      border-radius: 999px;
+      color: #bfdbfe;
+      background: rgba(37,99,235,.12);
+      font-size: 13px;
+      letter-spacing: .02em;
+    }
+
+    h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(30px, 5vw, 54px);
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+    }
+
+    .subtitle {
+      max-width: 900px;
+      color: var(--muted);
+      font-size: 18px;
+      margin: 0;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      gap: 28px;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    nav {
+      position: sticky;
+      top: 16px;
+      align-self: start;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: rgba(23, 32, 51, .82);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+      max-height: calc(100vh - 32px);
+      overflow-y: auto;
+    }
+
+    nav h2 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      color: #dbeafe;
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    nav li { margin: 4px 0; }
+
+    nav a {
+      display: block;
+      padding: 7px 9px;
+      border-radius: 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    nav a:hover {
+      background: rgba(96,165,250,.10);
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    main {
+      min-width: 0;
+    }
+
+    section, .card {
+      padding: 26px;
+      margin-bottom: 24px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: rgba(23, 32, 51, .84);
+      box-shadow: var(--shadow);
+    }
+
+    section h2 {
+      margin: 0 0 12px;
+      font-size: 28px;
+      line-height: 1.35;
+      letter-spacing: -0.02em;
+    }
+
+    h3 {
+      margin: 28px 0 10px;
+      font-size: 20px;
+      color: #dbeafe;
+    }
+
+    h4 {
+      margin: 20px 0 8px;
+      font-size: 16px;
+      color: #bfdbfe;
+    }
+
+    p { margin: 10px 0; }
+
+    .lead {
+      font-size: 17px;
+      color: #d1d5db;
+    }
+
+    .note, .warning, .good, .bad {
+      padding: 14px 16px;
+      border-radius: 16px;
+      margin: 16px 0;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, .60);
+    }
+
+    .note { border-left: 4px solid var(--accent); }
+    .warning { border-left: 4px solid var(--warn); }
+    .good { border-left: 4px solid var(--good); }
+    .bad { border-left: 4px solid var(--bad); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 16px;
+      margin: 16px 0;
+    }
+
+    .mini {
+      padding: 15px;
+      border-radius: 18px;
+      background: rgba(30,41,59,.75);
+      border: 1px solid var(--border);
+    }
+
+    .mini strong {
+      display: block;
+      color: #e0f2fe;
+      margin-bottom: 4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    th {
+      color: #dbeafe;
+      background: rgba(30, 41, 59, .96);
+      text-align: left;
+      font-weight: 700;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    td { color: #d1d5db; }
+
+    code {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: .93em;
+      color: #e0f2fe;
+      background: rgba(2,6,23,.55);
+      padding: 2px 5px;
+      border-radius: 6px;
+    }
+
+    pre {
+      margin: 14px 0 18px;
+      padding: 18px;
+      border-radius: 18px;
+      overflow-x: auto;
+      background: var(--code-bg);
+      border: 1px solid rgba(148,163,184,.20);
+      line-height: 1.55;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+      color: #e5e7eb;
+      font-size: 14px;
+    }
+
+    .tag {
+      display: inline-block;
+      margin: 4px 6px 4px 0;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,.26);
+      color: #cbd5e1;
+      background: rgba(15, 23, 42, .55);
+      font-size: 12px;
+    }
+
+    .item-title {
+      display: flex;
+      gap: 12px;
+      align-items: baseline;
+      flex-wrap: wrap;
+    }
+
+    .item-no {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 74px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      color: #08111f;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    ul, ol { padding-left: 1.4em; }
+    li { margin: 6px 0; }
+
+    .footnote {
+      color: var(--muted);
+      font-size: 13px;
+      padding: 24px 28px 50px;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .kbd {
+      display: inline-block;
+      border: 1px solid var(--border);
+      border-bottom-width: 2px;
+      padding: 1px 6px;
+      border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: .9em;
+      background: rgba(15,23,42,.65);
+    }
+
+    @media (max-width: 920px) {
+      .layout { grid-template-columns: 1fr; padding: 18px; }
+      nav { position: static; max-height: none; }
+      .grid { grid-template-columns: 1fr; }
+      header { padding: 38px 18px 24px; }
+      section, .card { padding: 20px; border-radius: 20px; }
+    }
+  </style>
+  <link rel="stylesheet" href="effective-java-theme.css" />
+</head>
+<body class="effective-java-note">
+<header>
+  <div class="header-inner">
+    <span class="eyebrow">Effective Java 3rd Edition / Chapter 2</span>
+    <h1>Creating and Destroying Objects<br>オブジェクトの生成と破棄</h1>
+    <p class="subtitle">
+      第2章は「newすればよい」「GCがあるから破棄は気にしなくてよい」という初級者的な理解を壊す章です。
+      重要なのは、<strong>APIとしてどのように生成させるか</strong>、<strong>不要な生成をどう避けるか</strong>、
+      <strong>参照・リソースをいつ手放すか</strong>を設計として扱うことです。
+    </p>
+  </div>
+</header>
+
+<div class="layout">
+  <nav>
+    <h2>目次</h2>
+    <ul>
+      <li><a href="#overview">章全体の見取り図</a></li>
+      <li><a href="#item1">Item 1: static factory method</a></li>
+      <li><a href="#item2">Item 2: Builder</a></li>
+      <li><a href="#item3">Item 3: Singleton</a></li>
+      <li><a href="#item4">Item 4: 非インスタンス化</a></li>
+      <li><a href="#item5">Item 5: Dependency Injection</a></li>
+      <li><a href="#item6">Item 6: 不要なオブジェクト生成</a></li>
+      <li><a href="#item7">Item 7: 古い参照の除去</a></li>
+      <li><a href="#item8">Item 8: finalizer / cleaner</a></li>
+      <li><a href="#item9">Item 9: try-with-resources</a></li>
+      <li><a href="#practical">実務判断のまとめ</a></li>
+      <li><a href="#checklist">レビュー用チェックリスト</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section id="overview">
+      <h2>章全体の見取り図</h2>
+      <p class="lead">
+        この章のテーマは「オブジェクトのライフサイクルを、クラス設計・API設計・リソース管理として制御する」ことです。
+        JavaにはGCがあるためメモリ解放の多くは自動化されますが、<strong>生成の仕方</strong>と<strong>参照・外部リソースの手放し方</strong>は依然として設計者の責任です。
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>中心テーマ</th>
+            <th>避けたい失敗</th>
+            <th>実務での使いどころ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>コンストラクタだけでなくstatic factory methodを検討する</td>
+            <td>生成APIが読みにくい、実装クラスを露出する、毎回newする</td>
+            <td>値オブジェクト、コレクション生成、インスタンス制御</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>多数の引数にはBuilderを使う</td>
+            <td>長いコンストラクタ、引数順ミス、途中不整合、可変化</td>
+            <td>検索条件、設定オブジェクト、複雑なDTO、外部APIリクエスト</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Singletonを正しく実装する</td>
+            <td>複数生成、テスト困難、シリアライズ・リフレクション破壊</td>
+            <td>真に一意なコンポーネント。ただし多用は危険</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Utility classをインスタンス化不可にする</td>
+            <td>意味のないnew、誤った継承意図</td>
+            <td>staticメソッドだけの補助クラス</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>リソースをクラス内で固定せず、依存性注入する</td>
+            <td>柔軟性・テスト容易性の欠落</td>
+            <td>SpringのDI、Repository/Client/Clock/設定値の注入</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>不要なオブジェクト生成を避ける</td>
+            <td>無駄なnew、正規表現の毎回コンパイル、autoboxing</td>
+            <td>ホットパス、ループ、バッチ処理、パフォーマンス劣化調査</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>古くなった参照を消す</td>
+            <td>GCが回収できない「意図しない保持」</td>
+            <td>自前コレクション、キャッシュ、リスナー、コールバック管理</td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td>finalizer / cleanerに頼らない</td>
+            <td>実行タイミング不定、実行保証なし、低速、脆弱性</td>
+            <td>原則AutoCloseable。Cleanerは安全網か非重要native resourceのみ</td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td>try-finallyよりtry-with-resources</td>
+            <td>close漏れ、例外の上書き、ネスト地獄</td>
+            <td>ファイル、ストリーム、DB接続、HTTPレスポンスなど</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="note">
+        <strong>この章の核心：</strong>
+        「オブジェクト生成」は単なる文法ではなく、APIの読みやすさ、拡張性、テスト容易性、メモリ効率、リソース安全性を左右する設計判断です。
+      </div>
+    </section>
+
+    <section id="item1">
+      <div class="item-title">
+        <span class="item-no">Item 1</span>
+        <h2>コンストラクタの代わりに static factory method を検討する</h2>
+      </div>
+
+      <p>
+        クラスのインスタンスを作る一般的な手段はpublicコンストラクタです。しかし本書は、クラスが
+        <code>public static</code> なファクトリメソッドを提供する設計を、コンストラクタと同列に検討すべきだと述べます。
+        ここでいうstatic factory methodは、GoFのFactory Methodパターンとは別物です。
+      </p>
+
+      <h3>本書の代表例：Boolean.valueOf</h3>
+      <pre><code class="language-java">public static Boolean valueOf(boolean b) {
+    return b ? Boolean.TRUE : Boolean.FALSE;
+}</code></pre>
+
+      <p>
+        この例が示す重要点は、<code>new Boolean(...)</code> のように毎回新しいオブジェクトを作る必要がないということです。
+        <code>true</code> と <code>false</code> は取り得る値が2つしかないため、あらかじめ用意されたインスタンスを返せば十分です。
+      </p>
+
+      <h3>利点1：名前を付けられる</h3>
+      <p>
+        コンストラクタはクラス名と同じ名前しか使えません。引数だけでは意味が分からない場合、static factory methodの名前がAPIの説明になります。
+      </p>
+
+      <pre><code class="language-java">// コンストラクタだけだと、何を生成しているか分かりづらい
+BigInteger p = new BigInteger(1024, 100, random);
+
+// 名前があると意図が明確になる
+BigInteger p = BigInteger.probablePrime(1024, random);</code></pre>
+
+      <p>
+        これは実務でもかなり重要です。たとえば <code>UserId</code> のような値オブジェクトで、
+        DB由来なのか、外部システム由来なのか、ランダム生成なのかをメソッド名で表せます。
+      </p>
+
+      <pre><code class="language-java">public final class UserId {
+    private final String value;
+
+    private UserId(String value) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException("userId must not be blank");
+        }
+        this.value = value;
+    }
+
+    public static UserId of(String value) {
+        return new UserId(value);
+    }
+
+    public static UserId fromExternalSystem(String externalId) {
+        return new UserId("EXT-" + externalId);
+    }
+
+    public static UserId generate() {
+        return new UserId(UUID.randomUUID().toString());
+    }
+}</code></pre>
+
+      <h3>利点2：毎回新しいオブジェクトを作らなくてよい</h3>
+      <p>
+        コンストラクタは呼ばれるたびに新しいインスタンスを作ります。一方、static factory methodは、既存インスタンスを返しても構いません。
+        これは不変クラス、値の種類が少ないクラス、キャッシュ可能なクラスで有効です。
+      </p>
+
+      <pre><code class="language-java">public final class Priority {
+    public static final Priority HIGH = new Priority("HIGH");
+    public static final Priority NORMAL = new Priority("NORMAL");
+    public static final Priority LOW = new Priority("LOW");
+
+    private final String value;
+
+    private Priority(String value) {
+        this.value = value;
+    }
+
+    public static Priority of(String value) {
+        return switch (value) {
+            case "HIGH" -> HIGH;
+            case "NORMAL" -> NORMAL;
+            case "LOW" -> LOW;
+            default -> throw new IllegalArgumentException("unknown priority: " + value);
+        };
+    }
+}</code></pre>
+
+      <p>
+        これにより、インスタンス数を制御できます。本書ではこのようなクラスを instance-controlled class と呼び、Singletonや不変値クラスの設計に関係すると説明しています。
+      </p>
+
+      <h3>利点3：戻り値型の任意のサブタイプを返せる</h3>
+      <p>
+        コンストラクタは、そのクラス自身のインスタンスしか返せません。しかしstatic factory methodは、宣言された戻り値型のサブタイプを返せます。
+        これにより、実装クラスをAPI利用者から隠せます。
+      </p>
+
+      <pre><code class="language-java">public interface NotificationSender {
+    void send(String message);
+
+    static NotificationSender email(String smtpHost) {
+        return new EmailNotificationSender(smtpHost); // 実装クラスは非公開でもよい
+    }
+
+    static NotificationSender noop() {
+        return message -> { }; // ラムダや別実装も返せる
+    }
+}</code></pre>
+
+      <p>
+        利用側は <code>EmailNotificationSender</code> という実装に依存せず、<code>NotificationSender</code> にだけ依存します。
+        これは「実装ではなくインターフェースに依存する」という設計にもつながります。
+      </p>
+
+      <h3>利点4：入力値によって返す実装クラスを変えられる</h3>
+      <p>
+        本書では <code>EnumSet</code> の例が出ます。要素数が少ないenumなら <code>long</code> ベースの実装、多いenumなら <code>long[]</code> ベースの実装を返す、というように、利用者に見せず内部実装を切り替えられます。
+      </p>
+
+      <pre><code class="language-java">// 利用者は具象クラスを知らなくてよい
+EnumSet&lt;DayOfWeek&gt; weekend = EnumSet.of(SATURDAY, SUNDAY);
+
+// 内部では enum の要素数などに応じて異なる実装が返され得る</code></pre>
+
+      <h3>利点5：メソッド作成時に戻り値の具象クラスが存在しなくてもよい</h3>
+      <p>
+        これはサービスプロバイダフレームワークの考え方です。JDBCのように、利用側は <code>DriverManager.getConnection(...)</code> を呼びますが、
+        実際にどのDBドライバ実装が使われるかは後から登録されたプロバイダに委ねられます。
+      </p>
+
+      <pre><code class="language-java">Connection conn = DriverManager.getConnection(url, user, password);</code></pre>
+
+      <p>
+        利用側は「Connectionが欲しい」とだけ言えばよく、PostgreSQLなのかMySQLなのかという具象ドライバの生成詳細から切り離されます。
+      </p>
+
+      <h3>欠点1：public/protectedコンストラクタがないと継承できない</h3>
+      <p>
+        static factory methodだけを提供し、コンストラクタをprivateにすると、利用者はそのクラスを継承できません。
+        ただし本書は、これは悪いことばかりではなく、継承よりコンポジションを促すため、むしろ利点にもなり得ると見ています。
+      </p>
+
+      <h3>欠点2：APIドキュメント上で見つけにくい</h3>
+      <p>
+        コンストラクタはJavadocで目立ちますが、static factory methodは通常メソッドに混ざります。
+        そのため、一般的な命名規則に従うことが重要です。
+      </p>
+
+      <table>
+        <thead>
+          <tr><th>名前</th><th>意味</th><th>例</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>from</code></td><td>単一引数からの型変換</td><td><code>Date.from(instant)</code></td></tr>
+          <tr><td><code>of</code></td><td>複数値から集約して生成</td><td><code>EnumSet.of(JACK, QUEEN, KING)</code></td></tr>
+          <tr><td><code>valueOf</code></td><td><code>from</code>/<code>of</code> より冗長な代替</td><td><code>BigInteger.valueOf(...)</code></td></tr>
+          <tr><td><code>getInstance</code></td><td>条件に合うインスタンスを返す。新規とは限らない</td><td><code>StackWalker.getInstance(...)</code></td></tr>
+          <tr><td><code>newInstance</code></td><td>毎回新しいインスタンスを返す意図</td><td><code>Array.newInstance(...)</code></td></tr>
+          <tr><td><code>getType</code></td><td>別クラス上にあるfactory</td><td><code>Files.getFileStore(path)</code></td></tr>
+          <tr><td><code>newType</code></td><td>別クラス上にあり、新規生成を示す</td><td><code>Files.newBufferedReader(path)</code></td></tr>
+        </tbody>
+      </table>
+
+      <div class="good">
+        <strong>判断基準：</strong>
+        単純なデータクラスで引数も少なく意味が明確ならコンストラクタでよいです。
+        ただし「名前で意図を表したい」「生成方法が複数ある」「キャッシュしたい」「実装クラスを隠したい」ならstatic factory methodを先に検討すべきです。
+      </div>
+    </section>
+
+    <section id="item2">
+      <div class="item-title">
+        <span class="item-no">Item 2</span>
+        <h2>多数のコンストラクタ引数があるなら Builder を検討する</h2>
+      </div>
+
+      <p>
+        static factory methodもコンストラクタも、オプション引数が多いクラスでは破綻します。
+        本書は、必須パラメータが少数あり、任意パラメータが多数ある例として <code>NutritionFacts</code> を使います。
+      </p>
+
+      <h3>悪い方向1：テレスコーピングコンストラクタ</h3>
+      <p>
+        引数の数に応じてコンストラクタを何個も作る方法です。動きはしますが、読みづらく、引数順のミスが起きやすくなります。
+      </p>
+
+      <pre><code class="language-java">public class NutritionFacts {
+    private final int servingSize;   // 必須
+    private final int servings;      // 必須
+    private final int calories;      // 任意
+    private final int fat;           // 任意
+    private final int sodium;        // 任意
+    private final int carbohydrate;  // 任意
+
+    public NutritionFacts(int servingSize, int servings) {
+        this(servingSize, servings, 0);
+    }
+
+    public NutritionFacts(int servingSize, int servings, int calories) {
+        this(servingSize, servings, calories, 0);
+    }
+
+    public NutritionFacts(int servingSize, int servings,
+                          int calories, int fat, int sodium, int carbohydrate) {
+        this.servingSize = servingSize;
+        this.servings = servings;
+        this.calories = calories;
+        this.fat = fat;
+        this.sodium = sodium;
+        this.carbohydrate = carbohydrate;
+    }
+}</code></pre>
+
+      <pre><code class="language-java">// 240, 8, 100, 0, 35, 27 が何を意味するか、呼び出し側だけでは分かりにくい
+NutritionFacts cocaCola = new NutritionFacts(240, 8, 100, 0, 35, 27);</code></pre>
+
+      <div class="bad">
+        <strong>問題点：</strong>
+        同じ <code>int</code> が並ぶと、<code>sodium</code> と <code>carbohydrate</code> を逆にしてもコンパイルは通ります。
+        つまり、型システムが守ってくれないバグになります。
+      </div>
+
+      <h3>悪い方向2：JavaBeansパターン</h3>
+      <p>
+        引数なしコンストラクタで作ってからsetterで値を入れる方法です。呼び出し側の読みやすさは改善しますが、
+        オブジェクトが生成途中の不整合状態を持つ問題があります。
+      </p>
+
+      <pre><code class="language-java">public class NutritionFacts {
+    private int servingSize = -1; // 必須だが初期値なし
+    private int servings = -1;
+    private int calories = 0;
+    private int sodium = 0;
+
+    public NutritionFacts() { }
+
+    public void setServingSize(int val) { servingSize = val; }
+    public void setServings(int val)    { servings = val; }
+    public void setCalories(int val)    { calories = val; }
+    public void setSodium(int val)      { sodium = val; }
+}</code></pre>
+
+      <pre><code class="language-java">NutritionFacts cocaCola = new NutritionFacts();
+cocaCola.setServingSize(240);
+cocaCola.setServings(8);
+cocaCola.setCalories(100);
+cocaCola.setSodium(35);</code></pre>
+
+      <p>
+        このコードは読みやすい一方、<code>setServings</code> を呼ぶ前のオブジェクトも存在してしまいます。
+        さらにsetterを公開するため、クラスを不変にしづらく、スレッドセーフ性も自分で考える必要があります。
+      </p>
+
+      <h3>改善：Builderパターン</h3>
+      <p>
+        Builderでは、必須項目をBuilderのコンストラクタで受け取り、任意項目はメソッドチェーンで設定し、最後に <code>build()</code> で完成した不変オブジェクトを作ります。
+      </p>
+
+      <pre><code class="language-java">public class NutritionFacts {
+    private final int servingSize;
+    private final int servings;
+    private final int calories;
+    private final int fat;
+    private final int sodium;
+    private final int carbohydrate;
+
+    public static class Builder {
+        // 必須
+        private final int servingSize;
+        private final int servings;
+
+        // 任意：デフォルト値をここに集約
+        private int calories = 0;
+        private int fat = 0;
+        private int sodium = 0;
+        private int carbohydrate = 0;
+
+        public Builder(int servingSize, int servings) {
+            if (servingSize <= 0 || servings <= 0) {
+                throw new IllegalArgumentException("servingSize and servings must be positive");
+            }
+            this.servingSize = servingSize;
+            this.servings = servings;
+        }
+
+        public Builder calories(int val) {
+            if (val < 0) throw new IllegalArgumentException("calories must not be negative");
+            calories = val;
+            return this;
+        }
+
+        public Builder fat(int val) {
+            if (val < 0) throw new IllegalArgumentException("fat must not be negative");
+            fat = val;
+            return this;
+        }
+
+        public Builder sodium(int val) {
+            if (val < 0) throw new IllegalArgumentException("sodium must not be negative");
+            sodium = val;
+            return this;
+        }
+
+        public Builder carbohydrate(int val) {
+            if (val < 0) throw new IllegalArgumentException("carbohydrate must not be negative");
+            carbohydrate = val;
+            return this;
+        }
+
+        public NutritionFacts build() {
+            return new NutritionFacts(this);
+        }
+    }
+
+    private NutritionFacts(Builder builder) {
+        servingSize = builder.servingSize;
+        servings = builder.servings;
+        calories = builder.calories;
+        fat = builder.fat;
+        sodium = builder.sodium;
+        carbohydrate = builder.carbohydrate;
+    }
+}</code></pre>
+
+      <pre><code class="language-java">NutritionFacts cocaCola = new NutritionFacts.Builder(240, 8)
+        .calories(100)
+        .sodium(35)
+        .carbohydrate(27)
+        .build();</code></pre>
+
+      <p>
+        これにより、呼び出しコードは「名前付き任意引数」に近い読みやすさを持ちます。
+        しかも完成物である <code>NutritionFacts</code> は <code>final</code> フィールドだけを持つ不変オブジェクトにできます。
+      </p>
+
+      <h3>バリデーションはどこで行うべきか</h3>
+      <p>
+        単一パラメータの妥当性はBuilderのコンストラクタや各setter風メソッドで検査します。
+        複数パラメータにまたがる不変条件は、<code>build()</code> が呼ぶ本体側コンストラクタで検査するのが自然です。
+      </p>
+
+      <pre><code class="language-java">private NutritionFacts(Builder builder) {
+    servingSize = builder.servingSize;
+    servings = builder.servings;
+    calories = builder.calories;
+    fat = builder.fat;
+    sodium = builder.sodium;
+    carbohydrate = builder.carbohydrate;
+
+    if (fat > 0 && calories == 0) {
+        throw new IllegalArgumentException("fat is set but calories is zero");
+    }
+}</code></pre>
+
+      <h3>クラス階層でのBuilder</h3>
+      <p>
+        本書ではPizzaの例を使い、抽象クラスと具象サブクラスに対応するBuilder階層を紹介しています。
+        ポイントは、親Builderのメソッドチェーンが子Builderでも正しく続くように、再帰的ジェネリクスと <code>self()</code> を使うことです。
+      </p>
+
+      <pre><code class="language-java">public abstract class Pizza {
+    public enum Topping { HAM, MUSHROOM, ONION, PEPPER, SAUSAGE }
+
+    final Set&lt;Topping&gt; toppings;
+
+    abstract static class Builder&lt;T extends Builder&lt;T&gt;&gt; {
+        EnumSet&lt;Topping&gt; toppings = EnumSet.noneOf(Topping.class);
+
+        public T addTopping(Topping topping) {
+            toppings.add(Objects.requireNonNull(topping));
+            return self();
+        }
+
+        abstract Pizza build();
+        protected abstract T self();
+    }
+
+    Pizza(Builder&lt;?&gt; builder) {
+        toppings = builder.toppings.clone();
+    }
+}</code></pre>
+
+      <pre><code class="language-java">public class NyPizza extends Pizza {
+    public enum Size { SMALL, MEDIUM, LARGE }
+    private final Size size;
+
+    public static class Builder extends Pizza.Builder&lt;Builder&gt; {
+        private final Size size;
+
+        public Builder(Size size) {
+            this.size = Objects.requireNonNull(size);
+        }
+
+        @Override public NyPizza build() {
+            return new NyPizza(this);
+        }
+
+        @Override protected Builder self() {
+            return this;
+        }
+    }
+
+    private NyPizza(Builder builder) {
+        super(builder);
+        size = builder.size;
+    }
+}</code></pre>
+
+      <pre><code class="language-java">NyPizza pizza = new NyPizza.Builder(NyPizza.Size.SMALL)
+        .addTopping(Pizza.Topping.SAUSAGE)
+        .addTopping(Pizza.Topping.ONION)
+        .build();</code></pre>
+
+      <div class="warning">
+        <strong>使いどころの線引き：</strong>
+        Builderは便利ですが、常に使うものではありません。引数が2〜3個で意味が明確なら過剰です。
+        一方、任意項目が多い、同じ型の引数が並ぶ、今後項目が増える見込みがあるなら、最初からBuilderにした方がAPIの劣化を防げます。
+      </div>
+    </section>
+
+    <section id="item3">
+      <div class="item-title">
+        <span class="item-no">Item 3</span>
+        <h2>Singleton性は private constructor または enum で保証する</h2>
+      </div>
+
+      <p>
+        Singletonとは、インスタンスが厳密に1つだけ存在するクラスです。
+        典型例は、状態を持たない関数的オブジェクトや、システム上本質的に一意なコンポーネントです。
+        ただし、Singletonはテストしづらくなりやすいので、多用すべきではありません。
+      </p>
+
+      <h3>方法1：public static final field</h3>
+      <pre><code class="language-java">public class Elvis {
+    public static final Elvis INSTANCE = new Elvis();
+
+    private Elvis() {
+        // 外部からnewできない
+    }
+
+    public void leaveTheBuilding() {
+        // ...
+    }
+}</code></pre>
+
+      <p>
+        API上、<code>Elvis.INSTANCE</code> しか取得口がありません。シンプルで、Singletonであることも読み取りやすい方法です。
+      </p>
+
+      <h3>方法2：static factory method</h3>
+      <pre><code class="language-java">public class Elvis {
+    private static final Elvis INSTANCE = new Elvis();
+
+    private Elvis() {
+    }
+
+    public static Elvis getInstance() {
+        return INSTANCE;
+    }
+
+    public void leaveTheBuilding() {
+        // ...
+    }
+}</code></pre>
+
+      <p>
+        この方法の利点は、APIを変えずに後から実装方針を変えられることです。
+        例えば将来「スレッドごとに別インスタンスを返す」などに変更する余地があります。
+      </p>
+
+      <h3>シリアライズ時の注意</h3>
+      <p>
+        上の2方式で <code>Serializable</code> にすると、デシリアライズ時に別インスタンスが作られ、Singleton性が壊れる可能性があります。
+        本書では <code>readResolve</code> を使って唯一のインスタンスを返す方法が紹介されています。
+      </p>
+
+      <pre><code class="language-java">private Object readResolve() {
+    return INSTANCE;
+}</code></pre>
+
+      <h3>推奨：単一要素のenum</h3>
+      <pre><code class="language-java">public enum Elvis {
+    INSTANCE;
+
+    public void leaveTheBuilding() {
+        // ...
+    }
+}</code></pre>
+
+      <p>
+        enum Singletonは簡潔で、シリアライズに強く、リフレクションによる多重生成にも強いです。
+        そのため、本書は多くの場合で単一要素enumを最善のSingleton実装と見なしています。
+      </p>
+
+      <div class="bad">
+        <strong>実務上の注意：</strong>
+        Singletonは「どこからでもアクセスできるグローバル変数」に近い使われ方をしがちです。
+        依存関係が見えづらくなり、テストで差し替えにくくなります。
+        Springを使う場合でも、「Beanのスコープがsingleton」であることと、「アプリケーション設計としてSingletonに依存すること」は区別してください。
+      </div>
+    </section>
+
+    <section id="item4">
+      <div class="item-title">
+        <span class="item-no">Item 4</span>
+        <h2>インスタンス化できないクラスは private constructor で明示する</h2>
+      </div>
+
+      <p>
+        <code>java.lang.Math</code> や <code>java.util.Arrays</code> のように、staticメソッドやstaticフィールドだけをまとめたクラスがあります。
+        このようなUtility classは、インスタンス化されても意味がありません。
+      </p>
+
+      <h3>間違い：abstractにする</h3>
+      <p>
+        インスタンス化を防ぐ目的で <code>abstract</code> にするのは不適切です。サブクラスを作ればインスタンス化できてしまううえ、
+        「継承して使うクラスなのか」と誤解させます。
+      </p>
+
+      <h3>正しいイディオム</h3>
+      <pre><code class="language-java">public final class StringUtils {
+    private StringUtils() {
+        throw new AssertionError("No instances");
+    }
+
+    public static boolean isBlank(String s) {
+        return s == null || s.isBlank();
+    }
+}</code></pre>
+
+      <p>
+        明示的なprivateコンストラクタがあると、コンパイラはpublicなデフォルトコンストラクタを生成しません。
+        <code>AssertionError</code> は必須ではありませんが、クラス内部から誤って呼ばれた場合にも即座に失敗させられます。
+      </p>
+
+      <div class="note">
+        <strong>副作用：</strong>
+        privateコンストラクタしかないため、サブクラスのコンストラクタから親コンストラクタを呼べません。
+        つまり、このイディオムは継承も防ぎます。
+      </div>
+    </section>
+
+    <section id="item5">
+      <div class="item-title">
+        <span class="item-no">Item 5</span>
+        <h2>リソースを直接固定せず、Dependency Injectionを選ぶ</h2>
+      </div>
+
+      <p>
+        多くのクラスは、内部で使うリソースに依存します。たとえばスペルチェッカーは辞書に依存します。
+        本書は、そのリソースをクラス内部で固定する実装を避けるべきだと述べます。
+      </p>
+
+      <h3>悪い例：static utilityにリソースを固定する</h3>
+      <pre><code class="language-java">public class SpellChecker {
+    private static final Lexicon dictionary = new EnglishLexicon();
+
+    private SpellChecker() {
+    }
+
+    public static boolean isValid(String word) {
+        return dictionary.contains(word);
+    }
+}</code></pre>
+
+      <p>
+        これだと、英語辞書以外を使いたい場合、テスト用辞書を使いたい場合、専門用語辞書を使いたい場合に困ります。
+        クラスの振る舞いがリソースに依存するのに、そのリソースが固定されているからです。
+      </p>
+
+      <h3>悪い例：Singletonにリソースを固定する</h3>
+      <pre><code class="language-java">public class SpellChecker {
+    public static final SpellChecker INSTANCE =
+            new SpellChecker(new EnglishLexicon());
+
+    private final Lexicon dictionary;
+
+    private SpellChecker(Lexicon dictionary) {
+        this.dictionary = dictionary;
+    }
+
+    public boolean isValid(String word) {
+        return dictionary.contains(word);
+    }
+}</code></pre>
+
+      <p>
+        これも「辞書は1種類だけ」という仮定をクラスに埋め込んでいます。将来の拡張やテストを妨げます。
+      </p>
+
+      <h3>改善：コンストラクタで依存を注入する</h3>
+      <pre><code class="language-java">public class SpellChecker {
+    private final Lexicon dictionary;
+
+    public SpellChecker(Lexicon dictionary) {
+        this.dictionary = Objects.requireNonNull(dictionary);
+    }
+
+    public boolean isValid(String word) {
+        return dictionary.contains(word);
+    }
+
+    public List&lt;String&gt; suggestions(String typo) {
+        return dictionary.suggest(typo);
+    }
+}</code></pre>
+
+      <p>
+        これなら、呼び出し側が用途に応じて辞書を選べます。
+      </p>
+
+      <pre><code class="language-java">SpellChecker englishChecker = new SpellChecker(new EnglishLexicon());
+SpellChecker testChecker = new SpellChecker(new InMemoryLexicon(List.of("test", "java")));</code></pre>
+
+      <h3>Factoryを注入するバリエーション</h3>
+      <p>
+        リソースそのものではなく、リソースを作るfactoryを渡すこともあります。
+        Java 8以降なら <code>Supplier&lt;T&gt;</code> が使えます。
+      </p>
+
+      <pre><code class="language-java">public class ReportService {
+    private final Supplier&lt;? extends ReportFormatter&gt; formatterFactory;
+
+    public ReportService(Supplier&lt;? extends ReportFormatter&gt; formatterFactory) {
+        this.formatterFactory = Objects.requireNonNull(formatterFactory);
+    }
+
+    public String createReport(Report report) {
+        ReportFormatter formatter = formatterFactory.get();
+        return formatter.format(report);
+    }
+}</code></pre>
+
+      <h3>Springとの接続</h3>
+      <p>
+        Springでは、手動で <code>new SpellChecker(...)</code> しなくても、コンストラクタインジェクションで依存を渡せます。
+        これは本書のDependency Injectionの考え方と同じ方向です。
+      </p>
+
+      <pre><code class="language-java">@Service
+public class SpellChecker {
+    private final Lexicon dictionary;
+
+    public SpellChecker(Lexicon dictionary) {
+        this.dictionary = Objects.requireNonNull(dictionary);
+    }
+}</code></pre>
+
+      <div class="good">
+        <strong>判断基準：</strong>
+        クラスの振る舞いが、DB、HTTPクライアント、Clock、設定値、辞書、Repositoryなどの外部リソースに依存するなら、
+        その依存をクラス内部で直接作らず、外から渡す設計を基本にしてください。
+      </div>
+    </section>
+
+    <section id="item6">
+      <div class="item-title">
+        <span class="item-no">Item 6</span>
+        <h2>不要なオブジェクト生成を避ける</h2>
+      </div>
+
+      <p>
+        このItemは「オブジェクト生成は絶対に悪い」と言っているわけではありません。
+        小さなオブジェクト生成は現代JVMでは安いことが多いです。
+        重要なのは、<strong>同じ意味のオブジェクトを無駄に繰り返し作らない</strong>ことです。
+      </p>
+
+      <h3>極端な悪い例：new String</h3>
+      <pre><code class="language-java">String s = new String("bikini"); // やってはいけない</code></pre>
+
+      <p>
+        文字列リテラル <code>"bikini"</code> 自体がすでに <code>String</code> インスタンスです。
+        そのため、さらに <code>new String(...)</code> する意味はありません。
+      </p>
+
+      <pre><code class="language-java">String s = "bikini"; // これでよい</code></pre>
+
+      <h3>static factory methodで再利用する</h3>
+      <p>
+        不変クラスで、コンストラクタとstatic factory methodの両方がある場合、後者を選ぶことで不要な生成を避けられることがあります。
+      </p>
+
+      <pre><code class="language-java">Boolean b1 = Boolean.valueOf("true"); // 再利用され得る
+// new Boolean("true") は古い書き方であり、避けるべき</code></pre>
+
+      <h3>高コストオブジェクトをキャッシュする：Patternの例</h3>
+      <p>
+        正規表現は、見た目以上に高コストです。<code>String.matches</code> は内部で <code>Pattern</code> を作って使い捨てます。
+        繰り返し呼ばれる処理では、あらかじめ <code>Pattern</code> をコンパイルして再利用します。
+      </p>
+
+      <pre><code class="language-java">// 悪い例：呼び出すたびにPatternが作られる
+static boolean isRomanNumeral(String s) {
+    return s.matches("^(?=.)M*(C[MD]|D?C{0,3})"
+            + "(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})$");
+}</code></pre>
+
+      <pre><code class="language-java">// 改善：Patternをstatic finalで再利用する
+public class RomanNumerals {
+    private static final Pattern ROMAN = Pattern.compile(
+            "^(?=.)M*(C[MD]|D?C{0,3})"
+          + "(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})$");
+
+    static boolean isRomanNumeral(String s) {
+        return ROMAN.matcher(s).matches();
+    }
+}</code></pre>
+
+      <h3>autoboxingによる隠れた生成</h3>
+      <p>
+        本書の有名な例です。<code>Long</code> と <code>long</code> の1文字違いで、大量の不要なオブジェクト生成が発生します。
+      </p>
+
+      <pre><code class="language-java">// 非常に遅い：sumがLongなので、加算のたびにboxing/unboxingが絡む
+private static long sum() {
+    Long sum = 0L;
+    for (long i = 0; i &lt;= Integer.MAX_VALUE; i++) {
+        sum += i;
+    }
+    return sum;
+}</code></pre>
+
+      <pre><code class="language-java">// 改善：プリミティブを使う
+private static long sum() {
+    long sum = 0L;
+    for (long i = 0; i &lt;= Integer.MAX_VALUE; i++) {
+        sum += i;
+    }
+    return sum;
+}</code></pre>
+
+      <div class="warning">
+        <strong>誤解してはいけない点：</strong>
+        不要な生成を避けるために、何でもオブジェクトプールにするのは逆効果です。
+        DBコネクションのように生成コストが極端に高いものはプールに値しますが、普通の軽量オブジェクトはJVMのGCに任せた方がよいことが多いです。
+      </div>
+
+      <p>
+        また、このItemはItem 50「防御的コピー」と対になります。
+        再利用すべきところで新規生成するのは主に性能・スタイルの問題ですが、
+        コピーすべきところで既存オブジェクトを再利用すると、バグやセキュリティホールになります。
+      </p>
+    </section>
+
+    <section id="item7">
+      <div class="item-title">
+        <span class="item-no">Item 7</span>
+        <h2>古くなったオブジェクト参照を取り除く</h2>
+      </div>
+
+      <p>
+        JavaにはGCがありますが、GCは「到達不能なオブジェクト」を回収するだけです。
+        プログラムが不要な参照を保持し続けていれば、GCから見るとまだ必要なオブジェクトに見えます。
+        これが、GC言語におけるメモリリーク、より正確には「意図しないオブジェクト保持」です。
+      </p>
+
+      <h3>本書のStack例：pop後も配列に参照が残る</h3>
+      <pre><code class="language-java">public class Stack {
+    private Object[] elements;
+    private int size = 0;
+
+    public Object pop() {
+        if (size == 0) {
+            throw new EmptyStackException();
+        }
+        return elements[--size]; // ここで返した後も、配列内に参照が残る
+    }
+}</code></pre>
+
+      <p>
+        <code>size</code> より後ろの領域はStackとしては使っていません。
+        しかし配列 <code>elements</code> には古い参照が残っているため、GCはそのオブジェクトを回収できません。
+      </p>
+
+      <h3>改善：不要になった参照をnullにする</h3>
+      <pre><code class="language-java">public Object pop() {
+    if (size == 0) {
+        throw new EmptyStackException();
+    }
+
+    Object result = elements[--size];
+    elements[size] = null; // 古い参照を消す
+    return result;
+}</code></pre>
+
+      <p>
+        ただし、すべてのローカル変数に <code>null</code> を代入すべきという意味ではありません。
+        通常は、変数のスコープを狭くし、自然にスコープアウトさせるのが最善です。
+      </p>
+
+      <h3>いつnull代入が必要か</h3>
+      <p>
+        本書のStackのように、クラスが自前でメモリを管理している場合です。
+        具体的には、配列の一部だけを有効領域として使い、残りを空き領域として扱うような実装です。
+      </p>
+
+      <div class="grid">
+        <div class="mini">
+          <strong>自前コレクション</strong>
+          内部配列、バッファ、プールなどを自分で管理する場合は、不要になった参照を消す。
+        </div>
+        <div class="mini">
+          <strong>キャッシュ</strong>
+          一度入れた参照が残り続けやすい。期限、サイズ上限、弱参照などを検討する。
+        </div>
+        <div class="mini">
+          <strong>リスナー / コールバック</strong>
+          登録解除されないと参照が蓄積する。弱参照や明示的解除APIを考える。
+        </div>
+        <div class="mini">
+          <strong>長寿命オブジェクト</strong>
+          Application scopeのMapやstatic fieldは特に注意。短命オブジェクトより影響が大きい。
+        </div>
+      </div>
+
+      <h3>キャッシュの扱い</h3>
+      <p>
+        キャッシュはメモリリークの温床です。
+        キーへの外部参照がなくなったらキャッシュエントリも不要、という性質なら <code>WeakHashMap</code> が使える場合があります。
+        ただし、<code>WeakHashMap</code> は「キーの寿命」でエントリを消す仕組みであり、値の寿命を直接管理するものではありません。
+      </p>
+
+      <pre><code class="language-java">Map&lt;Key, Value&gt; cache = new WeakHashMap&lt;&gt;();</code></pre>
+
+      <p>
+        より一般的には、サイズ上限、期限切れ、LRU、バックグラウンドクリーンアップなどを設計します。
+        <code>LinkedHashMap#removeEldestEntry</code> を使う簡易LRUも選択肢です。
+      </p>
+
+      <pre><code class="language-java">class LruCache&lt;K, V&gt; extends LinkedHashMap&lt;K, V&gt; {
+    private final int maxSize;
+
+    LruCache(int maxSize) {
+        super(16, 0.75f, true); // access-order
+        this.maxSize = maxSize;
+    }
+
+    @Override
+    protected boolean removeEldestEntry(Map.Entry&lt;K, V&gt; eldest) {
+        return size() &gt; maxSize;
+    }
+}</code></pre>
+    </section>
+
+    <section id="item8">
+      <div class="item-title">
+        <span class="item-no">Item 8</span>
+        <h2>finalizer と cleaner を避ける</h2>
+      </div>
+
+      <p>
+        本書は、finalizerは予測不能で危険であり、一般に不要だと強く述べます。
+        Java 9以降の代替としてcleanerがありますが、cleanerも予測不能・低速・多くの場合不要です。
+      </p>
+
+      <h3>なぜ危険か</h3>
+      <table>
+        <thead>
+          <tr><th>問題</th><th>内容</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>すぐ実行される保証がない</td>
+            <td>オブジェクトが到達不能になってから、finalizer/cleanerがいつ走るか分からない。</td>
+          </tr>
+          <tr>
+            <td>実行される保証もない</td>
+            <td>プログラム終了まで実行されないことがある。永続状態の更新やロック解放に使ってはいけない。</td>
+          </tr>
+          <tr>
+            <td>例外が扱いづらい</td>
+            <td>finalizer内の例外は無視され、オブジェクトが壊れた状態になり得る。</td>
+          </tr>
+          <tr>
+            <td>性能が悪い</td>
+            <td>GC最適化を妨げ、通常のcloseより大幅に遅くなり得る。</td>
+          </tr>
+          <tr>
+            <td>セキュリティ上の問題</td>
+            <td>finalizer attackにより、コンストラクタで失敗したはずの半端なオブジェクトが生き残る可能性がある。</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>代替：AutoCloseable + try-with-resources</h3>
+      <p>
+        ファイル、ソケット、DB接続、スレッドプールなど、明示的に終了処理が必要なリソースは
+        <code>AutoCloseable</code> を実装し、利用側に <code>close()</code> させます。
+      </p>
+
+      <pre><code class="language-java">public final class ResourceHandle implements AutoCloseable {
+    private boolean closed;
+
+    public void use() {
+        if (closed) {
+            throw new IllegalStateException("already closed");
+        }
+        // リソースを使う
+    }
+
+    @Override
+    public void close() {
+        if (!closed) {
+            // リソースを解放する
+            closed = true;
+        }
+    }
+}</code></pre>
+
+      <pre><code class="language-java">try (ResourceHandle handle = new ResourceHandle()) {
+    handle.use();
+}</code></pre>
+
+      <h3>Cleanerを使うなら安全網としてだけ</h3>
+      <p>
+        本書では、Roomという例でcleanerを「close忘れに対する安全網」として使う方法を示します。
+        ただし、cleanerのStateが元のRoomインスタンスを参照してはいけない点が重要です。
+      </p>
+
+      <pre><code class="language-java">public class Room implements AutoCloseable {
+    private static final Cleaner cleaner = Cleaner.create();
+
+    // Roomを参照してはいけないため、static nested classにする
+    private static class State implements Runnable {
+        int numJunkPiles;
+
+        State(int numJunkPiles) {
+            this.numJunkPiles = numJunkPiles;
+        }
+
+        @Override public void run() {
+            System.out.println("Cleaning room");
+            numJunkPiles = 0;
+        }
+    }
+
+    private final State state;
+    private final Cleaner.Cleanable cleanable;
+
+    public Room(int numJunkPiles) {
+        state = new State(numJunkPiles);
+        cleanable = cleaner.register(this, state);
+    }
+
+    @Override public void close() {
+        cleanable.clean();
+    }
+}</code></pre>
+
+      <div class="warning">
+        <strong>重要：</strong>
+        cleanerは「最後の保険」であり、通常のリソース解放経路にしてはいけません。
+        closeされなくてもいつか片付くだろう、という設計は危険です。
+      </div>
+    </section>
+
+    <section id="item9">
+      <div class="item-title">
+        <span class="item-no">Item 9</span>
+        <h2>try-finally より try-with-resources を使う</h2>
+      </div>
+
+      <p>
+        Javaには、明示的に <code>close()</code> しなければならないリソースが多くあります。
+        例として <code>InputStream</code>、<code>OutputStream</code>、<code>java.sql.Connection</code> などがあります。
+      </p>
+
+      <h3>古い方法：try-finally</h3>
+      <pre><code class="language-java">static String firstLineOfFile(String path) throws IOException {
+    BufferedReader br = new BufferedReader(new FileReader(path));
+    try {
+        return br.readLine();
+    } finally {
+        br.close();
+    }
+}</code></pre>
+
+      <p>
+        1リソースならまだ読めますが、複数リソースになるとネストが増えます。
+      </p>
+
+      <pre><code class="language-java">static void copy(String src, String dst) throws IOException {
+    InputStream in = new FileInputStream(src);
+    try {
+        OutputStream out = new FileOutputStream(dst);
+        try {
+            byte[] buf = new byte[8192];
+            int n;
+            while ((n = in.read(buf)) &gt;= 0) {
+                out.write(buf, 0, n);
+            }
+        } finally {
+            out.close();
+        }
+    } finally {
+        in.close();
+    }
+}</code></pre>
+
+      <h3>try-finallyの本質的な問題：例外が上書きされる</h3>
+      <p>
+        <code>try</code> ブロック内の処理でも、<code>finally</code> 内の <code>close()</code> でも例外が発生する可能性があります。
+        その場合、後から発生したclose側の例外が、最初に発生した本質的な例外を覆い隠してしまうことがあります。
+      </p>
+
+      <h3>改善：try-with-resources</h3>
+      <pre><code class="language-java">static String firstLineOfFile(String path) throws IOException {
+    try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+        return br.readLine();
+    }
+}</code></pre>
+
+      <pre><code class="language-java">static void copy(String src, String dst) throws IOException {
+    try (InputStream in = new FileInputStream(src);
+         OutputStream out = new FileOutputStream(dst)) {
+
+        byte[] buf = new byte[8192];
+        int n;
+        while ((n = in.read(buf)) &gt;= 0) {
+            out.write(buf, 0, n);
+        }
+    }
+}</code></pre>
+
+      <p>
+        try-with-resourcesを使える条件は、リソースが <code>AutoCloseable</code> を実装していることです。
+        Java標準ライブラリや多くのサードパーティライブラリのリソース型はこれに対応しています。
+      </p>
+
+      <h3>catchも付けられる</h3>
+      <pre><code class="language-java">static String firstLineOfFile(String path, String defaultValue) {
+    try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+        return br.readLine();
+    } catch (IOException e) {
+        return defaultValue;
+    }
+}</code></pre>
+
+      <div class="good">
+        <strong>結論：</strong>
+        closeが必要なリソースには、原則としてtry-with-resourcesを使ってください。
+        コードが短くなり、close漏れを防ぎ、例外情報も有用になります。
+      </div>
+    </section>
+
+    <section id="practical">
+      <h2>実務判断のまとめ：どの設計を選ぶか</h2>
+
+      <table>
+        <thead>
+          <tr><th>状況</th><th>選択肢</th><th>理由</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>単純な値を作る。引数も少なく意味が明確</td>
+            <td>コンストラクタでもよい</td>
+            <td>過剰設計にしない。読みやすさが十分なら問題ない。</td>
+          </tr>
+          <tr>
+            <td>生成方法が複数ある、名前で意図を出したい</td>
+            <td>static factory method</td>
+            <td><code>of</code>、<code>from</code>、<code>valueOf</code> などで意味を明示できる。</td>
+          </tr>
+          <tr>
+            <td>任意引数が多い、同じ型の引数が並ぶ</td>
+            <td>Builder</td>
+            <td>引数順ミスを避け、呼び出し側の可読性と不変性を両立できる。</td>
+          </tr>
+          <tr>
+            <td>staticメソッドだけの補助クラス</td>
+            <td>private constructor</td>
+            <td>意味のないインスタンス化と誤った継承を防ぐ。</td>
+          </tr>
+          <tr>
+            <td>クラスが外部リソースや別コンポーネントに依存する</td>
+            <td>Dependency Injection</td>
+            <td>差し替え可能性、テスト容易性、再利用性が上がる。</td>
+          </tr>
+          <tr>
+            <td>正規表現、Formatter、DB接続など生成コストが高い</td>
+            <td>再利用・キャッシュ・プールを検討</td>
+            <td>ただし普通の軽量オブジェクトを無理にプールしない。</td>
+          </tr>
+          <tr>
+            <td>closeが必要なリソースを扱う</td>
+            <td>AutoCloseable + try-with-resources</td>
+            <td>finalizer/cleanerや手書きtry-finallyに頼らない。</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="note">
+        <strong>あなたがSpring Bootでアプリを書くときの重点：</strong>
+        まず Item 2、5、9 を優先して体に入れるべきです。
+        DTO・検索条件・設定系はBuilderやstatic factoryを検討し、Service/Repository/Client/Clockなどはコンストラクタインジェクションにし、
+        ファイル・HTTPレスポンス・DB接続などはtry-with-resourcesで確実に閉じる、という形です。
+      </div>
+    </section>
+
+    <section id="checklist">
+      <h2>コードレビュー用チェックリスト</h2>
+
+      <h3>生成API</h3>
+      <ul>
+        <li>コンストラクタの引数だけで意味が伝わるか。</li>
+        <li>生成方法が複数あるなら、static factory methodに名前を付けた方がよくないか。</li>
+        <li><code>new</code> する必要がない値を毎回生成していないか。</li>
+        <li>実装クラスを公開APIに露出しすぎていないか。</li>
+      </ul>
+
+      <h3>引数が多いクラス</h3>
+      <ul>
+        <li>同じ型の引数が長く並んでいないか。</li>
+        <li>任意引数のためにテレスコーピングコンストラクタを増やしていないか。</li>
+        <li>setterで生成途中の不整合状態を外部に見せていないか。</li>
+        <li>Builderにした方が呼び出し側の意図が明確にならないか。</li>
+      </ul>
+
+      <h3>依存関係</h3>
+      <ul>
+        <li>クラス内部で <code>new Repository()</code>、<code>new HttpClient()</code>、<code>Clock.systemDefaultZone()</code> などを固定していないか。</li>
+        <li>テスト時にモック・スタブ・インメモリ実装へ差し替えられるか。</li>
+        <li>Singletonやstatic utilityで本来差し替えるべきリソースを固定していないか。</li>
+      </ul>
+
+      <h3>メモリ・リソース</h3>
+      <ul>
+        <li>ループ内で高コストオブジェクトを毎回作っていないか。</li>
+        <li>不要なautoboxingがホットパスにないか。</li>
+        <li>自前配列・キャッシュ・リスナーに古い参照が残り続けていないか。</li>
+        <li>closeが必要なリソースにtry-with-resourcesを使っているか。</li>
+        <li>finalizer/cleanerに通常の終了処理を任せていないか。</li>
+      </ul>
+
+      <div class="good">
+        <strong>最終結論：</strong>
+        第2章は「newとGCの章」ではなく、API設計・依存関係設計・リソース管理の章です。
+        ここを雑にすると、コードは動いても、読みづらく、テストしづらく、拡張しづらく、長期運用で壊れやすくなります。
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer class="footnote">
+  <p>
+    本HTMLは、ユーザー提供の『Effective Java, Third Edition』Chapter 2「Creating and Destroying Objects」の内容を学習用に日本語で再構成・解説したものです。
+    書籍本文の逐語訳・全文転載ではなく、主要論点、コード例、実務上の判断基準を整理した教材です。
+  </p>
+</footer>
+</body>
+</html>
