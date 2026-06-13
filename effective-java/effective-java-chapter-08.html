@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Effective Java Chapter 8 | Methods</title>
+<title>Effective Java 第8章 Methods 詳細解説</title>
 <style>
 :root {
   --bg: #f7f7fb;
@@ -72,6 +72,67 @@ th { background: #f8fafc; text-align: left; }
 .tag.good { background: #dcfce7; color: #166534; }
 .tag.note { background: #dbeafe; color: #1e40af; }
 .small { color: var(--muted); font-size: 13px; }
+.effective-java-note .supplement {
+  position: relative;
+  clear: both;
+  overflow: hidden;
+  border: 1px solid rgba(167, 139, 250, .34);
+  border-left: 5px solid #a78bfa;
+  background: linear-gradient(180deg, rgba(76, 29, 149, .18), rgba(8, 17, 31, .78));
+  padding: 18px 20px;
+  border-radius: 16px;
+  margin: 26px 0;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .18);
+}
+.effective-java-note .supplement::before {
+  content: "補足";
+  display: block;
+  width: fit-content;
+  margin: 0 0 10px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(167, 139, 250, .18);
+  color: #ddd6fe;
+  border: 1px solid rgba(167, 139, 250, .38);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: .06em;
+}
+.effective-java-note .supplement .label { display:none; }
+.effective-java-note .supplement > strong:first-of-type {
+  display: block;
+  margin: 0 0 8px;
+  color: #ede9fe;
+  font-size: 16px;
+}
+.effective-java-note .supplement p:first-of-type { margin-top: 6px; }
+.effective-java-note .supplement p:last-child,
+.effective-java-note .supplement ul:last-child,
+.effective-java-note .supplement ol:last-child,
+.effective-java-note .supplement pre:last-child { margin-bottom: 0; }
+.effective-java-note .supplement pre {
+  margin: 14px 0;
+  border-color: rgba(167, 139, 250, .24);
+}
+.effective-java-note .supplement + .supplement { margin-top: 18px; }
+.effective-java-note .supplement + h3,
+.effective-java-note .supplement + h4,
+.effective-java-note .supplement + p,
+.effective-java-note .supplement + pre,
+.effective-java-note .supplement + table,
+.effective-java-note .supplement + .callout,
+.effective-java-note .supplement + .importance { margin-top: 26px; }
+.effective-java-note .importance {
+  border: 1px solid rgba(110, 168, 254, .28);
+  border-left: 4px solid var(--accent);
+  background: rgba(55, 115, 210, .12);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin: 16px 0;
+}
+.effective-java-note .importance strong { color: #c8dcff; }
+.effective-java-note .ref-list { font-size: 13px; color: var(--muted); }
+
 hr { border: 0; border-top: 1px solid var(--line); margin: 22px 0; }
 .footer { text-align: center; color: var(--muted); font-size: 13px; padding: 30px; }
 @media (max-width: 940px) {
@@ -93,7 +154,7 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 22px 0; }
 </head>
 <body class="effective-java-note">
 <div class="layout">
-<nav>
+<nav aria-label="目次">
   <h2>目次</h2>
   <ol>
     <li><a href="#overview">第8章の全体像</a></li>
@@ -106,12 +167,13 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 22px 0; }
     <li><a href="#item55">Item 55: Optional</a></li>
     <li><a href="#item56">Item 56: Javadoc</a></li>
     <li><a href="#checklist">実務チェックリスト</a></li>
+    <li><a href="#references">補足参考リンク</a></li>
   </ol>
 </nav>
 <main>
   <div class="hero">
     <div class="eyebrow">Effective Java 3rd Edition / Chapter 8</div>
-    <h1>Methods<br>メソッド</h1>
+    <h1>Methods - メソッド設計の詳細解説</h1>
     <p>
       第8章は、Javaのメソッドを「単に動く処理」ではなく、他者が安全に使えるAPIとして設計するための章です。
       テーマは、パラメータ検証、防御的コピー、シグネチャ設計、オーバーロード、可変長引数、戻り値設計、Optional、Javadocです。
@@ -151,6 +213,9 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 22px 0; }
     <div class="callout warn">
       <strong>厳しめに言うと:</strong> 「内部実装を頑張ればよい」という考えは弱いです。Javaで中級以上を目指すなら、メソッドの引数・戻り値・例外・ドキュメントを含めて設計できないと、API利用者に負債を押し付けるコードになります。
     </div>
+    <div class="supplement">
+      <span class="label">補足</span>このHTMLでは、本書の内容そのものではなく、理解を補うために追加した現代Java/Spring/実務上の説明をこの紫色の「補足」ボックスで明示します。
+    </div>
     <table>
       <thead><tr><th>Item</th><th>一言でいうと</th><th>主な失敗</th></tr></thead>
       <tbody>
@@ -172,6 +237,7 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 22px 0; }
       メソッドやコンストラクタには、ほぼ必ず「受け取ってよい値」の制約があります。たとえば、インデックスは0以上、参照はnull不可、期間の開始日は終了日以前、などです。
       本Itemの主張は単純で、<strong>制約はJavadocで明示し、メソッド冒頭で検証する</strong>というものです。
     </p>
+    <div class="importance"><strong>現代開発での重要度: 高</strong><br>REST API、バッチ、ドメインサービス、ライブラリAPIのどれでも有効です。Springの入力バリデーションがあっても、ドメイン層・Service層・ユーティリティメソッドの契約は残るため、手動の事前条件チェックは今でも必要です。</div>
 
     <div class="callout good">
       <strong>狙い:</strong> 失敗をできるだけ早く、原因に近い場所で、適切な例外として発生させる。これにより、バグの調査範囲が狭くなり、failure atomicity、つまり失敗時にオブジェクトを壊れた状態にしない性質も守りやすくなります。
@@ -207,6 +273,29 @@ this.strategy = Objects.requireNonNull(strategy, &quot;strategy&quot;);</code></
     <div class="callout warn">
       <strong>注意:</strong> <code>requireNonNull</code> は「nullでない」ことしか保証しません。数値範囲、文字列の空、業務上の整合性は別途チェックが必要です。
     </div>
+    <div class="supplement">
+      <span class="label">補足</span><strong><code>Objects.requireNonNull</code> の仕様と読み方</strong>
+      <p><code>Objects.requireNonNull(strategy, "strategy")</code> は、<code>java.util.Objects</code> クラスの <code>static</code> メソッドをクラス名から直接呼び出しています。インスタンス化して <code>new Objects()</code> する必要はありません。<code>import static java.util.Objects.requireNonNull;</code> とすれば、<code>requireNonNull(strategy, "strategy")</code> とも書けます。</p>
+      <table>
+        <thead><tr><th>形式</th><th>意味</th><th>戻り値への影響</th></tr></thead>
+        <tbody>
+          <tr><td><code>Objects.requireNonNull(obj)</code></td><td><code>obj</code> が <code>null</code> なら <code>NullPointerException</code>。</td><td>非nullなら <code>obj</code> 自体を返す。</td></tr>
+          <tr><td><code>Objects.requireNonNull(obj, "message")</code></td><td>第2引数の文字列は、NPE発生時の詳細メッセージになる。</td><td>戻り値は第1引数 <code>obj</code> のまま。第2引数は戻り値を変えない。</td></tr>
+          <tr><td><code>Objects.requireNonNull(obj, supplier)</code></td><td>メッセージ生成を <code>null</code> 時まで遅延できる。</td><td>非nullなら <code>obj</code> を返す。</td></tr>
+        </tbody>
+      </table>
+      <pre><code class="language-java">public UserService(UserRepository repository) {
+    // repository が null なら NPE: "repository" がメッセージになる
+    this.repository = Objects.requireNonNull(repository, "repository");
+}
+
+public User find(UserId id) {
+    // 返り値が id なので、ローカル変数への代入にも使える
+    UserId nonNullId = Objects.requireNonNull(id, "id");
+    return repository.findById(nonNullId).orElseThrow();
+}</code></pre>
+      <p>つまり第2引数は「例外メッセージ用」であり、正常系の戻り値には一切影響しません。</p>
+    </div>
 
     <h3>非公開メソッドではassertを使える</h3>
     <pre><code class="language-java">// Private helper function for a recursive sort
@@ -220,6 +309,16 @@ private static void sort(long a[], int offset, int length) {
       <code>private</code> や package-private のメソッドは、呼び出し元を自分たちのパッケージ内で制御できます。そのため「この条件は必ず満たして呼ぶ」という内部契約を <code>assert</code> で表現できます。
       ただし、assertは通常実行時には無効です。<code>-ea</code> を付けた時だけ有効になるため、公開APIの入力検証をassertに任せてはいけません。
     </p>
+    <div class="supplement">
+      <span class="label">補足</span><strong><code>assert</code> とは何か</strong>
+      <p><code>assert</code> は「この条件はプログラム上、必ず真であるはずだ」という内部前提を実行時に検査するJavaの文です。条件が偽で、かつassertionが有効化されている場合、<code>AssertionError</code> が投げられます。</p>
+      <pre><code class="language-java">assert condition;
+assert condition : "failure message";
+
+// 実行例: assertionを有効化する
+// java -ea com.example.Main</code></pre>
+      <p>用途は「内部バグの検出」です。ユーザー入力、HTTPリクエスト、外部API応答など、外部から来る値の検証には使いません。外部入力の検証には <code>IllegalArgumentException</code>、<code>NullPointerException</code>、Bean Validationなど、常に有効な仕組みを使います。</p>
+    </div>
     <h3>補足例: Spring/業務アプリでの考え方</h3>
     <pre><code class="language-java">public User findUser(UserId id) {
     // public APIなら、責務として明示的に検証する
@@ -234,6 +333,36 @@ private int sliceLength(List&lt;?&gt; list, int from, int to) {
     assert 0 &lt;= from &amp;&amp; from &lt;= to &amp;&amp; to &lt;= list.size();
     return to - from;
 }</code></pre>
+    <div class="supplement">
+      <span class="label">補足</span><strong>Springのアノテーションで通常メソッドのパラメータ検証はできるか</strong>
+      <p>結論から言うと、できます。ただしJava言語そのものが <code>@NotNull</code> などを自動実行するわけではありません。Jakarta Validation/Bean Validationには「メソッド・コンストラクタのパラメータと戻り値に制約を付ける」仕組みがあり、Springでは <code>@Validated</code> とメソッドバリデーションの仕組みで実行できます。</p>
+      <pre><code class="language-java">import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.validation.annotation.Validated;
+
+@Validated
+@Service
+public class PriceService {
+    public Money calculate(@NotNull ProductId productId,
+                           @Min(1) int quantity) {
+        ...
+    }
+
+    public @NotNull Money currentPrice(@NotNull ProductId productId) {
+        ...
+    }
+}</code></pre>
+      <p>ただし、Springのメソッドバリデーションは通常AOPプロキシ経由で動きます。そのため、同じクラス内の自己呼び出し、privateメソッド、プロキシを通らない呼び出しでは期待通りに動かないことがあります。したがって、Controller境界の <code>@Valid</code> と、Service内部の事前条件チェックは役割が違います。</p>
+      <table>
+        <thead><tr><th>場所</th><th>向いている検証</th><th>例</th></tr></thead>
+        <tbody>
+          <tr><td>Controller DTO</td><td>外部入力の形式検証</td><td><code>@NotBlank</code>, <code>@Email</code>, <code>@Valid</code></td></tr>
+          <tr><td>Service公開メソッド</td><td>サービス契約としての基本制約</td><td><code>@Validated</code> + <code>@NotNull</code>, <code>@Min</code></td></tr>
+          <tr><td>ドメインロジック内部</td><td>不変条件・業務ルール・複数値の整合性</td><td>明示的な <code>if</code>、値オブジェクト、例外</td></tr>
+        </tbody>
+      </table>
+      <p>実務上の判断は「境界ではアノテーション、ドメイン不変条件は型と明示チェック」です。Springに寄せすぎると、フレームワーク外で呼ばれた時に契約が守られないコードになります。</p>
+    </div>
 
     <h3>このItemの判断基準</h3>
     <ul>
@@ -250,6 +379,20 @@ private int sliceLength(List&lt;?&gt; list, int from, int to) {
       Javaはメモリ安全な言語ですが、それだけではクラスの不変条件は守れません。mutableなオブジェクトの参照を外部と共有すると、外部コードから内部状態を壊されます。
       本Itemは、<strong>mutableな引数や内部状態を外部と共有しない</strong>ための防御的コピーを扱います。
     </p>
+    <div class="importance"><strong>現代開発での重要度: 高</strong><br>特にDTO、設定オブジェクト、キャッシュ、ドメインオブジェクト、公開ライブラリで重要です。<code>java.time</code> や <code>List.copyOf</code> の登場で実装は楽になりましたが、「所有権を誰が持つか」を考える必要はなくなっていません。</div>
+
+    <div class="supplement">
+      <span class="label">補足</span><strong>mutableとは何か</strong>
+      <p><code>mutable</code> とは、生成後に状態を変更できる性質です。反対は <code>immutable</code> で、生成後に状態が変わりません。</p>
+      <pre><code class="language-java">// mutable: 同じDateインスタンスの中身が変わる
+Date d = new Date();
+d.setTime(0L);
+
+// immutable: plusDaysは元の値を変えず、新しいLocalDateを返す
+LocalDate today = LocalDate.now();
+LocalDate tomorrow = today.plusDays(1);</code></pre>
+      <p><code>final</code> フィールドは「参照の差し替え」を防ぐだけで、参照先オブジェクトの中身の変更までは防ぎません。この点を誤解すると、防御的コピーの必要性が見えなくなります。</p>
+    </div>
 
     <h3>本書掲載コード: 壊れたimmutableクラス</h3>
     <pre><code class="language-java">// Broken &quot;immutable&quot; time period class
@@ -330,13 +473,13 @@ public Date end() {
     return new Date(end.getTime());
 }</code></pre>
 
-    <h3>現代Javaでの第一選択</h3>
-    <p>
-      新規コードでは、<code>Date</code> ではなく <code>Instant</code>、<code>LocalDateTime</code>、<code>ZonedDateTime</code> などの不変な <code>java.time</code> 型を優先します。
-      mutableな型をAPIに出さない設計にすれば、防御的コピーの必要性自体を減らせます。
-    </p>
+    <div class="supplement">
+      <span class="label">補足</span><strong>現代Javaでの第一選択</strong>
+      <p>新規コードでは、<code>Date</code> ではなく <code>Instant</code>、<code>LocalDateTime</code>、<code>ZonedDateTime</code> などの不変な <code>java.time</code> 型を優先します。mutableな型をAPIに出さない設計にすれば、防御的コピーの必要性自体を減らせます。</p>
+    </div>
 
-    <h3>補足例: Listを内部保持する場合</h3>
+    <div class="supplement">
+      <span class="label">補足</span><strong>Listを内部保持する場合</strong>
     <pre><code class="language-java">public final class Receipt {
     private final List&lt;LineItem&gt; items;
 
@@ -350,6 +493,21 @@ public Date end() {
         return items;
     }
 }</code></pre>
+    </div>
+    <div class="supplement">
+      <span class="label">補足</span><strong>防御的コピーの性能リスクをどう考えるか</strong>
+      <p>コピーは当然コストがあります。大量データや高頻度呼び出しでは、インスタンス生成・配列コピー・GC負荷が問題になる可能性があります。ただし、防御的コピーは「無駄なコピー」ではなく、所有権境界を守るためのコストです。コピーを省いて不変条件が壊れる方が、通常ははるかに高くつきます。</p>
+      <table>
+        <thead><tr><th>方針</th><th>説明</th></tr></thead>
+        <tbody>
+          <tr><td>まずmutable型を避ける</td><td><code>java.time</code>、record、不変コレクションなどを優先し、コピーの必要性を減らす。</td></tr>
+          <tr><td>信頼境界でコピーする</td><td>外部から受け取る時、外部へ返す時、内部に保存する時が主なコピー地点。</td></tr>
+          <tr><td>大きいデータは所有権を明文化する</td><td>コピーが重すぎる場合は「呼び出し側は変更してはいけない」など責務を文書化する。ただし安全性は下がる。</td></tr>
+          <tr><td>測定してから最適化する</td><td>防御的コピーが本当にボトルネックか、プロファイルして確認する。</td></tr>
+        </tbody>
+      </table>
+      <p>結論として、性能を理由に最初からコピーを省くのは危険です。省くなら、信頼できる内部APIであること、所有権が明確であること、性能測定で必要性が確認されていることが条件です。</p>
+    </div>
 
     <h3>このItemの判断基準</h3>
     <table>
@@ -369,6 +527,7 @@ public Date end() {
     <p class="lead">
       メソッド名、引数の数、引数の型、戻り値型は、APIの使いやすさを決めます。ここでの設計ミスは、実装内部ではなく呼び出し側全体に波及します。
     </p>
+    <div class="importance"><strong>現代開発での重要度: 高</strong><br>IDE補完や型推論が進んでも、悪いシグネチャは呼び出し側の誤用を防げません。アプリケーションコードでもAPI設計の基本として常に意識すべきItemです。</div>
 
     <h3>1. メソッド名は慎重に選ぶ</h3>
     <p>
@@ -404,17 +563,87 @@ ReservationRequest request = ReservationRequest.builder(userId, roomId, period)
 reservationService.reserve(request);</code></pre>
 
     <h3>長い引数リストを短くする3つの方法</h3>
-    <ol>
-      <li><strong>複数メソッドに分割する:</strong> <code>List.subList</code> と <code>indexOf</code> のように、直交性のあるメソッドの組み合わせで表現する。</li>
-      <li><strong>ヘルパークラスを作る:</strong> rank/suitを <code>Card</code> にするように、頻出する引数のまとまりを型にする。</li>
-      <li><strong>Builderをメソッド呼び出しに応用する:</strong> 任意パラメータが多い処理では、リクエストオブジェクトに値を設定してからexecute/reserveする。</li>
-    </ol>
+    <div class="supplement">
+      <span class="label">補足</span><strong>1. 複数メソッドに分割する</strong>
+      <p>1つの巨大メソッドに全部の条件を渡すのではなく、小さく直交したメソッドを組み合わせます。本書では <code>List.subList</code> と <code>indexOf</code> の組み合わせが例として挙げられます。</p>
+      <pre><code class="language-java">// 悪い例: 「範囲を指定して、その中から要素を探す」を1メソッドに詰め込む
+int indexOfInRange(List&lt;String&gt; list, String target, int fromIndex, int toIndex) { ... }
+
+// 良い例: 既存の小さい操作を組み合わせる
+List&lt;String&gt; page = list.subList(fromIndex, toIndex);
+int indexInPage = page.indexOf(target);
+int index = indexInPage &gt;= 0 ? fromIndex + indexInPage : -1;</code></pre>
+      <p>この方法の利点は、APIの組み合わせ可能性が上がることです。欠点は、呼び出し側に組み合わせの知識が必要になることです。</p>
+    </div>
+    <div class="supplement">
+      <span class="label">補足</span><strong>2. ヘルパークラス・値オブジェクトを作る</strong>
+      <p>いつも一緒に渡される値は、意味のある型にまとめます。単なる引数削減ではなく、概念をコード上に表現する効果があります。</p>
+      <pre><code class="language-java">// 悪い例: 座標や期間などのまとまりが裸の引数として流れている
+boolean isWithin(int x, int y, int left, int top, int right, int bottom) { ... }
+
+// 良い例: 意味のあるまとまりを型にする
+record Point(int x, int y) {}
+record Rectangle(int left, int top, int right, int bottom) {
+    boolean contains(Point p) {
+        return left &lt;= p.x() &amp;&amp; p.x() &lt; right
+            &amp;&amp; top &lt;= p.y() &amp;&amp; p.y() &lt; bottom;
+    }
+}
+
+boolean isWithin(Point point, Rectangle area) {
+    return area.contains(point);
+}</code></pre>
+    </div>
+    <div class="supplement">
+      <span class="label">補足</span><strong>3. Builderをメソッド呼び出しに応用する</strong>
+      <p>任意引数が多く、組み合わせが多い処理では、メソッドに全部渡すのではなく、リクエストオブジェクトをBuilderで作ります。</p>
+      <pre><code class="language-java">// 悪い例: 何のbooleanか分からず、nullも混ざりやすい
+searchOrders(userId, from, to, true, false, 100, "createdAt");
+
+// 良い例: 呼び出し側で意味が読める
+SearchOrdersRequest request = SearchOrdersRequest.builder(userId)
+        .period(from, to)
+        .includeCancelled(true)
+        .onlyPaid(false)
+        .limit(100)
+        .sortBy("createdAt")
+        .build();
+
+orderService.search(request);</code></pre>
+      <p>この方法は、Controllerの検索条件DTO、バッチ実行条件、外部API呼び出し条件などで特に有効です。</p>
+    </div>
 
     <h3>4. 引数型は具象クラスよりinterfaceを優先する</h3>
     <p>
       <code>HashMap</code> を受け取るのではなく <code>Map</code> を受け取ります。これにより、<code>TreeMap</code>、<code>ConcurrentHashMap</code>、将来のMap実装も受け取れます。
       具象型を要求すると、呼び出し側に不要な変換やコピーを強制します。
     </p>
+    <div class="supplement">
+      <span class="label">補足</span><strong>具象クラスではなくinterfaceを受けるコード例</strong>
+      <pre><code class="language-java">// 悪い例: HashMapしか受け取れない。LinkedHashMapやConcurrentHashMapを渡せない
+public int totalPrice(HashMap&lt;ProductId, Integer&gt; quantities) {
+    ...
+}
+
+// 良い例: Mapの契約だけに依存する
+public int totalPrice(Map&lt;ProductId, Integer&gt; quantities) {
+    ...
+}
+
+// 悪い例: ArrayListに限定している
+public void sendAll(ArrayList&lt;Email&gt; emails) { ... }
+
+// 良い例: 順序付きの要素列が必要なだけならListでよい
+public void sendAll(List&lt;Email&gt; emails) { ... }
+
+// さらに、単に走査できればよいだけならIterableまで広げられる
+public void sendAll(Iterable&lt;Email&gt; emails) {
+    for (Email email : emails) {
+        mailer.send(email);
+    }
+}</code></pre>
+      <p>受け取る型は「実装が本当に必要としている能力」まで狭めます。ランダムアクセスが必要なら <code>List</code>、キー検索が必要なら <code>Map</code>、走査だけなら <code>Iterable</code> で足ります。</p>
+    </div>
 
     <h3>5. boolean引数より2値enumを検討する</h3>
     <pre><code class="language-java">public enum TemperatureScale { FAHRENHEIT, CELSIUS }
@@ -432,6 +661,7 @@ Thermometer.newInstance(TemperatureScale.CELSIUS);
       このItemはかなり重要です。Javaでは、<strong>オーバーロードはコンパイル時の型で選ばれる</strong>一方、<strong>オーバーライドは実行時の型で選ばれる</strong>からです。
       この違いを曖昧にしたままAPIを設計すると、直感に反するバグを作ります。
     </p>
+    <div class="importance"><strong>現代開発での重要度: 高</strong><br>ラムダ、メソッド参照、ジェネリクス、autoboxingがある現代Javaでは、むしろ混乱の余地が増えています。公開APIでは特に慎重に扱うべきです。</div>
 
     <h3>本書掲載コード: 壊れたCollectionClassifier</h3>
     <pre><code class="language-java">// Broken! - What does this program print?
@@ -505,6 +735,49 @@ public class Overriding {
       </tbody>
     </table>
 
+    <div class="supplement">
+      <span class="label">補足</span><strong>なぜ「同じ引数個数のoverload」が危険なのか</strong>
+      <p>問題は「呼び出し側の見た目」と「実際に選ばれるメソッド」がずれることです。特に継承関係、<code>null</code>、autoboxing、ラムダが絡むと、API利用者の直感に反します。</p>
+      <h4>別例1: 実体はAdminでも、変数型がUserならUser版が呼ばれる</h4>
+      <pre><code class="language-java">class User {}
+class Admin extends User {}
+
+class PermissionService {
+    void grant(User user) {
+        System.out.println("normal user permission");
+    }
+
+    void grant(Admin admin) {
+        System.out.println("admin permission");
+    }
+}
+
+PermissionService service = new PermissionService();
+User user = new Admin();
+service.grant(user); // "normal user permission"。実体はAdminでも、コンパイル時型はUser</code></pre>
+      <p>これがバグになるのは、<code>grant(User)</code> と <code>grant(Admin)</code> の意味が違う場合です。利用者は「中身はAdminだからAdmin版」と期待しがちですが、overloadは実行時型を見ません。</p>
+      <h4>別例2: <code>null</code> を渡すと曖昧または意図しないoverloadになる</h4>
+      <pre><code class="language-java">void export(Path path) { ... }
+void export(URI uri) { ... }
+
+export(null); // Path版かURI版か決められず、コンパイルエラー
+
+void log(Object value) { System.out.println("object"); }
+void log(String value) { System.out.println("string"); }
+
+log(null); // より具体的な String 版が選ばれる</code></pre>
+      <p>どちらも「同じ1引数」ですが、呼び出し側は型推論・最具体メソッド選択の規則を知らないと挙動を読めません。</p>
+      <h4>別例3: autoboxingで意味が変わる</h4>
+      <pre><code class="language-java">void remove(int index) { System.out.println("remove by index"); }
+void remove(Integer value) { System.out.println("remove by value"); }
+
+Integer value = 1;
+remove(1);     // int版
+remove(value); // Integer版
+remove((Integer) 1); // Integer版</code></pre>
+      <p><code>List.remove(int)</code> と <code>List.remove(Object)</code> の罠と同じ構造です。APIとしては、呼び出し側にキャストを要求した時点でかなり負けています。</p>
+    </div>
+
     <h3>安全な方針: 同じ引数個数のoverloadを公開しない</h3>
     <p>
       本書は保守的な方針として、<strong>同じ数の引数を取るオーバーロードを公開しない</strong>ことを勧めます。
@@ -564,6 +837,7 @@ public boolean contentEquals(StringBuffer sb) {
     <p class="lead">
       可変長引数、varargsは、0個以上の引数を受け取るメソッドを定義できます。便利ですが、内部的には呼び出しごとに配列が作られる点と、「最低1個必要」という制約を表現しにくい点に注意します。
     </p>
+    <div class="importance"><strong>現代開発での重要度: 中〜高</strong><br>通常の業務アプリでは性能問題になりにくい一方、APIの意味を誤って0個許容にしてしまう危険は今でもあります。ライブラリ設計やユーティリティ設計では高重要度です。</div>
 
     <h3>本書掲載コード: 単純なvarargs</h3>
     <pre><code class="language-java">// Simple use of varargs
@@ -629,6 +903,7 @@ public void foo(int a1, int a2, int a3, int... rest) { }</code></pre>
       「該当なし」を表すために <code>null</code> を返すAPIは、呼び出し側に余計な分岐を強制します。本Itemの結論は明確です。
       <strong>コレクションや配列を返すメソッドでは、要素がないなら空を返す。</strong>
     </p>
+    <div class="importance"><strong>現代開発での重要度: 非常に高</strong><br>Java/Springの業務開発で毎日のように効く原則です。戻り値に <code>null</code> を混ぜると、呼び出し側のnullチェック漏れ、テスト漏れ、NPEの温床になります。</div>
 
     <h3>本書掲載コード: nullを返す悪い例</h3>
     <pre><code class="language-java">// Returns null to indicate an empty collection. Don&#x27;t do this!
@@ -671,6 +946,61 @@ public List&lt;Cheese&gt; getCheeses() {
       ただし、これは最適化です。まずは通常の空コレクションを返す設計で十分です。性能問題が測定で確認された場合だけ検討します。
     </p>
 
+
+
+    <div class="supplement">
+      <span class="label">補足</span><strong>現代開発に近い例: REST APIの検索結果は <code>null</code> ではなく空リストを返す</strong>
+      <p>業務アプリやSpring系のREST APIでは、「条件に一致するデータが0件」は異常ではありません。したがって、Service層・Controller層の戻り値は <code>null</code> ではなく空の <code>List</code> に寄せるのが自然です。</p>
+      <p>悪い例です。0件を <code>null</code> で表現すると、Controller側に余計な分岐が漏れ出します。</p>
+      <pre><code class="language-java">// 悪い例: 0件を null で表現している
+@Service
+public class OrderQueryService {
+    public List&lt;OrderSummary&gt; findByCustomerId(long customerId) {
+        List&lt;Order&gt; orders = orderRepository.findByCustomerId(customerId);
+
+        if (orders.isEmpty()) {
+            return null;
+        }
+
+        return orders.stream()
+                .map(OrderSummary::from)
+                .toList();
+    }
+}
+
+@RestController
+public class OrderController {
+    @GetMapping(&quot;/customers/{customerId}/orders&quot;)
+    public List&lt;OrderSummary&gt; getOrders(@PathVariable long customerId) {
+        List&lt;OrderSummary&gt; orders = orderQueryService.findByCustomerId(customerId);
+
+        // Serviceがnullを返すため、Controllerがnullを意識させられる
+        return orders == null ? List.of() : orders;
+    }
+}</code></pre>
+      <p>良い例です。Serviceが「0件なら空リスト」という契約を持てば、Controllerは結果の件数に関係なく同じ処理を書けます。</p>
+      <pre><code class="language-java">// 良い例: 0件でも空Listを返す
+@Service
+public class OrderQueryService {
+    public List&lt;OrderSummary&gt; findByCustomerId(long customerId) {
+        return orderRepository.findByCustomerId(customerId).stream()
+                .map(OrderSummary::from)
+                .toList();
+    }
+}
+
+@RestController
+public class OrderController {
+    @GetMapping(&quot;/customers/{customerId}/orders&quot;)
+    public List&lt;OrderSummary&gt; getOrders(@PathVariable long customerId) {
+        return orderQueryService.findByCustomerId(customerId);
+    }
+}</code></pre>
+      <p>この形なら、HTTPレスポンスのJSONも自然に <code>[]</code> になります。呼び出し側も「レスポンスが <code>null</code> かもしれない」と考えず、単に配列として処理できます。</p>
+      <pre><code class="language-json">[]</code></pre>
+      <p>ただし、単一リソース取得では話が別です。たとえば <code>GET /orders/{orderId}</code> で注文が存在しない場合は、「空リスト」ではなく、<code>404 Not Found</code>、例外、またはService層の <code>Optional&lt;Order&gt;</code> などで「1件が存在しない」ことを表現する方が自然です。Item 54が対象にしているのは、主に「複数件を返すコレクション・配列」です。</p>
+    </div>
+
     <h3>配列の場合</h3>
     <pre><code class="language-java">// The right way to return a possibly empty array
 public Cheese[] getCheeses() {
@@ -686,6 +1016,24 @@ public Cheese[] getCheeses() {
       本書では、<code>toArray(new Cheese[0])</code> が通常の正しい書き方として示されます。
       空配列の生成が問題になる場合は、static finalな空配列を使って共有できます。
     </p>
+    <div class="supplement">
+      <span class="label">補足</span><strong><code>toArray(new Cheese[0])</code> の <code>[0]</code> は何か</strong>
+      <p><code>Collection.toArray(T[] a)</code> は、戻り値の配列の実行時型を知るために配列を受け取ります。<code>new Cheese[0]</code> は「要素を入れるための容量」ではなく、主に「<code>Cheese[]</code> が欲しい」という型情報を渡すための空配列です。</p>
+      <pre><code class="language-java">List&lt;Cheese&gt; cheeses = List.of(Cheese.STILTON, Cheese.BRIE);
+
+Cheese[] array = cheeses.toArray(new Cheese[0]);
+// 渡した配列は長さ0なので入りきらない。
+// toArray側が必要な長さの Cheese[] を新しく作って返す。</code></pre>
+      <table>
+        <thead><tr><th>渡す配列</th><th>動作</th></tr></thead>
+        <tbody>
+          <tr><td><code>new Cheese[0]</code></td><td>長さ0なので、必要サイズの新しい <code>Cheese[]</code> が返る。型情報として使う。</td></tr>
+          <tr><td><code>new Cheese[cheeses.size()]</code></td><td>ぴったり入るが、本書では事前確保が性能上よくない例として扱われる。</td></tr>
+          <tr><td>大きすぎる配列</td><td>その配列に詰め、最後の次の要素に <code>null</code> が入るため扱いが面倒。</td></tr>
+        </tbody>
+      </table>
+      <p>つまり <code>[0]</code> は「空でもよいから型を渡す」ための書き方です。<code>null</code> を渡すと型情報がないため <code>NullPointerException</code> になります。</p>
+    </div>
 
     <h3>避けるべき配列生成</h3>
     <pre><code class="language-java">// Don&#x27;t do this - preallocating the array harms performance!
@@ -701,6 +1049,46 @@ return cheesesInStock.toArray(new Cheese[cheesesInStock.size()]);</code></pre>
       Java 8以前は、「値を返せない可能性」を表す方法は主に例外かnullでした。<code>Optional&lt;T&gt;</code> は第三の選択肢です。
       ただし、Optionalは万能ではありません。<strong>主に戻り値として、値がない可能性を呼び出し側に意識させたい場合に使う</strong>ものです。
     </p>
+    <div class="importance"><strong>現代開発での重要度: 高</strong><br>Repository、検索、変換、外部API応答の解釈などで頻出します。ただし乱用すると型が冗長になり、むしろ読みづらくなります。「戻り値に限って慎重に使う」が基本です。</div>
+
+    <div class="supplement">
+      <span class="label">補足</span><strong>Optionalの基本理解</strong>
+      <p><code>Optional&lt;T&gt;</code> は「<code>T</code> の値が存在するかもしれないし、存在しないかもしれない」ことを表すコンテナです。重要なのは、<strong>Optional自体はnullにしない</strong>、そして<strong>Optionalの中身は非null値だけ</strong>という設計思想です。</p>
+      <pre><code class="language-java">Optional&lt;User&gt; found = userRepository.findById(id);
+
+// 値がある場合
+Optional&lt;String&gt; name = Optional.of("Alice");
+
+// 値がない場合
+Optional&lt;String&gt; empty = Optional.empty();
+
+// nullかもしれない値から作る場合
+String nullableName = externalApi.getName();
+Optional&lt;String&gt; maybeName = Optional.ofNullable(nullableName);</code></pre>
+      <p><code>Optional&lt;T&gt;</code> は「nullを完全に消す魔法」ではありません。値がない可能性を型として見えるようにし、呼び出し側に分岐を考えさせる道具です。</p>
+    </div>
+    <div class="supplement">
+      <span class="label">補足</span><strong>Optionalの主要メソッド</strong>
+      <table>
+        <thead><tr><th>メソッド</th><th>意味</th><th>注意点</th></tr></thead>
+        <tbody>
+          <tr><td><code>Optional.empty()</code></td><td>値なしを表すOptionalを作る。</td><td>Optional自体は非nullとして扱う。</td></tr>
+          <tr><td><code>Optional.of(value)</code></td><td>非null値を入れたOptionalを作る。</td><td><code>value</code> が <code>null</code> ならNPE。</td></tr>
+          <tr><td><code>Optional.ofNullable(value)</code></td><td><code>value</code> が非nullなら <code>of</code>、nullなら <code>empty</code>。</td><td>外部APIなどnull混入可能性がある値の境界で使う。</td></tr>
+          <tr><td><code>isPresent()</code></td><td>値があればtrue。</td><td>乱用するとnullチェック風のコードに戻る。</td></tr>
+          <tr><td><code>isEmpty()</code></td><td>値がなければtrue。</td><td>Java 11以降。</td></tr>
+          <tr><td><code>get()</code></td><td>値を直接取り出す。</td><td>空なら <code>NoSuchElementException</code>。原則、最後の手段。</td></tr>
+          <tr><td><code>orElse(defaultValue)</code></td><td>空ならデフォルト値を返す。</td><td>デフォルト値の式は、値があっても評価される。</td></tr>
+          <tr><td><code>orElseGet(supplier)</code></td><td>空ならSupplierを実行して値を作る。</td><td>重いデフォルト値生成はこちら。</td></tr>
+          <tr><td><code>orElseThrow(...)</code></td><td>空なら指定例外を投げる。</td><td>Repository結果を業務例外に変換する時に有効。</td></tr>
+          <tr><td><code>map(f)</code></td><td>値があれば変換する。</td><td>変換結果がnullなら空Optionalになる。</td></tr>
+          <tr><td><code>flatMap(f)</code></td><td>値があればOptionalを返す関数で変換する。</td><td><code>Optional&lt;Optional&lt;T&gt;&gt;</code> を避ける。</td></tr>
+          <tr><td><code>filter(p)</code></td><td>値があり、条件を満たす場合だけ残す。</td><td>条件不一致なら空。</td></tr>
+          <tr><td><code>ifPresent(c)</code></td><td>値がある場合だけ処理する。</td><td>戻り値が不要な副作用処理向け。</td></tr>
+          <tr><td><code>stream()</code></td><td>Optionalを0個または1個のStreamに変換する。</td><td>Java 9以降。<code>Stream&lt;Optional&lt;T&gt;&gt;</code> の平坦化に便利。</td></tr>
+        </tbody>
+      </table>
+    </div>
 
     <h3>本書掲載コード: 空なら例外を投げるmax</h3>
     <pre><code class="language-java">// Returns maximum value in collection - throws exception if empty
@@ -734,12 +1122,47 @@ public static &lt;E extends Comparable&lt;E&gt;&gt; Optional&lt;E&gt; max(Collec
       <code>Optional.empty()</code> は値がないことを表し、<code>Optional.of(result)</code> は非null値を持つOptionalを返します。
       <strong>Optionalを返すメソッドでnullを返してはいけません。</strong> それはOptionalの目的を壊します。
     </p>
+    <div class="supplement">
+      <span class="label">補足</span><strong><code>Optional.empty()</code> と <code>Optional.of(result)</code>、そしてnull可能性</strong>
+      <p><code>Optional.of(result)</code> は <code>result</code> が非nullであることを前提にします。もし <code>result</code> が <code>null</code> なら、<code>Optional.of(result)</code> は <code>NullPointerException</code> を投げます。</p>
+      <pre><code class="language-java">Optional.of("abc");      // OK
+Optional.of(null);       // NPE
+Optional.ofNullable(null); // Optional.empty()</code></pre>
+      <p>本書の <code>max</code> では、空コレクションなら先に <code>Optional.empty()</code> を返し、ループ内で <code>Objects.requireNonNull(e)</code> によって要素nullを禁止しています。そのため、最後の <code>result</code> は非nullである、という前提が成立します。</p>
+      <p>もし仕様として「計算結果がnullになる可能性があり、そのnullを値なしとして扱いたい」なら <code>Optional.ofNullable(result)</code> を使います。ただし、コレクション内のnullを許す設計自体が複雑さを増やすため、通常はnull要素を禁止する方が明確です。</p>
+    </div>
+
+    <div class="supplement">
+      <span class="label">補足</span><strong><code>public static &lt;E extends Comparable&lt;E&gt;&gt; Optional&lt;E&gt; max(Collection&lt;E&gt; c)</code> の読み方</strong>
+      <p><code>&lt;E extends Comparable&lt;E&gt;&gt;</code> は、メソッド用の型パラメータ宣言です。「このメソッドで扱う型 <code>E</code> は、自分自身の型 <code>E</code> と比較できる必要がある」という意味です。</p>
+      <pre><code class="language-java">public static &lt;E extends Comparable&lt;E&gt;&gt; Optional&lt;E&gt; max(Collection&lt;E&gt; c)
+//            ^^^^^^^^^^^^^^^^^^^^^^^  型パラメータ宣言
+//                                           ^^^^^^^^^^^ 戻り値型
+//                                                       ^^^^^^^^^^^^^^^ 引数型</code></pre>
+      <p>なぜ必要かというと、メソッド内部で <code>e.compareTo(result)</code> を呼ぶからです。<code>E</code> が <code>Comparable&lt;E&gt;</code> を実装しているとコンパイラに伝えないと、<code>compareTo</code> を安全に呼べません。</p>
+      <pre><code class="language-java">max(List.of(3, 1, 2));                 // IntegerはComparable&lt;Integer&gt;なのでOK
+max(List.of("b", "a", "c"));           // StringはComparable&lt;String&gt;なのでOK
+// max(List.of(new Object(), new Object())); // ObjectはComparableではないのでNG</code></pre>
+      <p>さらに柔軟にするなら、Item 31の考え方で <code>&lt;E extends Comparable&lt;? super E&gt;&gt;</code> とする選択肢もあります。ただし、まずは「比較可能な型だけを受け取るための制約」と理解すれば十分です。</p>
+    </div>
 
     <h3>Streamを使う場合</h3>
     <pre><code class="language-java">// Returns max val in collection as Optional&lt;E&gt; - uses stream
 public static &lt;E extends Comparable&lt;E&gt;&gt; Optional&lt;E&gt; max(Collection&lt;E&gt; c) {
     return c.stream().max(Comparator.naturalOrder());
 }</code></pre>
+
+    <div class="supplement">
+      <span class="label">補足</span><strong>StreamとOptionalの関係</strong>
+      <p>Streamの終端操作には「結果が存在しないかもしれない」ものがあります。たとえば、空Streamに対する <code>findFirst()</code>、<code>findAny()</code>、<code>max()</code>、<code>min()</code>、引数なしの <code>reduce()</code> は、結果がない可能性があるためOptionalを返します。</p>
+      <pre><code class="language-java">Optional&lt;User&gt; firstActive = users.stream()
+        .filter(User::isActive)
+        .findFirst();
+
+Optional&lt;Integer&gt; maxScore = scores.stream()
+        .max(Comparator.naturalOrder());</code></pre>
+      <p>逆に、Java 9以降の <code>Optional.stream()</code> は、Optionalを「0個または1個の要素を持つStream」に変換します。これにより、<code>Stream&lt;Optional&lt;T&gt;&gt;</code> を自然に <code>Stream&lt;T&gt;</code> にできます。</p>
+    </div>
 
     <h3>呼び出し側の選択肢</h3>
     <pre><code class="language-java">// Using an optional to provide a chosen default value
@@ -804,6 +1227,7 @@ Map&lt;UserId, Optional&lt;UserProfile&gt;&gt; profiles;</code></pre>
       APIは、コードだけでは完成しません。公開クラス、interface、コンストラクタ、メソッド、フィールドには、利用者が正しく使えるだけのドキュメントが必要です。
       Javadocは、ソースコード中のdoc commentからAPIドキュメントを生成します。
     </p>
+    <div class="importance"><strong>現代開発での重要度: 中〜高</strong><br>社内アプリの全メソッドに長文Javadocは不要ですが、公開API、共通部品、複雑なドメインロジック、例外条件があるメソッドでは今でも重要です。生成AI時代でも、契約が明文化されていないAPIは誤用されます。</div>
 
     <h3>メソッドのdoc commentに書くべき契約</h3>
     <ul>
@@ -946,6 +1370,17 @@ public @interface ExceptionTest {
     <div class="callout good">
       <strong>最終的な理解:</strong> 第8章は「メソッド単位のコーディング規約」ではなく、API設計の章です。呼び出し側が間違えにくく、失敗時に原因が明確で、将来変更に耐え、ドキュメントから契約が読めるメソッドを作ることが目的です。
     </div>
+  </section>
+
+  <section id="references">
+    <h2>補足参考リンク</h2>
+    <p class="ref-list">補足説明では、Java標準APIおよびSpring/Jakarta Validationの公式ドキュメントを参照しています。</p>
+    <ul class="ref-list">
+      <li>Oracle Java API: <code>java.util.Objects</code> / <code>requireNonNull</code></li>
+      <li>Oracle Java API: <code>java.util.Optional</code></li>
+      <li>Spring Framework Reference: Bean Validation / Method Validation</li>
+      <li>Jakarta Validation Specification: Method validation</li>
+    </ul>
   </section>
 
   <div class="footer">
