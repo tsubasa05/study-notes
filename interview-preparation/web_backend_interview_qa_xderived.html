@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>X由来・海外アカウント型 Q&amp;A</title>
+<style>
+:root {
+  --bg: #f7f7fb;
+  --paper: #ffffff;
+  --ink: #1f2937;
+  --muted: #64748b;
+  --line: #e5e7eb;
+  --accent: #2563eb;
+  --accent2: #0f766e;
+  --warn: #b45309;
+  --danger: #b91c1c;
+  --soft: #eef2ff;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+  line-height: 1.75;
+}
+header {
+  background: linear-gradient(135deg, #111827 0%, #1e3a8a 55%, #0f766e 100%);
+  color: white;
+  padding: 44px 24px 36px;
+}
+.header-inner { max-width: 1160px; margin: 0 auto; }
+h1 { font-size: clamp(26px, 4vw, 44px); line-height: 1.25; margin: 0 0 16px; }
+.lead { font-size: 17px; max-width: 920px; color: #e5e7eb; }
+.meta { margin-top: 16px; color: #bfdbfe; font-size: 14px; }
+nav {
+  position: sticky; top: 0; z-index: 10;
+  background: rgba(255,255,255,.96);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(8px);
+}
+.nav-inner {
+  max-width: 1160px; margin: 0 auto; padding: 10px 20px;
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+}
+nav a {
+  color: #1e40af; text-decoration: none; font-weight: 700; font-size: 13px;
+  padding: 6px 10px; border-radius: 999px; background: #eff6ff;
+}
+main { max-width: 1160px; margin: 0 auto; padding: 26px 20px 80px; }
+section { margin: 28px 0; }
+.panel {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 4px 20px rgba(15,23,42,.05);
+}
+h2 { margin: 0 0 16px; font-size: 26px; line-height: 1.35; }
+h3 { margin: 8px 0 8px; line-height: 1.45; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 16px; }
+.source-card, .qa-card, .note-card {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px;
+}
+.source-card { border-top: 5px solid var(--accent); }
+.source-top { display: flex; justify-content: space-between; }
+.source-priority, .cat, .badge {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 800;
+}
+.source-priority { background: #ecfeff; color: #155e75; }
+.cat { background: #f1f5f9; color: #334155; }
+.badge-S { background: #fee2e2; color: #991b1b; }
+.badge-A { background: #ffedd5; color: #9a3412; }
+.badge-B { background: #dbeafe; color: #1e40af; }
+.qa-card { margin: 14px 0; }
+.qa-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.num { color: var(--muted); font-weight: 800; font-size: 13px; }
+.intent {
+  margin: 8px 0 10px;
+  color: #475569;
+  background: #f8fafc;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border-left: 4px solid #cbd5e1;
+}
+details {
+  margin-top: 8px;
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+summary { cursor: pointer; font-weight: 800; color: #1d4ed8; }
+.answer { margin-top: 10px; white-space: pre-line; }
+.warn {
+  border-left: 6px solid var(--warn);
+  background: #fffbeb;
+}
+.danger {
+  border-left: 6px solid var(--danger);
+  background: #fef2f2;
+}
+.ok {
+  border-left: 6px solid var(--accent2);
+  background: #ecfdf5;
+}
+ul.tight li { margin: 4px 0; }
+.kpi {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;
+}
+.kpi div {
+  background: #f8fafc; padding: 14px; border-radius: 14px; border: 1px solid var(--line);
+}
+.kpi strong { display:block; font-size: 22px; color:#1d4ed8; }
+.searchbox {
+  width: 100%; padding: 14px 16px; border: 1px solid #cbd5e1;
+  border-radius: 14px; font-size: 16px; margin: 12px 0 16px;
+}
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; background: white; }
+th, td { border: 1px solid var(--line); padding: 10px; vertical-align: top; }
+th { background: #f1f5f9; text-align: left; }
+.code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: #0f172a; color: #e2e8f0; padding: 14px; border-radius: 14px;
+  overflow-x:auto; white-space: pre-wrap;
+}
+.footer {
+  color: var(--muted); font-size: 13px; margin-top: 40px;
+}
+
+.answer.structured { white-space: normal; }
+.answer.structured h4 { margin: 14px 0 6px; font-size: 15px; color: #0f172a; }
+.answer.structured ul, .answer.structured ol { margin: 6px 0 10px 1.3em; padding: 0; }
+.answer.structured li { margin: 5px 0; }
+.answer.structured .short-answer {
+  background: #eff6ff; border-left: 4px solid #2563eb; padding: 10px 12px;
+  border-radius: 10px; margin: 8px 0 12px;
+}
+.answer.structured .supplement {
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
+  padding: 10px 12px; margin: 10px 0;
+}
+.answer.structured .caution {
+  background: #fffbeb; border-left: 4px solid #b45309; padding: 10px 12px;
+  border-radius: 10px; margin: 10px 0;
+}
+.answer.structured code { background:#e2e8f0; color:#0f172a; padding:1px 5px; border-radius:5px; }
+
+
+.answer.structured .diagram {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: #0f172a; color: #e2e8f0; padding: 12px 14px;
+  border-radius: 12px; overflow-x: auto; white-space: pre; margin: 10px 0;
+}
+.answer.structured .mini-table { overflow-x:auto; margin:10px 0; }
+.answer.structured .mini-table table { font-size: 14px; }
+
+@media print {
+  nav, .searchbox { display:none; }
+  body { background:white; }
+  .panel, .qa-card, .source-card { box-shadow:none; break-inside: avoid; }
+  details[open] { break-inside: avoid; }
+}
+
+.index-back-button {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border: 1px solid rgba(35, 88, 197, 0.22);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1e40af;
+  padding: 8px 12px;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.16);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  text-decoration: none;
+}
+.index-back-button:hover {
+  border-color: #2358c5;
+  background: #eef4ff;
+}
+@media print {
+  .index-back-button { display: none; }
+}
+
+</style>
+<script>
+function filterCards() {
+  const q = document.getElementById('filter').value.toLowerCase().trim();
+  const cards = document.querySelectorAll('.qa-card');
+  cards.forEach(card => {
+    const hit = card.getAttribute('data-text').includes(q);
+    card.style.display = hit ? '' : 'none';
+  });
+}
+function openAll() {
+  document.querySelectorAll('details').forEach(d => d.open = true);
+}
+function closeAll() {
+  document.querySelectorAll('details').forEach(d => d.open = false);
+}
+</script>
+</head>
+<body>
+<a class="index-back-button" href="../index.html">Indexへ戻る</a>
+<header>
+<div class="header-inner">
+<h1>X由来・海外アカウント型 Q&amp;A</h1>
+<p class="lead">海外エンジニア発信でよく見かけるSystem Design、API、DB、障害調査テーマを面接回答用に整理したQ&amp;Aページです。</p>
+<div class="meta">作成日: 2026-06-09 / 更新: 2026-06-27 / 分割ページ構成</div>
+</div>
+</header>
+<nav>
+<div class="nav-inner">
+<a href="web_backend_interview_qa_2026.html">入口</a>
+<a href="web_backend_interview_qa_overseas.html">海外面接型</a>
+<a href="web_backend_interview_qa_xderived.html">X由来・海外アカウント型</a>
+<a href="web_backend_interview_qa_priority.html">あなた向け優先</a>
+</div>
+</nav>
+<main>
+<section class="panel" id="xderived">
+<h2>X由来・海外アカウント型 Q&amp;A</h2>
+<p>X上の海外エンジニア・System Design系アカウントで頻出しているバックエンド/システムデザイン問題を、面接対策用に再構成したセクションです。投稿文を転載するのではなく、検索で確認できた出題テーマをもとに、質問・回答例・補足・図解として整理しています。</p>
+<div class="note-card warn" style="margin-top:12px;">
+<h3>このセクションの扱い</h3>
+<p>Xの投稿は短く、解答品質にもばらつきがあります。そのため、このセクションでは <strong>「Xでよく見かける問題テーマ」→「面接で答えるべき構造」→「理解補足」</strong> に変換しています。暗記する対象は投稿文ではなく、設計の型です。</p>
+</div>
+<div class="kpi" style="margin:14px 0 18px;">
+<div><strong>30問</strong>X頻出テーマを追加</div>
+<div><strong>設計中心</strong>Backend / API / DB / Cache / Queue</div>
+<div><strong>図解付き</strong>要件・構成・失敗時を確認</div>
+</div>
+<article class="qa-card" data-text="xq001 x由来 / system design s tinyurl / url短縮サービスを設計してください。 短い問題に見えて、id生成、db設計、リダイレクト、キャッシュ、ホットキー、悪用対策まで広く見られる。 url短縮サービスは、長いurlを短いキーに対応付け、短縮urlへのアクセス時に元urlへリダイレクトするサービスです。基本構成は、短縮キー生成、urlマッピングdb、リダイレクトapi、キャッシュ、分析ログです。面接では、まず読み取りが多いのか、書き込みが多いのか、短縮urlの有効期限やカスタムaliasの有無を確認し、キー衝突、dbインデックス、キャッシュ、悪性url対策まで説明します。 &lt;strong&gt;api：&lt;/strong&gt;&lt;code&gt;post /shorten&lt;/code&gt; で長いurlを受け取り、短縮キーを返す。&lt;code&gt;get /{key}&lt;/code&gt; で元urlを取得し、301/302でリダイレクトする。 &lt;strong&gt;キー生成：&lt;/strong&gt;dbの連番idをbase62化する方式、ランダム文字列方式、snowflake風id方式などがある。衝突回避と推測困難性を分けて考える。 &lt;strong&gt;db：&lt;/strong&gt;&lt;code&gt;short_code&lt;/code&gt; をユニークキーにし、&lt;code&gt;original_url&lt;/code&gt;、&lt;code&gt;created_at&lt;/code&gt;、&lt;code&gt;expires_at&lt;/code&gt;、&lt;code&gt;owner_id&lt;/code&gt; などを持つ。 &lt;strong&gt;キャッシュ：&lt;/strong&gt;リダイレクトは読み取り頻度が高いので、&lt;code&gt;short_code → original_url&lt;/code&gt; をredisやcdn側でキャッシュする。 &lt;strong&gt;運用：&lt;/strong&gt;不正url、スパム、削除、期限切れ、アクセス分析ログ、ホットurl対策が必要。 xではtinyurl/url shortenerは初級〜中級の定番システムデザイン問題として頻繁に挙がります。重要なのは「短縮urlを作るだけ」と捉えないことです。面接官は、urlマッピングという単純な要件から、キー設計、読み取り負荷、キャッシュ、リダイレクトステータス、ログ収集、悪用対策まで広げられるかを見ています。 301は恒久的リダイレクト、302は一時的リダイレクトです。アクセス分析やリンク変更可能性を考えると、短縮urlサービスでは302の方が扱いやすいケースがあります。ここを言えると一段深く見えます。">
+<div class="qa-head">
+<div><span class="cat">X由来 / System Design</span> <span class="badge badge-S">S</span></div>
+<div class="num">XQ001</div>
+</div>
+<h3>TinyURL / URL短縮サービスを設計してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>短い問題に見えて、ID生成、DB設計、リダイレクト、キャッシュ、ホットキー、悪用対策まで広く見られる。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">URL短縮サービスは、長いURLを短いキーに対応付け、短縮URLへのアクセス時に元URLへリダイレクトするサービスです。基本構成は、短縮キー生成、URLマッピングDB、リダイレクトAPI、キャッシュ、分析ログです。面接では、まず読み取りが多いのか、書き込みが多いのか、短縮URLの有効期限やカスタムaliasの有無を確認し、キー衝突、DBインデックス、キャッシュ、悪性URL対策まで説明します。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>API：</strong><code>POST /shorten</code> で長いURLを受け取り、短縮キーを返す。<code>GET /{key}</code> で元URLを取得し、301/302でリダイレクトする。</li>
+<li><strong>キー生成：</strong>DBの連番IDをBase62化する方式、ランダム文字列方式、Snowflake風ID方式などがある。衝突回避と推測困難性を分けて考える。</li>
+<li><strong>DB：</strong><code>short_code</code> をユニークキーにし、<code>original_url</code>、<code>created_at</code>、<code>expires_at</code>、<code>owner_id</code> などを持つ。</li>
+<li><strong>キャッシュ：</strong>リダイレクトは読み取り頻度が高いので、<code>short_code → original_url</code> をRedisやCDN側でキャッシュする。</li>
+<li><strong>運用：</strong>不正URL、スパム、削除、期限切れ、アクセス分析ログ、ホットURL対策が必要。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Client → GET /abc123 → Redirect Service → Cache/DB → 302 Location: original_url
+                             ↓
+                         Analytics Queue → Log Store</div>
+<h4>理解補足</h4>
+<div class="supplement">XではTinyURL/URL Shortenerは初級〜中級の定番システムデザイン問題として頻繁に挙がります。重要なのは「短縮URLを作るだけ」と捉えないことです。面接官は、URLマッピングという単純な要件から、キー設計、読み取り負荷、キャッシュ、リダイレクトステータス、ログ収集、悪用対策まで広げられるかを見ています。</div>
+<h4>注意点</h4>
+<div class="caution">301は恒久的リダイレクト、302は一時的リダイレクトです。アクセス分析やリンク変更可能性を考えると、短縮URLサービスでは302の方が扱いやすいケースがあります。ここを言えると一段深く見えます。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq002 x由来 / system design s 高トラフィックapi向けrate limiterを設計してください。 アルゴリズム暗記ではなく、何を守るための制限か、どこで制限するか、分散環境でどう整合させるかを見る。 rate limiterは、一定期間に許可するリクエスト数を制限し、バックエンドを過負荷・不正利用・ブルートフォース攻撃から守る仕組みです。方式にはfixed window、sliding window、token bucket、leaky bucketがあります。api gatewayやload balancerの手前で粗く制限し、アプリ側でユーザー単位・api単位の細かい制限を行う設計が現実的です。 &lt;strong&gt;fixed window：&lt;/strong&gt;1分100回のように固定区間で数える。簡単だが、境界時刻にリクエストが集中すると実質2倍近く通ることがある。 &lt;strong&gt;sliding window：&lt;/strong&gt;直近60秒など移動窓で数える。精度は高いが、実装・ストレージ負荷は上がる。redis sorted setで実装しやすい。 &lt;strong&gt;token bucket：&lt;/strong&gt;時間経過でトークンが補充され、リクエストごとに消費する。平均レートを守りつつ短時間のバーストを許容できる。 &lt;strong&gt;leaky bucket：&lt;/strong&gt;キューから一定速度で流す。出力レートを平滑化できるが、待ち時間やキューあふれを考える必要がある。 &lt;strong&gt;返却：&lt;/strong&gt;制限超過時は一般に &lt;code&gt;429 too many requests&lt;/code&gt; と &lt;code&gt;retry-after&lt;/code&gt; を返す。 xでよく出るrate limiter問題は、単に「redisでカウントします」と答えると弱いです。誰を単位にするのか、ip単位かユーザー単位かapiキー単位か、グローバル制限かテナント制限か、分散インスタンス間でカウンタをどう共有するかまで話す必要があります。aws api gatewayでも、リクエストがレート/バースト制限を超えると429を返すようなスロットリングが提供されています。 完全に正確な分散rate limiterは難しいです。面接では、厳密性よりも「多少の誤差を許すのか」「redis集中でよいのか」「リージョン分散時にローカル制限でよいのか」を明示するとよいです。">
+<div class="qa-head">
+<div><span class="cat">X由来 / System Design</span> <span class="badge badge-S">S</span></div>
+<div class="num">XQ002</div>
+</div>
+<h3>高トラフィックAPI向けRate Limiterを設計してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>アルゴリズム暗記ではなく、何を守るための制限か、どこで制限するか、分散環境でどう整合させるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">Rate Limiterは、一定期間に許可するリクエスト数を制限し、バックエンドを過負荷・不正利用・ブルートフォース攻撃から守る仕組みです。方式にはFixed Window、Sliding Window、Token Bucket、Leaky Bucketがあります。API GatewayやLoad Balancerの手前で粗く制限し、アプリ側でユーザー単位・API単位の細かい制限を行う設計が現実的です。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>Fixed Window：</strong>1分100回のように固定区間で数える。簡単だが、境界時刻にリクエストが集中すると実質2倍近く通ることがある。</li>
+<li><strong>Sliding Window：</strong>直近60秒など移動窓で数える。精度は高いが、実装・ストレージ負荷は上がる。Redis Sorted Setで実装しやすい。</li>
+<li><strong>Token Bucket：</strong>時間経過でトークンが補充され、リクエストごとに消費する。平均レートを守りつつ短時間のバーストを許容できる。</li>
+<li><strong>Leaky Bucket：</strong>キューから一定速度で流す。出力レートを平滑化できるが、待ち時間やキューあふれを考える必要がある。</li>
+<li><strong>返却：</strong>制限超過時は一般に <code>429 Too Many Requests</code> と <code>Retry-After</code> を返す。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Client → API Gateway Rate Limit → App Rate Limit → Business Logic
+                    ↓                    ↓
+              coarse limit         Redis counters / tokens</div>
+<h4>理解補足</h4>
+<div class="supplement">Xでよく出るRate Limiter問題は、単に「Redisでカウントします」と答えると弱いです。誰を単位にするのか、IP単位かユーザー単位かAPIキー単位か、グローバル制限かテナント制限か、分散インスタンス間でカウンタをどう共有するかまで話す必要があります。AWS API Gatewayでも、リクエストがレート/バースト制限を超えると429を返すようなスロットリングが提供されています。</div>
+<h4>注意点</h4>
+<div class="caution">完全に正確な分散Rate Limiterは難しいです。面接では、厳密性よりも「多少の誤差を許すのか」「Redis集中でよいのか」「リージョン分散時にローカル制限でよいのか」を明示するとよいです。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq003 x由来 / feed design s 有名人が5,000万人のフォロワーに投稿したら、フィードをどう配信しますか？ fan-out on write/read、ホットユーザー、非同期処理、キャッシュ、最終整合性を理解しているかを見る。 フィードは、ユーザーに表示する投稿一覧・タイムラインです。通常ユーザーは投稿時にフォロワーのフィードへ事前配信するfan-out on writeが有効ですが、有名人のようにフォロワーが極端に多い場合は書き込みが爆発します。そのため、有名人投稿はfan-out on readに寄せる、またはハイブリッド方式で扱います。 &lt;strong&gt;fan-out on write：&lt;/strong&gt;投稿時にフォロワー全員のtimelineに投稿idを配る。読み取りは速いが、巨大フォロワーを持つユーザーの投稿で書き込みが爆発する。 &lt;strong&gt;fan-out on read：&lt;/strong&gt;読み取り時にフォロー中ユーザーの投稿を集めてランキングする。書き込みは軽いが、読み取りが重くなりやすい。 &lt;strong&gt;ハイブリッド：&lt;/strong&gt;一般ユーザーはwrite fan-out、有名人はread時合成、または一部キャッシュを使う。 &lt;strong&gt;非同期：&lt;/strong&gt;投稿イベントをqueueに入れ、fanout workerが分散処理する。 &lt;strong&gt;整合性：&lt;/strong&gt;フィードは多少遅れても許容されやすく、結果整合性で設計しやすい。 xでよく見かける「celebrity with 50m followers」系の問題です。狙いは、単純なフィード設計からホットキー/ホットユーザー問題に気づけるかです。全員に即時配信しようとすると、1投稿で5,000万件のtimeline書き込みが発生します。これは非同期化しても巨大なので、ユーザー種別ごとに方式を変えるのが現実的です。 「全部kafkaに流せば解決」とは言わない方がいいです。queueは処理を平滑化できますが、総処理量そのものは消えません。5,000万件の書き込みを本当に行う必要があるのかを先に疑うべきです。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Feed Design</span> <span class="badge badge-S">S</span></div>
+<div class="num">XQ003</div>
+</div>
+<h3>有名人が5,000万人のフォロワーに投稿したら、フィードをどう配信しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>fan-out on write/read、ホットユーザー、非同期処理、キャッシュ、最終整合性を理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">フィードは、ユーザーに表示する投稿一覧・タイムラインです。通常ユーザーは投稿時にフォロワーのフィードへ事前配信するfan-out on writeが有効ですが、有名人のようにフォロワーが極端に多い場合は書き込みが爆発します。そのため、有名人投稿はfan-out on readに寄せる、またはハイブリッド方式で扱います。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>fan-out on write：</strong>投稿時にフォロワー全員のtimelineに投稿IDを配る。読み取りは速いが、巨大フォロワーを持つユーザーの投稿で書き込みが爆発する。</li>
+<li><strong>fan-out on read：</strong>読み取り時にフォロー中ユーザーの投稿を集めてランキングする。書き込みは軽いが、読み取りが重くなりやすい。</li>
+<li><strong>ハイブリッド：</strong>一般ユーザーはwrite fan-out、有名人はread時合成、または一部キャッシュを使う。</li>
+<li><strong>非同期：</strong>投稿イベントをQueueに入れ、Fanout Workerが分散処理する。</li>
+<li><strong>整合性：</strong>フィードは多少遅れても許容されやすく、結果整合性で設計しやすい。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Post Service → Post Event → Queue → Fanout Workers → Timeline Store
+      ↑                                            ↓
+ Celebrity posts may be merged at read time ← Read API</div>
+<h4>理解補足</h4>
+<div class="supplement">Xでよく見かける「celebrity with 50M followers」系の問題です。狙いは、単純なフィード設計からホットキー/ホットユーザー問題に気づけるかです。全員に即時配信しようとすると、1投稿で5,000万件のtimeline書き込みが発生します。これは非同期化しても巨大なので、ユーザー種別ごとに方式を変えるのが現実的です。</div>
+<h4>注意点</h4>
+<div class="caution">「全部Kafkaに流せば解決」とは言わない方がいいです。Queueは処理を平滑化できますが、総処理量そのものは消えません。5,000万件の書き込みを本当に行う必要があるのかを先に疑うべきです。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq004 x由来 / notification s 1億ユーザー向け通知システムを設計してください。 通知種別、配信チャネル、優先度、再試行、重複排除、ユーザー設定、外部サービス連携を整理できるかを見る。 通知システムは、イベントを受け取り、ユーザー設定に応じてpush、email、sms、アプリ内通知などに配信する仕組みです。同期処理で直接送るのではなく、イベント受付、通知生成、queue、チャネル別worker、外部provider、配信ログの構成にします。重要なのは、重複送信防止、再試行、優先度、ユーザーの通知設定、provider障害時の扱いです。 &lt;strong&gt;入力：&lt;/strong&gt;注文完了、コメント、セキュリティ通知などのイベントを受け取る。 &lt;strong&gt;preference：&lt;/strong&gt;ユーザーがemailを許可しているか、夜間通知を止めるかなどを確認する。 &lt;strong&gt;template：&lt;/strong&gt;通知文面をテンプレート化し、多言語・変数埋め込みを扱う。 &lt;strong&gt;queue：&lt;/strong&gt;チャネル別・優先度別に分ける。緊急通知と広告通知を同じキューで扱わない。 &lt;strong&gt;delivery log：&lt;/strong&gt;送信済み、失敗、再試行回数、providerレスポンスを記録する。 xで「design a notification system for 100m users」のような問題が頻出です。重要なのは、「通知を送るapi」ではなく、「通知のライフサイクル」を設計することです。通知は外部provider依存が強いため、失敗・遅延・重複を前提にします。 通知は完全なexactly-once配信が難しい領域です。面接では「少なくとも1回送信＋冪等キーで重複抑制」「provider側の重複仕様」「ユーザー体験として許容できる重複/遅延」を話せると強いです。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Notification</span> <span class="badge badge-S">S</span></div>
+<div class="num">XQ004</div>
+</div>
+<h3>1億ユーザー向け通知システムを設計してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>通知種別、配信チャネル、優先度、再試行、重複排除、ユーザー設定、外部サービス連携を整理できるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">通知システムは、イベントを受け取り、ユーザー設定に応じてPush、Email、SMS、アプリ内通知などに配信する仕組みです。同期処理で直接送るのではなく、イベント受付、通知生成、Queue、チャネル別Worker、外部Provider、配信ログの構成にします。重要なのは、重複送信防止、再試行、優先度、ユーザーの通知設定、Provider障害時の扱いです。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>入力：</strong>注文完了、コメント、セキュリティ通知などのイベントを受け取る。</li>
+<li><strong>Preference：</strong>ユーザーがEmailを許可しているか、夜間通知を止めるかなどを確認する。</li>
+<li><strong>Template：</strong>通知文面をテンプレート化し、多言語・変数埋め込みを扱う。</li>
+<li><strong>Queue：</strong>チャネル別・優先度別に分ける。緊急通知と広告通知を同じキューで扱わない。</li>
+<li><strong>Delivery Log：</strong>送信済み、失敗、再試行回数、Providerレスポンスを記録する。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Event → Notification Service → Preference / Template
+        → Priority Queue → Channel Workers → APNs/FCM/Email/SMS
+        → Delivery Log / Retry / DLQ</div>
+<h4>理解補足</h4>
+<div class="supplement">Xで「Design a notification system for 100M users」のような問題が頻出です。重要なのは、「通知を送るAPI」ではなく、「通知のライフサイクル」を設計することです。通知は外部Provider依存が強いため、失敗・遅延・重複を前提にします。</div>
+<h4>注意点</h4>
+<div class="caution">通知は完全なexactly-once配信が難しい領域です。面接では「少なくとも1回送信＋冪等キーで重複抑制」「Provider側の重複仕様」「ユーザー体験として許容できる重複/遅延」を話せると強いです。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq005 x由来 / e-commerce s amazonの注文管理システムを設計してください。 注文、在庫、決済、配送、キャンセル、整合性をどう分けるかを見る。 注文管理は、カートから注文を確定し、在庫引当、決済、配送、キャンセル、返金まで状態遷移を管理するシステムです。order serviceを中心に、inventory、payment、shippingと連携します。同期一発で全て成功させるのではなく、注文状態を持ち、失敗時は補償処理を行うsaga的な考え方が重要です。 &lt;strong&gt;注文状態：&lt;/strong&gt;&lt;code&gt;created → inventory_reserved → paid → shipped → completed&lt;/code&gt; のように状態を明示する。 &lt;strong&gt;在庫：&lt;/strong&gt;注文確定前に在庫を予約する。過剰販売を避けるため、在庫引当は強い整合性寄りにする。 &lt;strong&gt;決済：&lt;/strong&gt;外部決済apiはタイムアウト・二重送信があるため、idempotency-keyを使う。 &lt;strong&gt;補償：&lt;/strong&gt;決済成功後に配送作成失敗なら、返金や再試行などの補償が必要。 &lt;strong&gt;イベント：&lt;/strong&gt;注文状態変更をイベントとして発行し、通知・分析・配送連携へ流す。 xで見かけるsenior/staff向け注文管理問題は、「crud設計」ではありません。複数サービスにまたがる状態遷移と失敗処理を見ています。特に、在庫と決済は業務上の不整合が大きな問題になるため、どこを強い整合性にするか、どこをイベント駆動で遅延許容にするかを切り分けます。 いきなり「マイクロサービスに分けます」と言うより、まず注文の状態遷移と不整合時の業務影響を説明する方がよいです。技術分割より業務の不変条件が先です。">
+<div class="qa-head">
+<div><span class="cat">X由来 / E-commerce</span> <span class="badge badge-S">S</span></div>
+<div class="num">XQ005</div>
+</div>
+<h3>Amazonの注文管理システムを設計してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>注文、在庫、決済、配送、キャンセル、整合性をどう分けるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">注文管理は、カートから注文を確定し、在庫引当、決済、配送、キャンセル、返金まで状態遷移を管理するシステムです。Order Serviceを中心に、Inventory、Payment、Shippingと連携します。同期一発で全て成功させるのではなく、注文状態を持ち、失敗時は補償処理を行うSaga的な考え方が重要です。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>注文状態：</strong><code>CREATED → INVENTORY_RESERVED → PAID → SHIPPED → COMPLETED</code> のように状態を明示する。</li>
+<li><strong>在庫：</strong>注文確定前に在庫を予約する。過剰販売を避けるため、在庫引当は強い整合性寄りにする。</li>
+<li><strong>決済：</strong>外部決済APIはタイムアウト・二重送信があるため、Idempotency-Keyを使う。</li>
+<li><strong>補償：</strong>決済成功後に配送作成失敗なら、返金や再試行などの補償が必要。</li>
+<li><strong>イベント：</strong>注文状態変更をイベントとして発行し、通知・分析・配送連携へ流す。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Order Service ──reserve──&gt; Inventory
+      │             └──fail: cancel order
+      ├──charge───&gt; Payment
+      │             └──timeout: retry with idempotency key
+      └──ship────&gt; Shipping</div>
+<h4>理解補足</h4>
+<div class="supplement">Xで見かけるSenior/Staff向け注文管理問題は、「CRUD設計」ではありません。複数サービスにまたがる状態遷移と失敗処理を見ています。特に、在庫と決済は業務上の不整合が大きな問題になるため、どこを強い整合性にするか、どこをイベント駆動で遅延許容にするかを切り分けます。</div>
+<h4>注意点</h4>
+<div class="caution">いきなり「マイクロサービスに分けます」と言うより、まず注文の状態遷移と不整合時の業務影響を説明する方がよいです。技術分割より業務の不変条件が先です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq006 x由来 / geo system a google mapsのような地図・位置検索システムをどう設計しますか？ 地理空間データ、近傍検索、タイル、キャッシュ、読み取り負荷を大まかに整理できるかを見る。 地図系システムは、地図表示、経路検索、近くの店舗検索、位置更新など複数の問題に分かれます。面接では、対象を絞るのが最初です。近傍検索なら緯度経度を空間インデックスに変換し、geohashやquadtree、r-tree系の考え方で候補を絞り、詳細距離計算で並べます。地図表示ならタイルを事前生成し、cdnに乗せて配信します。 &lt;strong&gt;要件分解：&lt;/strong&gt;地図表示、検索、ルート、リアルタイム位置共有は別問題として扱う。 &lt;strong&gt;近傍検索：&lt;/strong&gt;緯度経度そのものを全件比較せず、空間インデックスで候補を絞る。 &lt;strong&gt;タイル：&lt;/strong&gt;地図はズームレベルごとにタイル画像/ベクトルタイルとして分割し、cdnで配信する。 &lt;strong&gt;更新頻度：&lt;/strong&gt;地図データは比較的低頻度更新、ユーザー位置は高頻度更新。ストレージを分ける。 &lt;strong&gt;キャッシュ：&lt;/strong&gt;人気エリア・タイル・検索結果はキャッシュ対象になりやすい。 xでgoogle maps設計のような大きい問題が出ることがありますが、全部を設計しようとすると破綻します。最初に「今日は近くの店舗検索に絞ってよいですか」「地図タイル配信に絞りますか」とスコープを確認するのが正解です。 知らない空間インデックス名を無理に出すより、「全件検索は無理なので、緯度経度をグリッド化して候補範囲を絞る」と説明できれば十分です。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Geo System</span> <span class="badge badge-A">A</span></div>
+<div class="num">XQ006</div>
+</div>
+<h3>Google Mapsのような地図・位置検索システムをどう設計しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>地理空間データ、近傍検索、タイル、キャッシュ、読み取り負荷を大まかに整理できるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">地図系システムは、地図表示、経路検索、近くの店舗検索、位置更新など複数の問題に分かれます。面接では、対象を絞るのが最初です。近傍検索なら緯度経度を空間インデックスに変換し、GeoHashやQuadTree、R-tree系の考え方で候補を絞り、詳細距離計算で並べます。地図表示ならタイルを事前生成し、CDNに乗せて配信します。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>要件分解：</strong>地図表示、検索、ルート、リアルタイム位置共有は別問題として扱う。</li>
+<li><strong>近傍検索：</strong>緯度経度そのものを全件比較せず、空間インデックスで候補を絞る。</li>
+<li><strong>タイル：</strong>地図はズームレベルごとにタイル画像/ベクトルタイルとして分割し、CDNで配信する。</li>
+<li><strong>更新頻度：</strong>地図データは比較的低頻度更新、ユーザー位置は高頻度更新。ストレージを分ける。</li>
+<li><strong>キャッシュ：</strong>人気エリア・タイル・検索結果はキャッシュ対象になりやすい。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Map Display: Client → CDN → Tile Store
+Nearby Search: Client → Search API → Geo Index → Candidate POIs → Distance Sort</div>
+<h4>理解補足</h4>
+<div class="supplement">XでGoogle Maps設計のような大きい問題が出ることがありますが、全部を設計しようとすると破綻します。最初に「今日は近くの店舗検索に絞ってよいですか」「地図タイル配信に絞りますか」とスコープを確認するのが正解です。</div>
+<h4>注意点</h4>
+<div class="caution">知らない空間インデックス名を無理に出すより、「全件検索は無理なので、緯度経度をグリッド化して候補範囲を絞る」と説明できれば十分です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq007 x由来 / incident s queueが詰まり、dbが遅く、cacheが古く、ログも足りない。どう調査しますか？ 障害時に闇雲に直さず、影響範囲・時系列・ボトルネック・暫定対処を切り分けられるかを見る。 まずユーザー影響とsloを確認し、いつから・どのapi・どのテナント・どのリージョンで起きているかを切り分けます。次にメトリクスでqueue backlog、db latency、cache hit rate、エラー率、cpu/メモリを見ます。暫定対処として、重い機能の制限、ワーカー増強、リトライ停止、キャッシュttl調整、レート制限を検討します。恒久対策として、ログ・メトリクス・トレース整備、負荷試験、バックプレッシャー設計を入れます。 &lt;strong&gt;影響確認：&lt;/strong&gt;全ユーザーか、一部apiか、一部テナントか。売上・注文・ログインなど重要機能への影響を優先。 &lt;strong&gt;時系列：&lt;/strong&gt;直前のデプロイ、バッチ、キャンペーン、外部api障害、トラフィック急増を確認する。 &lt;strong&gt;queue：&lt;/strong&gt;流入量、消費量、滞留時間、dlq件数を見る。 &lt;strong&gt;db：&lt;/strong&gt;スロークエリ、ロック、接続数、インデックス、i/o待ちを見る。 &lt;strong&gt;cache：&lt;/strong&gt;hit率、stale data、hot key、ttl、再生成負荷を見る。 xで見かける「全部悪い状態」の障害質問は、正解の技術を聞いているのではなく、調査順序を見ています。良い回答は「まず観測」「次に影響制御」「最後に恒久対策」です。いきなりdbチューニングやサーバー増強に飛ぶと、障害対応経験が浅く見えます。 ログが足りない場合でも、alb/api gateway/db/queue/cloudwatchなど周辺のメトリクスから推定できます。「ログがないので分かりません」ではなく、「今ある観測点で絞る」と答えるべきです。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Incident</span> <span class="badge badge-S">S</span></div>
+<div class="num">XQ007</div>
+</div>
+<h3>Queueが詰まり、DBが遅く、Cacheが古く、ログも足りない。どう調査しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>障害時に闇雲に直さず、影響範囲・時系列・ボトルネック・暫定対処を切り分けられるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">まずユーザー影響とSLOを確認し、いつから・どのAPI・どのテナント・どのリージョンで起きているかを切り分けます。次にメトリクスでQueue backlog、DB latency、Cache hit rate、エラー率、CPU/メモリを見ます。暫定対処として、重い機能の制限、ワーカー増強、リトライ停止、キャッシュTTL調整、レート制限を検討します。恒久対策として、ログ・メトリクス・トレース整備、負荷試験、バックプレッシャー設計を入れます。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>影響確認：</strong>全ユーザーか、一部APIか、一部テナントか。売上・注文・ログインなど重要機能への影響を優先。</li>
+<li><strong>時系列：</strong>直前のデプロイ、バッチ、キャンペーン、外部API障害、トラフィック急増を確認する。</li>
+<li><strong>Queue：</strong>流入量、消費量、滞留時間、DLQ件数を見る。</li>
+<li><strong>DB：</strong>スロークエリ、ロック、接続数、インデックス、I/O待ちを見る。</li>
+<li><strong>Cache：</strong>Hit率、stale data、hot key、TTL、再生成負荷を見る。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Impact → Timeline → Metrics → Hypothesis → Mitigation → Root Cause → Prevention</div>
+<h4>理解補足</h4>
+<div class="supplement">Xで見かける「全部悪い状態」の障害質問は、正解の技術を聞いているのではなく、調査順序を見ています。良い回答は「まず観測」「次に影響制御」「最後に恒久対策」です。いきなりDBチューニングやサーバー増強に飛ぶと、障害対応経験が浅く見えます。</div>
+<h4>注意点</h4>
+<div class="caution">ログが足りない場合でも、ALB/API Gateway/DB/Queue/CloudWatchなど周辺のメトリクスから推定できます。「ログがないので分かりません」ではなく、「今ある観測点で絞る」と答えるべきです。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq008 x由来 / database s なぜ最初からdbをシャーディングしない方がよいのですか？ スケール手段の副作用を理解し、単純な解決策に飛びつかないかを見る。 シャーディングは、データを複数dbに分割して水平スケールする方法ですが、最初から導入すると運用・クエリ・トランザクション・再配置が複雑になります。まずはクエリ改善、適切なインデックス、読み取りレプリカ、キャッシュ、アーカイブ、パーティショニングで対応できないかを検討します。シャーディングは、単一dbの限界が明確で、アクセスキーやデータ分布が設計できる段階で導入するのが現実的です。 &lt;strong&gt;メリット：&lt;/strong&gt;データ量・書き込み負荷を複数ノードに分散できる。 &lt;strong&gt;デメリット：&lt;/strong&gt;join、集計、トランザクション、バックアップ、再シャーディングが難しくなる。 &lt;strong&gt;シャードキー：&lt;/strong&gt;ユーザーid、テナントid、地域など。偏りがあるとホットシャードが発生する。 &lt;strong&gt;代替：&lt;/strong&gt;インデックス、クエリ改善、レプリカ、キャッシュ、アーカイブ、パーティショニング。 &lt;strong&gt;判断基準：&lt;/strong&gt;データ量、書き込みqps、単一ノード限界、成長予測、運用体制。 xでは「shard from day one」は面接での罠としてよく語られます。シニア面接では、派手な分散設計よりも、まず単純な構成でどこまで持つか、どの時点で複雑化するかを説明できる方が評価されやすいです。 シャーディングは「dbが遅いから入れる魔法」ではありません。遅さの原因がインデックス不足やn+1なら、シャーディングしても本質的には直りません。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Database</span> <span class="badge badge-S">S</span></div>
+<div class="num">XQ008</div>
+</div>
+<h3>なぜ最初からDBをシャーディングしない方がよいのですか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>スケール手段の副作用を理解し、単純な解決策に飛びつかないかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">シャーディングは、データを複数DBに分割して水平スケールする方法ですが、最初から導入すると運用・クエリ・トランザクション・再配置が複雑になります。まずはクエリ改善、適切なインデックス、読み取りレプリカ、キャッシュ、アーカイブ、パーティショニングで対応できないかを検討します。シャーディングは、単一DBの限界が明確で、アクセスキーやデータ分布が設計できる段階で導入するのが現実的です。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>メリット：</strong>データ量・書き込み負荷を複数ノードに分散できる。</li>
+<li><strong>デメリット：</strong>JOIN、集計、トランザクション、バックアップ、再シャーディングが難しくなる。</li>
+<li><strong>シャードキー：</strong>ユーザーID、テナントID、地域など。偏りがあるとホットシャードが発生する。</li>
+<li><strong>代替：</strong>インデックス、クエリ改善、レプリカ、キャッシュ、アーカイブ、パーティショニング。</li>
+<li><strong>判断基準：</strong>データ量、書き込みQPS、単一ノード限界、成長予測、運用体制。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Before sharding: App → Single Primary DB + Read Replicas + Cache
+After sharding : App → Shard Router → DB shard 1 / 2 / 3 ...</div>
+<h4>理解補足</h4>
+<div class="supplement">Xでは「shard from day one」は面接での罠としてよく語られます。シニア面接では、派手な分散設計よりも、まず単純な構成でどこまで持つか、どの時点で複雑化するかを説明できる方が評価されやすいです。</div>
+<h4>注意点</h4>
+<div class="caution">シャーディングは「DBが遅いから入れる魔法」ではありません。遅さの原因がインデックス不足やN+1なら、シャーディングしても本質的には直りません。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq009 x由来 / cache s cache-aside、read-through、write-through、write-behindの違いは？ キャッシュを「速くする箱」ではなく、読み書き経路と整合性の問題として捉えられるかを見る。 cache-asideはアプリがキャッシュを明示的に読む方式で、ミスしたらdbから読み、キャッシュに戻します。read-throughはキャッシュ層がdb読み込みまで担います。write-throughは書き込み時にdbとキャッシュを同期更新します。write-behindは先にキャッシュ/キューへ書き、後でdbへ反映します。読み取り性能、整合性、実装複雑性、障害時の安全性で選びます。 &lt;strong&gt;cache-aside：&lt;/strong&gt;最も一般的。アプリがcache miss時のdb読み込みとcache populateを制御する。 &lt;strong&gt;read-through：&lt;/strong&gt;アプリから見るとキャッシュがデータソースのように振る舞う。キャッシュ製品側の機能に依存。 &lt;strong&gt;write-through：&lt;/strong&gt;書き込み時にdbとキャッシュを同時更新。読み取りは新しくなりやすいが書き込み遅延が増える。 &lt;strong&gt;write-behind：&lt;/strong&gt;書き込みを一旦キャッシュ/キューに受け、非同期でdbへ反映。高スループットだがデータ損失対策が必要。 &lt;strong&gt;ttl：&lt;/strong&gt;古いデータをいつまで許すか。ttlが短いとdb負荷、長いとstale dataが増える。 xではredis、ttl、cache invalidation、read-through/write-throughが頻出です。面接では方式名より「このデータは古くてもよいか」「書き込み後すぐ読まれるか」「キャッシュ削除とdb更新の順序はどうするか」を説明する方が重要です。 キャッシュは障害要因にもなります。stale data、hot key、cache stampede、dbとの不整合、削除漏れを必ずセットで話してください。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Cache</span> <span class="badge badge-S">S</span></div>
+<div class="num">XQ009</div>
+</div>
+<h3>Cache-Aside、Read-Through、Write-Through、Write-Behindの違いは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>キャッシュを「速くする箱」ではなく、読み書き経路と整合性の問題として捉えられるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">Cache-Asideはアプリがキャッシュを明示的に読む方式で、ミスしたらDBから読み、キャッシュに戻します。Read-Throughはキャッシュ層がDB読み込みまで担います。Write-Throughは書き込み時にDBとキャッシュを同期更新します。Write-Behindは先にキャッシュ/キューへ書き、後でDBへ反映します。読み取り性能、整合性、実装複雑性、障害時の安全性で選びます。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>Cache-Aside：</strong>最も一般的。アプリがcache miss時のDB読み込みとcache populateを制御する。</li>
+<li><strong>Read-Through：</strong>アプリから見るとキャッシュがデータソースのように振る舞う。キャッシュ製品側の機能に依存。</li>
+<li><strong>Write-Through：</strong>書き込み時にDBとキャッシュを同時更新。読み取りは新しくなりやすいが書き込み遅延が増える。</li>
+<li><strong>Write-Behind：</strong>書き込みを一旦キャッシュ/キューに受け、非同期でDBへ反映。高スループットだがデータ損失対策が必要。</li>
+<li><strong>TTL：</strong>古いデータをいつまで許すか。TTLが短いとDB負荷、長いとstale dataが増える。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Cache-Aside Read:
+App → Cache miss → DB → Cache set → Response
+
+Write-Through:
+App → Cache/DB update together → Response</div>
+<h4>理解補足</h4>
+<div class="supplement">XではRedis、TTL、cache invalidation、read-through/write-throughが頻出です。面接では方式名より「このデータは古くてもよいか」「書き込み後すぐ読まれるか」「キャッシュ削除とDB更新の順序はどうするか」を説明する方が重要です。</div>
+<h4>注意点</h4>
+<div class="caution">キャッシュは障害要因にもなります。stale data、hot key、cache stampede、DBとの不整合、削除漏れを必ずセットで話してください。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq010 x由来 / cache s hot key / thundering herd / cache stampedeをどう防ぎますか？ キャッシュ導入後に起きる高負荷パターンを理解しているかを見る。 hot keyは特定キーにアクセスが集中する問題です。thundering herdやcache stampedeは、キャッシュ失効時に大量リクエストが同時にdbへ流れる問題です。対策は、ttlにランダム性を持たせる、単一リクエストだけが再生成するロックを使う、古い値を一時的に返す、事前更新する、キーを分散する、cdnや多層キャッシュを使うことです。 &lt;strong&gt;hot key：&lt;/strong&gt;有名人のプロフィール、人気商品の在庫、トップページなど特定キーに集中する。 &lt;strong&gt;stampede：&lt;/strong&gt;人気キーが同時にexpireし、全リクエストがdbへ向かう。 &lt;strong&gt;ttl jitter：&lt;/strong&gt;ttlにランダム値を足して、同時失効を避ける。 &lt;strong&gt;single flight：&lt;/strong&gt;同じキーの再生成を1リクエストにまとめ、他リクエストは待つ/古い値を返す。 &lt;strong&gt;stale-while-revalidate：&lt;/strong&gt;古い値を返しつつ裏で更新する。 xのシステム設計系アカウントでは、キャッシュはほぼ必ず登場します。ただし、キャッシュを入れるだけの回答は弱いです。キャッシュが壊れた時、古い時、集中した時、dbに戻った時の設計まで話せると実務感が出ます。 在庫や残高のような強整合が必要な値は、安易にキャッシュだけで判断しない方がよいです。キャッシュ可能なデータと、最終確認をdbで行うデータを分けて説明してください。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Cache</span> <span class="badge badge-S">S</span></div>
+<div class="num">XQ010</div>
+</div>
+<h3>Hot Key / Thundering Herd / Cache Stampedeをどう防ぎますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>キャッシュ導入後に起きる高負荷パターンを理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">Hot Keyは特定キーにアクセスが集中する問題です。Thundering HerdやCache Stampedeは、キャッシュ失効時に大量リクエストが同時にDBへ流れる問題です。対策は、TTLにランダム性を持たせる、単一リクエストだけが再生成するロックを使う、古い値を一時的に返す、事前更新する、キーを分散する、CDNや多層キャッシュを使うことです。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>Hot Key：</strong>有名人のプロフィール、人気商品の在庫、トップページなど特定キーに集中する。</li>
+<li><strong>Stampede：</strong>人気キーが同時にexpireし、全リクエストがDBへ向かう。</li>
+<li><strong>TTL jitter：</strong>TTLにランダム値を足して、同時失効を避ける。</li>
+<li><strong>Single Flight：</strong>同じキーの再生成を1リクエストにまとめ、他リクエストは待つ/古い値を返す。</li>
+<li><strong>Stale-while-revalidate：</strong>古い値を返しつつ裏で更新する。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Cache expires
+1000 clients → Cache miss → DB overload  ← Stampede
+
+Mitigation: lock / stale value / TTL jitter / pre-warm</div>
+<h4>理解補足</h4>
+<div class="supplement">Xのシステム設計系アカウントでは、キャッシュはほぼ必ず登場します。ただし、キャッシュを入れるだけの回答は弱いです。キャッシュが壊れた時、古い時、集中した時、DBに戻った時の設計まで話せると実務感が出ます。</div>
+<h4>注意点</h4>
+<div class="caution">在庫や残高のような強整合が必要な値は、安易にキャッシュだけで判断しない方がよいです。キャッシュ可能なデータと、最終確認をDBで行うデータを分けて説明してください。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq011 x由来 / api design s ページング・フィルタリング・ソートを持つ一覧apiをどう設計しますか？ api設計を、見た目のパラメータではなく性能・互換性・db負荷まで考えられるかを見る。 一覧apiでは、フィルタ条件、ソート順、ページング方式、最大件数、インデックス、レスポンスメタデータを設計します。小規模なら&lt;code&gt;offset/limit&lt;/code&gt;でもよいですが、大規模・更新頻度が高い一覧ではcursor方式が安定します。ソート条件とフィルタ条件に合うインデックスを設計し、深いページングや任意ソートを無制限に許可しないことが重要です。 &lt;strong&gt;offset方式：&lt;/strong&gt;&lt;code&gt;?offset=100&amp;limit=20&lt;/code&gt;。分かりやすいが、深いページでdbが多くの行を読み飛ばす。 &lt;strong&gt;cursor方式：&lt;/strong&gt;&lt;code&gt;?cursor=...&lt;/code&gt;。前回の最後の位置から続きを取る。更新が多いデータで重複/欠落が起きにくい。 &lt;strong&gt;filter：&lt;/strong&gt;検索条件を増やすほどインデックス設計が難しくなる。 &lt;strong&gt;sort：&lt;/strong&gt;任意ソートは重い。許可するソートキーを限定する。 &lt;strong&gt;response：&lt;/strong&gt;&lt;code&gt;items&lt;/code&gt;、&lt;code&gt;next_cursor&lt;/code&gt;、&lt;code&gt;has_more&lt;/code&gt; などを返す。 xでは「pagination/filtering/sorting in endpoints」はバックエンド面接で頻出のapi設計トピックとして挙がります。ここは実務でよく使う一方、性能劣化も起きやすい領域です。面接では、パラメータ名だけでなく、dbクエリとインデックスまでつなげて話すと強いです。 cursor方式では、単にidだけをcursorにするとソート順と矛盾することがあります。&lt;code&gt;created_at desc, id desc&lt;/code&gt; のように安定ソートキーを組み合わせるのが実務的です。">
+<div class="qa-head">
+<div><span class="cat">X由来 / API Design</span> <span class="badge badge-S">S</span></div>
+<div class="num">XQ011</div>
+</div>
+<h3>ページング・フィルタリング・ソートを持つ一覧APIをどう設計しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>API設計を、見た目のパラメータではなく性能・互換性・DB負荷まで考えられるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">一覧APIでは、フィルタ条件、ソート順、ページング方式、最大件数、インデックス、レスポンスメタデータを設計します。小規模なら<code>offset/limit</code>でもよいですが、大規模・更新頻度が高い一覧ではCursor方式が安定します。ソート条件とフィルタ条件に合うインデックスを設計し、深いページングや任意ソートを無制限に許可しないことが重要です。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>OFFSET方式：</strong><code>?offset=100&limit=20</code>。分かりやすいが、深いページでDBが多くの行を読み飛ばす。</li>
+<li><strong>Cursor方式：</strong><code>?cursor=...</code>。前回の最後の位置から続きを取る。更新が多いデータで重複/欠落が起きにくい。</li>
+<li><strong>Filter：</strong>検索条件を増やすほどインデックス設計が難しくなる。</li>
+<li><strong>Sort：</strong>任意ソートは重い。許可するソートキーを限定する。</li>
+<li><strong>Response：</strong><code>items</code>、<code>next_cursor</code>、<code>has_more</code> などを返す。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">GET /orders?status=paid&amp;sort=created_at_desc&amp;limit=50&amp;cursor=...
+Response: { items: [...], next_cursor: &quot;...&quot;, has_more: true }</div>
+<h4>理解補足</h4>
+<div class="supplement">Xでは「pagination/filtering/sorting in endpoints」はバックエンド面接で頻出のAPI設計トピックとして挙がります。ここは実務でよく使う一方、性能劣化も起きやすい領域です。面接では、パラメータ名だけでなく、DBクエリとインデックスまでつなげて話すと強いです。</div>
+<h4>注意点</h4>
+<div class="caution">Cursor方式では、単にIDだけをcursorにするとソート順と矛盾することがあります。<code>created_at desc, id desc</code> のように安定ソートキーを組み合わせるのが実務的です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq012 x由来 / api design s 決済・注文apiでidempotency keyをどう使いますか？ ネットワーク失敗時のリトライと二重実行問題を理解しているかを見る。 idempotency keyは、同じ操作の再送をサーバー側で同一リクエストとして扱うためのキーです。決済や注文作成では、クライアントがuuidなどの一意キーを送り、サーバーはそのキーと結果を保存します。同じキーの再送が来たら、処理をもう一度実行せず、保存済み結果を返します。これにより、タイムアウト後のリトライで二重決済・二重注文を防ぎます。 &lt;strong&gt;対象：&lt;/strong&gt;決済、注文作成、送金、在庫予約など「二重実行が危険」な操作。 &lt;strong&gt;保存：&lt;/strong&gt;&lt;code&gt;idempotency_key&lt;/code&gt;、request hash、status、response、created_atをdb/redisに保存する。 &lt;strong&gt;同じキー・同じ内容：&lt;/strong&gt;保存済み結果を返す。 &lt;strong&gt;同じキー・異なる内容：&lt;/strong&gt;クライアントバグの可能性があるため409などで拒否する。 &lt;strong&gt;有効期限：&lt;/strong&gt;キーを永久保存せず、業務に応じたttlを決める。 stripeのapiでもidempotency-keyは有名です。stripeは同じidempotency keyの初回結果を保存し、後続リクエストに同じ結果を返す仕組みを説明しています。面接では、ただ「冪等にします」ではなく、キー保存、リクエスト内容比較、同時実行制御まで話す必要があります。 httpのget/putの冪等性と、業務操作のidempotency keyは関連しますが同じではありません。post /payments のような本来非冪等なapiでも、idempotency keyにより「同じ操作の再送」を安全にできます。">
+<div class="qa-head">
+<div><span class="cat">X由来 / API Design</span> <span class="badge badge-S">S</span></div>
+<div class="num">XQ012</div>
+</div>
+<h3>決済・注文APIでIdempotency Keyをどう使いますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>ネットワーク失敗時のリトライと二重実行問題を理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">Idempotency Keyは、同じ操作の再送をサーバー側で同一リクエストとして扱うためのキーです。決済や注文作成では、クライアントがUUIDなどの一意キーを送り、サーバーはそのキーと結果を保存します。同じキーの再送が来たら、処理をもう一度実行せず、保存済み結果を返します。これにより、タイムアウト後のリトライで二重決済・二重注文を防ぎます。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>対象：</strong>決済、注文作成、送金、在庫予約など「二重実行が危険」な操作。</li>
+<li><strong>保存：</strong><code>idempotency_key</code>、request hash、status、response、created_atをDB/Redisに保存する。</li>
+<li><strong>同じキー・同じ内容：</strong>保存済み結果を返す。</li>
+<li><strong>同じキー・異なる内容：</strong>クライアントバグの可能性があるため409などで拒否する。</li>
+<li><strong>有効期限：</strong>キーを永久保存せず、業務に応じたTTLを決める。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Client --POST /payments + Idempotency-Key--&gt; API
+API checks key:
+  not exists → execute payment → save result
+  exists     → return saved result</div>
+<h4>理解補足</h4>
+<div class="supplement">StripeのAPIでもIdempotency-Keyは有名です。Stripeは同じidempotency keyの初回結果を保存し、後続リクエストに同じ結果を返す仕組みを説明しています。面接では、ただ「冪等にします」ではなく、キー保存、リクエスト内容比較、同時実行制御まで話す必要があります。</div>
+<h4>注意点</h4>
+<div class="caution">HTTPのGET/PUTの冪等性と、業務操作のIdempotency Keyは関連しますが同じではありません。POST /payments のような本来非冪等なAPIでも、Idempotency Keyにより「同じ操作の再送」を安全にできます。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq013 x由来 / search a 検索機能をdb likeで作る場合と検索エンジンで作る場合の違いは？ 検索要件を、単純一致・全文検索・ランキング・スケールに分けられるかを見る。 小規模で単純な前方一致やid検索ならdbインデックスで十分です。一方、全文検索、形態素解析、スコアリング、曖昧検索、サジェスト、ランキングが必要ならelasticsearch/opensearchのような検索エンジンを使います。検索エンジンは読み取り性能と検索機能に強い一方、dbとの同期遅延や運用コストが増えます。 &lt;strong&gt;db検索：&lt;/strong&gt;完全一致、範囲検索、前方一致、管理画面の小規模検索に向く。 &lt;strong&gt;全文検索：&lt;/strong&gt;文章をトークン化し、転置インデックスで単語から文書を引く。 &lt;strong&gt;ランキング：&lt;/strong&gt;一致度、人気度、更新日などで並べる。単純sqlより検索エンジンが得意。 &lt;strong&gt;同期：&lt;/strong&gt;db更新イベントを検索インデックスへ反映する。結果整合性になることが多い。 &lt;strong&gt;障害：&lt;/strong&gt;検索エンジン停止時にdbフォールバックするか、検索不可にするかを決める。 x上ではsearch、pagination、cacheはバックエンド面接の実務寄りトピックとしてよく並べられます。検索は「likeでよいか」「全文検索基盤が必要か」を要件で判断するのがポイントです。 検索エンジンを導入すると、dbと検索インデックスの不一致が起きます。商品名を変更した直後に検索結果へ反映されない可能性を許容できるかを確認してください。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Search</span> <span class="badge badge-A">A</span></div>
+<div class="num">XQ013</div>
+</div>
+<h3>検索機能をDB LIKEで作る場合と検索エンジンで作る場合の違いは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>検索要件を、単純一致・全文検索・ランキング・スケールに分けられるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">小規模で単純な前方一致やID検索ならDBインデックスで十分です。一方、全文検索、形態素解析、スコアリング、曖昧検索、サジェスト、ランキングが必要ならElasticsearch/OpenSearchのような検索エンジンを使います。検索エンジンは読み取り性能と検索機能に強い一方、DBとの同期遅延や運用コストが増えます。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>DB検索：</strong>完全一致、範囲検索、前方一致、管理画面の小規模検索に向く。</li>
+<li><strong>全文検索：</strong>文章をトークン化し、転置インデックスで単語から文書を引く。</li>
+<li><strong>ランキング：</strong>一致度、人気度、更新日などで並べる。単純SQLより検索エンジンが得意。</li>
+<li><strong>同期：</strong>DB更新イベントを検索インデックスへ反映する。結果整合性になることが多い。</li>
+<li><strong>障害：</strong>検索エンジン停止時にDBフォールバックするか、検索不可にするかを決める。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Write Path: DB update → Event → Indexer → Search Index
+Read Path : Search API → Search Index → IDs → DB/details</div>
+<h4>理解補足</h4>
+<div class="supplement">X上ではsearch、pagination、cacheはバックエンド面接の実務寄りトピックとしてよく並べられます。検索は「LIKEでよいか」「全文検索基盤が必要か」を要件で判断するのがポイントです。</div>
+<h4>注意点</h4>
+<div class="caution">検索エンジンを導入すると、DBと検索インデックスの不一致が起きます。商品名を変更した直後に検索結果へ反映されない可能性を許容できるかを確認してください。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq014 x由来 / file storage a 大容量ファイルアップロード機能を設計してください。 アプリサーバーに直接持たせず、オブジェクトストレージ、署名url、非同期処理を使えるかを見る。 大容量ファイルはアプリサーバーを経由させず、s3のようなオブジェクトストレージへ直接アップロードさせる設計が基本です。アプリはアップロード用の署名urlを発行し、クライアントが直接ストレージへputします。完了後にメタデータをdbへ登録し、ウイルススキャン、サムネイル生成、変換処理を非同期workerで行います。 &lt;strong&gt;署名url：&lt;/strong&gt;短時間だけ有効なアップロードurlを発行し、アプリサーバーの帯域を節約する。 &lt;strong&gt;multipart upload：&lt;/strong&gt;大容量ファイルを分割してアップロードし、失敗時の再送範囲を小さくする。 &lt;strong&gt;metadata：&lt;/strong&gt;所有者、ファイル名、サイズ、mime、状態、保存キーをdbに持つ。 &lt;strong&gt;非同期処理：&lt;/strong&gt;スキャン、変換、サムネイル生成をqueue経由で行う。 &lt;strong&gt;配信：&lt;/strong&gt;ダウンロードはcdnや署名付きurlを使う。 xでfile storageやuploadは、api設計＋インフラ設計の接続問題として出ます。ポイントは「アプリサーバーにファイルを一旦置かない」ことです。アプリは認可とメタデータ管理を担当し、バイナリ本体はオブジェクトストレージに任せます。 アップロード完了前にdbだけ登録される、またはストレージだけにファイルが残る不整合が起きます。状態管理とクリーンアップバッチを設計に入れると実務的です。">
+<div class="qa-head">
+<div><span class="cat">X由来 / File Storage</span> <span class="badge badge-A">A</span></div>
+<div class="num">XQ014</div>
+</div>
+<h3>大容量ファイルアップロード機能を設計してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>アプリサーバーに直接持たせず、オブジェクトストレージ、署名URL、非同期処理を使えるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">大容量ファイルはアプリサーバーを経由させず、S3のようなオブジェクトストレージへ直接アップロードさせる設計が基本です。アプリはアップロード用の署名URLを発行し、クライアントが直接ストレージへPUTします。完了後にメタデータをDBへ登録し、ウイルススキャン、サムネイル生成、変換処理を非同期Workerで行います。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>署名URL：</strong>短時間だけ有効なアップロードURLを発行し、アプリサーバーの帯域を節約する。</li>
+<li><strong>Multipart Upload：</strong>大容量ファイルを分割してアップロードし、失敗時の再送範囲を小さくする。</li>
+<li><strong>Metadata：</strong>所有者、ファイル名、サイズ、MIME、状態、保存キーをDBに持つ。</li>
+<li><strong>非同期処理：</strong>スキャン、変換、サムネイル生成をQueue経由で行う。</li>
+<li><strong>配信：</strong>ダウンロードはCDNや署名付きURLを使う。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Client → App: request upload URL
+App → Client: signed URL
+Client → Object Storage: upload
+Storage Event → Queue → Scan/Thumbnail Worker → DB update</div>
+<h4>理解補足</h4>
+<div class="supplement">Xでfile storageやuploadは、API設計＋インフラ設計の接続問題として出ます。ポイントは「アプリサーバーにファイルを一旦置かない」ことです。アプリは認可とメタデータ管理を担当し、バイナリ本体はオブジェクトストレージに任せます。</div>
+<h4>注意点</h4>
+<div class="caution">アップロード完了前にDBだけ登録される、またはストレージだけにファイルが残る不整合が起きます。状態管理とクリーンアップバッチを設計に入れると実務的です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq015 x由来 / payment a 決済フローを含むバックエンドを設計するとき、何に注意しますか？ 外部決済api、二重決済、状態遷移、監査ログ、補償処理を考えられるかを見る。 決済では、金額・通貨・注文id・顧客idを確定したうえでpayment intentのような決済状態を作り、外部決済providerへリクエストします。タイムアウトやwebhook遅延を前提に、idempotency key、状態遷移、webhook検証、監査ログ、返金処理を設計します。注文と決済を完全同期で一体化させず、状態を持って回復可能にすることが重要です。 &lt;strong&gt;二重決済防止：&lt;/strong&gt;idempotency keyとユニーク制約で防ぐ。 &lt;strong&gt;状態：&lt;/strong&gt;&lt;code&gt;initiated / authorized / captured / failed / refunded&lt;/code&gt; などを管理する。 &lt;strong&gt;webhook：&lt;/strong&gt;providerからの非同期通知を署名検証し、冪等に処理する。 &lt;strong&gt;監査：&lt;/strong&gt;金額、リクエスト、レスポンス、状態変更を監査可能に残す。 &lt;strong&gt;補償：&lt;/strong&gt;注文キャンセル時の返金、決済成功後の注文失敗時の扱いを決める。 xではpayment flowsがバックエンド面接で重要トピックとして挙がります。決済は「apiを呼ぶだけ」ではなく、ネットワーク失敗・外部providerの非同期通知・ユーザー再試行・二重送信・返金まで含めて設計します。 決済成功/失敗の真実は、最終的には決済provider側にあります。自社dbだけを信じず、webhookや照会apiで状態を収束させる設計が必要です。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Payment</span> <span class="badge badge-A">A</span></div>
+<div class="num">XQ015</div>
+</div>
+<h3>決済フローを含むバックエンドを設計するとき、何に注意しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>外部決済API、二重決済、状態遷移、監査ログ、補償処理を考えられるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">決済では、金額・通貨・注文ID・顧客IDを確定したうえでPayment Intentのような決済状態を作り、外部決済Providerへリクエストします。タイムアウトやWebhook遅延を前提に、Idempotency Key、状態遷移、Webhook検証、監査ログ、返金処理を設計します。注文と決済を完全同期で一体化させず、状態を持って回復可能にすることが重要です。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>二重決済防止：</strong>Idempotency Keyとユニーク制約で防ぐ。</li>
+<li><strong>状態：</strong><code>INITIATED / AUTHORIZED / CAPTURED / FAILED / REFUNDED</code> などを管理する。</li>
+<li><strong>Webhook：</strong>Providerからの非同期通知を署名検証し、冪等に処理する。</li>
+<li><strong>監査：</strong>金額、リクエスト、レスポンス、状態変更を監査可能に残す。</li>
+<li><strong>補償：</strong>注文キャンセル時の返金、決済成功後の注文失敗時の扱いを決める。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Order → Payment Intent → Provider API
+  ↑            ↓             ↓
+  └── state update ← Webhook ← Provider</div>
+<h4>理解補足</h4>
+<div class="supplement">Xではpayment flowsがバックエンド面接で重要トピックとして挙がります。決済は「APIを呼ぶだけ」ではなく、ネットワーク失敗・外部Providerの非同期通知・ユーザー再試行・二重送信・返金まで含めて設計します。</div>
+<h4>注意点</h4>
+<div class="caution">決済成功/失敗の真実は、最終的には決済Provider側にあります。自社DBだけを信じず、Webhookや照会APIで状態を収束させる設計が必要です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq016 x由来 / auth a マルチテナントsaasの認証・認可をどう設計しますか？ ユーザー、テナント、ロール、リソース境界、データ分離を整理できるかを見る。 マルチテナントsaasでは、ユーザーがどのテナントに所属し、そのテナント内でどのロールを持ち、どのリソースへアクセスできるかを分けて設計します。認証はユーザー本人確認、認可はテナント・ロール・リソース単位のアクセス判定です。dbクエリでも必ずtenant_idで絞り、アプリ・db・ログ・監査の全層でテナント境界を守ります。 &lt;strong&gt;モデル：&lt;/strong&gt;user、tenant、membership、role、permission、resourceを分ける。 &lt;strong&gt;認証：&lt;/strong&gt;oidc/saml/パスワードレスなど。企業向けならsso要件も出る。 &lt;strong&gt;認可：&lt;/strong&gt;rbacに加え、リソース所有者・部署・組織階層など属性/関係を見る場合がある。 &lt;strong&gt;db：&lt;/strong&gt;共有dbなら全テーブルにtenant_idを持ち、漏れを防ぐ。 &lt;strong&gt;監査：&lt;/strong&gt;誰が、どのテナントで、何をしたかを記録する。 あなたの経験領域に近いテーマです。xではauth、rate limit、pagination、versioningがapi設計トピックとしてよく挙がりますが、マルチテナント認可はweb系btob saasでかなり刺さる話です。 jwtにtenant_idやroleを入れる場合でも、それだけで最終認可を完結させるかは慎重に考えます。権限変更の即時反映やリソース状態依存の認可では、db/外部認可問い合わせが必要になることがあります。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Auth</span> <span class="badge badge-A">A</span></div>
+<div class="num">XQ016</div>
+</div>
+<h3>マルチテナントSaaSの認証・認可をどう設計しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>ユーザー、テナント、ロール、リソース境界、データ分離を整理できるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">マルチテナントSaaSでは、ユーザーがどのテナントに所属し、そのテナント内でどのロールを持ち、どのリソースへアクセスできるかを分けて設計します。認証はユーザー本人確認、認可はテナント・ロール・リソース単位のアクセス判定です。DBクエリでも必ずtenant_idで絞り、アプリ・DB・ログ・監査の全層でテナント境界を守ります。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>モデル：</strong>User、Tenant、Membership、Role、Permission、Resourceを分ける。</li>
+<li><strong>認証：</strong>OIDC/SAML/パスワードレスなど。企業向けならSSO要件も出る。</li>
+<li><strong>認可：</strong>RBACに加え、リソース所有者・部署・組織階層など属性/関係を見る場合がある。</li>
+<li><strong>DB：</strong>共有DBなら全テーブルにtenant_idを持ち、漏れを防ぐ。</li>
+<li><strong>監査：</strong>誰が、どのテナントで、何をしたかを記録する。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">User ─Membership─ Tenant
+       └ Role/Permission within Tenant
+Request → AuthN → Tenant Context → AuthZ → Resource Query WHERE tenant_id=?</div>
+<h4>理解補足</h4>
+<div class="supplement">あなたの経験領域に近いテーマです。Xではauth、rate limit、pagination、versioningがAPI設計トピックとしてよく挙がりますが、マルチテナント認可はWeb系BtoB SaaSでかなり刺さる話です。</div>
+<h4>注意点</h4>
+<div class="caution">JWTにtenant_idやroleを入れる場合でも、それだけで最終認可を完結させるかは慎重に考えます。権限変更の即時反映やリソース状態依存の認可では、DB/外部認可問い合わせが必要になることがあります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq017 x由来 / api gateway a api gatewayにはどこまで責務を持たせるべきですか？ 横断関心事と業務ロジックの境界を切れるかを見る。 api gatewayには、ルーティング、tls終端、認証前処理、レート制限、cors、リクエストサイズ制限、ログ、メトリクスなどの横断的責務を持たせます。一方、リソース状態や業務ルールに依存する判断は、基本的にバックエンドサービス側に残します。gatewayが肥大化すると、デプロイ・障害影響・責務境界が重くなるためです。 &lt;strong&gt;持たせやすい：&lt;/strong&gt;ルーティング、認証トークン検証、ip制限、レート制限、cors、監査ログの入口。 &lt;strong&gt;慎重に扱う：&lt;/strong&gt;詳細な認可、リクエスト変換、レスポンス集約、複雑な業務ロジック。 &lt;strong&gt;bff：&lt;/strong&gt;フロントエンドごとの集約や表示都合の変換はgatewayではなくbffに置く選択もある。 &lt;strong&gt;可用性：&lt;/strong&gt;gatewayは単一入口なので、障害影響が大きい。設定変更の安全性が重要。 &lt;strong&gt;観測：&lt;/strong&gt;入口でtrace idを付与し、下流へ伝搬する。 xでapi設計比較の投稿を見ると、api gatewayに何でも入れる設計と、サービス側へ責務を残す設計の比較がよくあります。面接では「共通化したいからgatewayへ」ではなく、「gatewayで判断できる情報か」「下流サービスの責務を奪っていないか」で説明してください。 認可はgatewayで粗く、サービスで細かく、という二段構えも現実的です。例：gatewayで認証済みか確認し、order serviceでその注文を閲覧できるか判定する。">
+<div class="qa-head">
+<div><span class="cat">X由来 / API Gateway</span> <span class="badge badge-A">A</span></div>
+<div class="num">XQ017</div>
+</div>
+<h3>API Gatewayにはどこまで責務を持たせるべきですか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>横断関心事と業務ロジックの境界を切れるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">API Gatewayには、ルーティング、TLS終端、認証前処理、レート制限、CORS、リクエストサイズ制限、ログ、メトリクスなどの横断的責務を持たせます。一方、リソース状態や業務ルールに依存する判断は、基本的にバックエンドサービス側に残します。Gatewayが肥大化すると、デプロイ・障害影響・責務境界が重くなるためです。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>持たせやすい：</strong>ルーティング、認証トークン検証、IP制限、レート制限、CORS、監査ログの入口。</li>
+<li><strong>慎重に扱う：</strong>詳細な認可、リクエスト変換、レスポンス集約、複雑な業務ロジック。</li>
+<li><strong>BFF：</strong>フロントエンドごとの集約や表示都合の変換はGatewayではなくBFFに置く選択もある。</li>
+<li><strong>可用性：</strong>Gatewayは単一入口なので、障害影響が大きい。設定変更の安全性が重要。</li>
+<li><strong>観測：</strong>入口でtrace idを付与し、下流へ伝搬する。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Client → API Gateway → Service A
+          │             → Service B
+          ├ AuthN / Rate Limit / Routing
+          └ Trace ID / Access Log</div>
+<h4>理解補足</h4>
+<div class="supplement">XでAPI設計比較の投稿を見ると、API Gatewayに何でも入れる設計と、サービス側へ責務を残す設計の比較がよくあります。面接では「共通化したいからGatewayへ」ではなく、「Gatewayで判断できる情報か」「下流サービスの責務を奪っていないか」で説明してください。</div>
+<h4>注意点</h4>
+<div class="caution">認可はGatewayで粗く、サービスで細かく、という二段構えも現実的です。例：Gatewayで認証済みか確認し、Order Serviceでその注文を閲覧できるか判定する。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq018 x由来 / queue s queueを使う設計で、再試行・dlq・backpressureをどう考えますか？ 非同期化を万能視せず、失敗時に安全に処理を収束させられるかを見る。 queueは処理を非同期化し、ピーク負荷を平滑化します。ただし、失敗時の再試行、重複処理、順序性、dlq、滞留監視が必要です。下流が遅いときは無限にqueueへ積むのではなく、backpressureとして受付制限、優先度制御、リトライ間隔調整、ワーカー数制御を行います。 &lt;strong&gt;retry：&lt;/strong&gt;一時的障害には指数バックオフで再試行する。すぐ再試行すると障害を悪化させる。 &lt;strong&gt;dlq：&lt;/strong&gt;一定回数失敗したメッセージを隔離し、調査・再投入できるようにする。 &lt;strong&gt;冪等性：&lt;/strong&gt;同じメッセージが複数回処理されても結果が壊れないようにする。 &lt;strong&gt;backpressure：&lt;/strong&gt;下流の処理能力を超えたら、入口で制限・遅延・拒否する。 &lt;strong&gt;監視：&lt;/strong&gt;queue depth、oldest message age、processing rate、dlq countを見る。 xでは「queue is full」という障害シナリオがよく出ます。queueを入れると同期apiは軽く見えますが、処理が消えるわけではありません。滞留が増えると、ユーザーには遅延や未反映として見えます。 queueは「後でやる」仕組みです。後でやることが許されない処理、たとえば在庫の最終確定や残高更新は、同期・強整合寄りにする必要があります。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Queue</span> <span class="badge badge-S">S</span></div>
+<div class="num">XQ018</div>
+</div>
+<h3>Queueを使う設計で、再試行・DLQ・Backpressureをどう考えますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>非同期化を万能視せず、失敗時に安全に処理を収束させられるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">Queueは処理を非同期化し、ピーク負荷を平滑化します。ただし、失敗時の再試行、重複処理、順序性、DLQ、滞留監視が必要です。下流が遅いときは無限にQueueへ積むのではなく、Backpressureとして受付制限、優先度制御、リトライ間隔調整、ワーカー数制御を行います。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>Retry：</strong>一時的障害には指数バックオフで再試行する。すぐ再試行すると障害を悪化させる。</li>
+<li><strong>DLQ：</strong>一定回数失敗したメッセージを隔離し、調査・再投入できるようにする。</li>
+<li><strong>冪等性：</strong>同じメッセージが複数回処理されても結果が壊れないようにする。</li>
+<li><strong>Backpressure：</strong>下流の処理能力を超えたら、入口で制限・遅延・拒否する。</li>
+<li><strong>監視：</strong>queue depth、oldest message age、processing rate、DLQ countを見る。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Producer → Queue → Worker → DB / External API
+              ↓
+          Retry Policy → DLQ
+              ↑
+       Monitoring / Backpressure</div>
+<h4>理解補足</h4>
+<div class="supplement">Xでは「queue is full」という障害シナリオがよく出ます。Queueを入れると同期APIは軽く見えますが、処理が消えるわけではありません。滞留が増えると、ユーザーには遅延や未反映として見えます。</div>
+<h4>注意点</h4>
+<div class="caution">Queueは「後でやる」仕組みです。後でやることが許されない処理、たとえば在庫の最終確定や残高更新は、同期・強整合寄りにする必要があります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq019 x由来 / realtime a チャットサービスを設計してください。 websocket、メッセージ永続化、既読、順序、オンライン/オフライン配信を整理できるかを見る。 チャットでは、クライアントとリアルタイム接続を維持するwebsocket gateway、メッセージ保存db、配信queue、参加者管理、既読管理が必要です。送信時はまずメッセージを永続化し、イベントとして配信し、オンラインユーザーにはwebsocket、オフラインユーザーにはpush通知などで届けます。 &lt;strong&gt;接続：&lt;/strong&gt;websocket gatewayがユーザー接続を管理し、user_idとconnection_idを持つ。 &lt;strong&gt;保存：&lt;/strong&gt;message_id、room_id、sender_id、body、created_atをdbに保存する。 &lt;strong&gt;順序：&lt;/strong&gt;room内のmessage sequenceやcreated_at + idで順序を安定させる。 &lt;strong&gt;配信：&lt;/strong&gt;オンラインならwebsocket、オフラインならpush/通知。 &lt;strong&gt;既読：&lt;/strong&gt;ユーザーごとにlast_read_message_idなどを持つ。 xのsystem designロードマップではchat app/whatsapp設計が定番として出ます。全部を作ると巨大なので、1対1チャットかグループチャットか、既読が必要か、履歴検索が必要かを最初に確認します。 「websocketを使います」で終わると浅いです。websocketは通信手段であって、メッセージの永続化、再接続、重複配信、順序、既読は別に設計する必要があります。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Realtime</span> <span class="badge badge-A">A</span></div>
+<div class="num">XQ019</div>
+</div>
+<h3>チャットサービスを設計してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>WebSocket、メッセージ永続化、既読、順序、オンライン/オフライン配信を整理できるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">チャットでは、クライアントとリアルタイム接続を維持するWebSocket Gateway、メッセージ保存DB、配信Queue、参加者管理、既読管理が必要です。送信時はまずメッセージを永続化し、イベントとして配信し、オンラインユーザーにはWebSocket、オフラインユーザーにはPush通知などで届けます。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>接続：</strong>WebSocket Gatewayがユーザー接続を管理し、user_idとconnection_idを持つ。</li>
+<li><strong>保存：</strong>message_id、room_id、sender_id、body、created_atをDBに保存する。</li>
+<li><strong>順序：</strong>room内のmessage sequenceやcreated_at + idで順序を安定させる。</li>
+<li><strong>配信：</strong>オンラインならWebSocket、オフラインならPush/通知。</li>
+<li><strong>既読：</strong>ユーザーごとにlast_read_message_idなどを持つ。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Client ↔ WebSocket Gateway → Chat Service → Message DB
+                                  ↓
+                              Delivery Queue → Push Notification</div>
+<h4>理解補足</h4>
+<div class="supplement">XのSystem DesignロードマップではChat App/WhatsApp設計が定番として出ます。全部を作ると巨大なので、1対1チャットかグループチャットか、既読が必要か、履歴検索が必要かを最初に確認します。</div>
+<h4>注意点</h4>
+<div class="caution">「WebSocketを使います」で終わると浅いです。WebSocketは通信手段であって、メッセージの永続化、再接続、重複配信、順序、既読は別に設計する必要があります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq020 x由来 / observability s ログ・メトリクス・トレースはどう使い分けますか？ 障害調査と運用設計の基本を理解しているかを見る。 ログは個別イベントの詳細、メトリクスは数値の時系列、トレースはリクエストが複数サービスを通る経路を追うために使います。障害調査では、メトリクスで異常の場所と時間を見つけ、トレースで遅い区間を特定し、ログで詳細原因を確認します。 &lt;strong&gt;ログ：&lt;/strong&gt;エラー詳細、入力の一部、処理分岐、例外スタックなど。ただし個人情報や機密情報は出さない。 &lt;strong&gt;メトリクス：&lt;/strong&gt;rps、error rate、latency p95/p99、cpu、db connection、queue depthなど。 &lt;strong&gt;トレース：&lt;/strong&gt;1リクエストがgateway、service、db、外部apiをどう通ったかを見る。 &lt;strong&gt;correlation id：&lt;/strong&gt;ログとトレースをつなぐidをリクエスト入口で付与する。 &lt;strong&gt;アラート：&lt;/strong&gt;cpu単体ではなく、ユーザー影響に近いsliで設定する。 xで「logs are missing」という障害質問が出るのは、実務では観測が不十分な状態で調査する場面が多いからです。面接では、最初から完璧なログがある前提ではなく、今ある情報で絞り、次に観測性を改善する姿勢を見せるとよいです。 ログを増やしすぎると、コスト・検索性・個人情報漏洩リスクが増えます。何でもログに出すのではなく、調査に必要な粒度を設計する必要があります。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Observability</span> <span class="badge badge-S">S</span></div>
+<div class="num">XQ020</div>
+</div>
+<h3>ログ・メトリクス・トレースはどう使い分けますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>障害調査と運用設計の基本を理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">ログは個別イベントの詳細、メトリクスは数値の時系列、トレースはリクエストが複数サービスを通る経路を追うために使います。障害調査では、メトリクスで異常の場所と時間を見つけ、トレースで遅い区間を特定し、ログで詳細原因を確認します。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>ログ：</strong>エラー詳細、入力の一部、処理分岐、例外スタックなど。ただし個人情報や機密情報は出さない。</li>
+<li><strong>メトリクス：</strong>RPS、error rate、latency p95/p99、CPU、DB connection、queue depthなど。</li>
+<li><strong>トレース：</strong>1リクエストがGateway、Service、DB、外部APIをどう通ったかを見る。</li>
+<li><strong>Correlation ID：</strong>ログとトレースをつなぐIDをリクエスト入口で付与する。</li>
+<li><strong>アラート：</strong>CPU単体ではなく、ユーザー影響に近いSLIで設定する。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Metrics: where/when abnormal?
+Trace  : which hop is slow?
+Logs   : what happened in that hop?</div>
+<h4>理解補足</h4>
+<div class="supplement">Xで「logs are missing」という障害質問が出るのは、実務では観測が不十分な状態で調査する場面が多いからです。面接では、最初から完璧なログがある前提ではなく、今ある情報で絞り、次に観測性を改善する姿勢を見せるとよいです。</div>
+<h4>注意点</h4>
+<div class="caution">ログを増やしすぎると、コスト・検索性・個人情報漏洩リスクが増えます。何でもログに出すのではなく、調査に必要な粒度を設計する必要があります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq021 x由来 / database s dbが遅いとき、サーバーを増やす前に何を確認しますか？ インフラ増強より、クエリ・インデックス・設計を先に疑えるかを見る。 まずスロークエリ、実行計画、インデックス、n+1、ロック、接続数、データ量、i/oを確認します。単純にサーバーを増やしても、インデックス不足や不要な全表走査、アプリのn+1が原因なら本質的には改善しません。必要に応じてクエリ改善、インデックス追加、ページング見直し、キャッシュ、読み取りレプリカを検討します。 &lt;strong&gt;slow query：&lt;/strong&gt;どのsqlが遅いかを特定する。平均ではなくp95/p99も見る。 &lt;strong&gt;execution plan：&lt;/strong&gt;index scanかseq scanか、想定行数と実行行数のズレを見る。 &lt;strong&gt;n+1：&lt;/strong&gt;一覧取得後に1件ずつ関連データを取りに行っていないか。 &lt;strong&gt;lock：&lt;/strong&gt;更新系でロック待ちが発生していないか。 &lt;strong&gt;connection pool：&lt;/strong&gt;db接続枯渇や過剰接続がないか。 xでは「missing index can cost more than infrastructure upgrade」のような趣旨の投稿が多いです。これは真実です。db性能問題は、まずクエリとアクセスパターンを見るべきです。 インデックスも追加すればよいわけではありません。書き込み性能、ストレージ、更新コスト、選択度、複合インデックスの順序を考える必要があります。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Database</span> <span class="badge badge-S">S</span></div>
+<div class="num">XQ021</div>
+</div>
+<h3>DBが遅いとき、サーバーを増やす前に何を確認しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>インフラ増強より、クエリ・インデックス・設計を先に疑えるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">まずスロークエリ、実行計画、インデックス、N+1、ロック、接続数、データ量、I/Oを確認します。単純にサーバーを増やしても、インデックス不足や不要な全表走査、アプリのN+1が原因なら本質的には改善しません。必要に応じてクエリ改善、インデックス追加、ページング見直し、キャッシュ、読み取りレプリカを検討します。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>Slow Query：</strong>どのSQLが遅いかを特定する。平均ではなくp95/p99も見る。</li>
+<li><strong>Execution Plan：</strong>Index ScanかSeq Scanか、想定行数と実行行数のズレを見る。</li>
+<li><strong>N+1：</strong>一覧取得後に1件ずつ関連データを取りに行っていないか。</li>
+<li><strong>Lock：</strong>更新系でロック待ちが発生していないか。</li>
+<li><strong>Connection Pool：</strong>DB接続枯渇や過剰接続がないか。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">App latency ↑
+  ├ API CPU?
+  ├ DB slow query? → EXPLAIN → index/query fix
+  ├ Lock wait?
+  └ Connection pool exhausted?</div>
+<h4>理解補足</h4>
+<div class="supplement">Xでは「missing index can cost more than infrastructure upgrade」のような趣旨の投稿が多いです。これは真実です。DB性能問題は、まずクエリとアクセスパターンを見るべきです。</div>
+<h4>注意点</h4>
+<div class="caution">インデックスも追加すればよいわけではありません。書き込み性能、ストレージ、更新コスト、選択度、複合インデックスの順序を考える必要があります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq022 x由来 / cache a cache invalidationはなぜ難しいのですか？ キャッシュ更新とdb更新のタイミング差、不整合、分散環境の難しさを理解しているかを見る。 cache invalidationが難しい理由は、db更新とキャッシュ削除/更新が別操作になり、途中失敗や競合で古い値が残るからです。代表的には、db更新後にキャッシュ削除する、キャッシュ更新ではなく削除する、ttlを併用する、イベントで非同期無効化する、バージョンを持たせるなどの対策があります。 &lt;strong&gt;db→cache削除：&lt;/strong&gt;db更新後にキャッシュを消す。次回読み取りでdbから新値を入れる。一般的。 &lt;strong&gt;cache更新：&lt;/strong&gt;db更新時にキャッシュも更新するが、複雑な集計や複数キーでは漏れやすい。 &lt;strong&gt;ttl：&lt;/strong&gt;削除漏れの保険。ただし古い値を一定時間許容する。 &lt;strong&gt;非同期無効化：&lt;/strong&gt;db更新イベントを流して関連キャッシュを消す。遅延がある。 &lt;strong&gt;race：&lt;/strong&gt;削除と再生成が競合し、古い値を再キャッシュすることがある。 xでcache invalidationは定番です。キャッシュは読み取り性能を上げますが、更新系と組み合わせた瞬間に難しくなります。面接では「ttlを入れます」だけでなく、db更新順序と失敗時の扱いまで説明してください。 金額・権限・在庫のように古い値が危険なデータでは、キャッシュ利用範囲を限定し、最終判断はdbや認可基盤で行う方が安全です。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Cache</span> <span class="badge badge-A">A</span></div>
+<div class="num">XQ022</div>
+</div>
+<h3>Cache Invalidationはなぜ難しいのですか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>キャッシュ更新とDB更新のタイミング差、不整合、分散環境の難しさを理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">Cache Invalidationが難しい理由は、DB更新とキャッシュ削除/更新が別操作になり、途中失敗や競合で古い値が残るからです。代表的には、DB更新後にキャッシュ削除する、キャッシュ更新ではなく削除する、TTLを併用する、イベントで非同期無効化する、バージョンを持たせるなどの対策があります。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>DB→Cache削除：</strong>DB更新後にキャッシュを消す。次回読み取りでDBから新値を入れる。一般的。</li>
+<li><strong>Cache更新：</strong>DB更新時にキャッシュも更新するが、複雑な集計や複数キーでは漏れやすい。</li>
+<li><strong>TTL：</strong>削除漏れの保険。ただし古い値を一定時間許容する。</li>
+<li><strong>非同期無効化：</strong>DB更新イベントを流して関連キャッシュを消す。遅延がある。</li>
+<li><strong>Race：</strong>削除と再生成が競合し、古い値を再キャッシュすることがある。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Update flow:
+1. Update DB
+2. Delete cache key
+3. Next read repopulates cache
+
+Failure between 1 and 2 → stale cache risk</div>
+<h4>理解補足</h4>
+<div class="supplement">Xでcache invalidationは定番です。キャッシュは読み取り性能を上げますが、更新系と組み合わせた瞬間に難しくなります。面接では「TTLを入れます」だけでなく、DB更新順序と失敗時の扱いまで説明してください。</div>
+<h4>注意点</h4>
+<div class="caution">金額・権限・在庫のように古い値が危険なデータでは、キャッシュ利用範囲を限定し、最終判断はDBや認可基盤で行う方が安全です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq023 x由来 / scaling a consistent hashingは何のために使いますか？ ノード追加・削除時の再配置コストを理解しているかを見る。 consistent hashingは、キャッシュノードやシャードノードを増減するときに、キーの再配置を最小限にするための方式です。通常の&lt;code&gt;hash(key) % n&lt;/code&gt;ではnが変わると多くのキーの配置先が変わります。consistent hashingではハッシュリング上にキーとノードを配置し、ノード増減時に影響範囲を限定します。 &lt;strong&gt;用途：&lt;/strong&gt;分散キャッシュ、シャーディング、ロード分散。 &lt;strong&gt;問題：&lt;/strong&gt;単純modulo方式はノード数が変わると大量のキーが移動する。 &lt;strong&gt;リング：&lt;/strong&gt;キーのハッシュ値からリング上で次のノードに割り当てる。 &lt;strong&gt;仮想ノード：&lt;/strong&gt;ノードごとの偏りを減らすため、1物理ノードを複数点として配置する。 &lt;strong&gt;限界：&lt;/strong&gt;データの偏り、ホットキー、再配置中の整合性は別途考える必要がある。 xのsystem designロードマップでは、scalabilityやconsistent hashingがよく挙がります。面接で名前だけ出すと危険ですが、「ノード数変更時に再配置を減らすため」と説明できればまず十分です。 consistent hashingはホットキー問題を自動解決しません。1つのキーにアクセスが集中する場合、どのノードに置いてもそこが熱くなります。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Scaling</span> <span class="badge badge-A">A</span></div>
+<div class="num">XQ023</div>
+</div>
+<h3>Consistent Hashingは何のために使いますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>ノード追加・削除時の再配置コストを理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">Consistent Hashingは、キャッシュノードやシャードノードを増減するときに、キーの再配置を最小限にするための方式です。通常の<code>hash(key) % N</code>ではNが変わると多くのキーの配置先が変わります。Consistent Hashingではハッシュリング上にキーとノードを配置し、ノード増減時に影響範囲を限定します。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>用途：</strong>分散キャッシュ、シャーディング、ロード分散。</li>
+<li><strong>問題：</strong>単純Modulo方式はノード数が変わると大量のキーが移動する。</li>
+<li><strong>リング：</strong>キーのハッシュ値からリング上で次のノードに割り当てる。</li>
+<li><strong>仮想ノード：</strong>ノードごとの偏りを減らすため、1物理ノードを複数点として配置する。</li>
+<li><strong>限界：</strong>データの偏り、ホットキー、再配置中の整合性は別途考える必要がある。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">hash(key) % N: N changes → many keys move
+Consistent Hash Ring: node added/removed → nearby range moves</div>
+<h4>理解補足</h4>
+<div class="supplement">XのSystem Designロードマップでは、scalabilityやconsistent hashingがよく挙がります。面接で名前だけ出すと危険ですが、「ノード数変更時に再配置を減らすため」と説明できればまず十分です。</div>
+<h4>注意点</h4>
+<div class="caution">Consistent Hashingはホットキー問題を自動解決しません。1つのキーにアクセスが集中する場合、どのノードに置いてもそこが熱くなります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq024 x由来 / data processing a batch processingとstream processingの違いは？ データ処理を、遅延・整合性・コスト・ユースケースで分けられるかを見る。 batch processingは、一定量のデータをまとめて処理する方式です。日次集計、請求、レポートに向きます。stream processingは、イベントをほぼリアルタイムに処理する方式で、通知、不正検知、リアルタイム分析に向きます。batchは単純で再実行しやすい一方、遅延があります。streamは低遅延ですが、順序、重複、状態管理、再処理が難しくなります。 &lt;strong&gt;batch：&lt;/strong&gt;日次・時間単位でまとめて処理。失敗時に再実行しやすい。 &lt;strong&gt;stream：&lt;/strong&gt;イベント到着ごとに処理。低遅延だが状態管理が難しい。 &lt;strong&gt;ユースケース：&lt;/strong&gt;請求集計はbatch、セキュリティ通知はstream寄り。 &lt;strong&gt;重複：&lt;/strong&gt;streamではat-least-once配信による重複処理を想定する。 &lt;strong&gt;ハイブリッド：&lt;/strong&gt;リアルタイム概算をstream、正確な最終集計をbatchで行うこともある。 x上のsystem designリストでは、batch/streamがよく並びます。大事なのは、どちらが上位かではなく、遅延許容と再処理容易性で選ぶことです。 リアルタイムに見せたいからといって、全てstreamにすると運用が難しくなります。正確性が重要な集計ではbatchで最終確定する設計も現実的です。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Data Processing</span> <span class="badge badge-A">A</span></div>
+<div class="num">XQ024</div>
+</div>
+<h3>Batch ProcessingとStream Processingの違いは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>データ処理を、遅延・整合性・コスト・ユースケースで分けられるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">Batch Processingは、一定量のデータをまとめて処理する方式です。日次集計、請求、レポートに向きます。Stream Processingは、イベントをほぼリアルタイムに処理する方式で、通知、不正検知、リアルタイム分析に向きます。Batchは単純で再実行しやすい一方、遅延があります。Streamは低遅延ですが、順序、重複、状態管理、再処理が難しくなります。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>Batch：</strong>日次・時間単位でまとめて処理。失敗時に再実行しやすい。</li>
+<li><strong>Stream：</strong>イベント到着ごとに処理。低遅延だが状態管理が難しい。</li>
+<li><strong>ユースケース：</strong>請求集計はBatch、セキュリティ通知はStream寄り。</li>
+<li><strong>重複：</strong>Streamではat-least-once配信による重複処理を想定する。</li>
+<li><strong>ハイブリッド：</strong>リアルタイム概算をStream、正確な最終集計をBatchで行うこともある。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Batch : Data Lake/DB → Scheduled Job → Report
+Stream: Event → Broker → Stream Processor → Real-time Store</div>
+<h4>理解補足</h4>
+<div class="supplement">X上のSystem Designリストでは、Batch/Streamがよく並びます。大事なのは、どちらが上位かではなく、遅延許容と再処理容易性で選ぶことです。</div>
+<h4>注意点</h4>
+<div class="caution">リアルタイムに見せたいからといって、全てStreamにすると運用が難しくなります。正確性が重要な集計ではBatchで最終確定する設計も現実的です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq025 x由来 / redis a leaderboardを設計してください。 ランキング更新・取得に適したデータ構造を選べるかを見る。 leaderboardは、ユーザーやチームをスコア順に並べる機能です。redis sorted setのように、memberとscoreを持ち、スコア順に範囲取得できるデータ構造が向きます。更新時はユーザーidのスコアを更新し、上位n件、特定ユーザーの順位、周辺順位を取得します。永続dbには履歴やメタデータを保存し、redisは高速ランキング表示に使います。 &lt;strong&gt;データ構造：&lt;/strong&gt;redis sorted setはmemberをscoreで順序付けできる。 &lt;strong&gt;取得：&lt;/strong&gt;top n、ユーザー順位、ユーザー周辺の順位を高速に取得する。 &lt;strong&gt;期間：&lt;/strong&gt;日次・週次・全期間でキーを分ける。 &lt;strong&gt;不正対策：&lt;/strong&gt;スコア更新の検証、重複投稿防止、監査ログが必要。 &lt;strong&gt;永続化：&lt;/strong&gt;ランキング表示はredis、履歴や正本はdbに置く設計が多い。 xでleaderboardはrate limiterやqueueと並んでよく出ます。redis公式もsorted setsをleaderboardの用途例として示しています。面接では、sorted setの名前だけでなく、score更新、期間別ランキング、正本データ、障害時復旧まで触れるとよいです。 スコアが同点の場合の並び順、期間切り替え、ユーザー退会時の扱いなど、仕様の細部が重要です。最初に要件確認してください。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Redis</span> <span class="badge badge-A">A</span></div>
+<div class="num">XQ025</div>
+</div>
+<h3>Leaderboardを設計してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>ランキング更新・取得に適したデータ構造を選べるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">Leaderboardは、ユーザーやチームをスコア順に並べる機能です。Redis Sorted Setのように、memberとscoreを持ち、スコア順に範囲取得できるデータ構造が向きます。更新時はユーザーIDのスコアを更新し、上位N件、特定ユーザーの順位、周辺順位を取得します。永続DBには履歴やメタデータを保存し、Redisは高速ランキング表示に使います。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>データ構造：</strong>Redis Sorted Setはmemberをscoreで順序付けできる。</li>
+<li><strong>取得：</strong>Top N、ユーザー順位、ユーザー周辺の順位を高速に取得する。</li>
+<li><strong>期間：</strong>日次・週次・全期間でキーを分ける。</li>
+<li><strong>不正対策：</strong>スコア更新の検証、重複投稿防止、監査ログが必要。</li>
+<li><strong>永続化：</strong>ランキング表示はRedis、履歴や正本はDBに置く設計が多い。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Score Event → Validation → DB history
+                     ↓
+              Redis ZSET: leaderboard:weekly
+                     ↓
+              Top N / Rank / Nearby Rank</div>
+<h4>理解補足</h4>
+<div class="supplement">Xでleaderboardはrate limiterやqueueと並んでよく出ます。Redis公式もSorted Setsをleaderboardの用途例として示しています。面接では、Sorted Setの名前だけでなく、score更新、期間別ランキング、正本データ、障害時復旧まで触れるとよいです。</div>
+<h4>注意点</h4>
+<div class="caution">スコアが同点の場合の並び順、期間切り替え、ユーザー退会時の扱いなど、仕様の細部が重要です。最初に要件確認してください。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq026 x由来 / webhook a webhook配信システムを設計してください。 外部顧客向けイベント配信で、再試行・署名・順序・重複・観測性を設計できるかを見る。 webhookは、自社システム内のイベントを外部顧客のhttpエンドポイントへ通知する仕組みです。イベント発生時にqueueへ積み、delivery workerが顧客urlへpostします。署名ヘッダで改ざん検知し、失敗時は指数バックオフで再試行し、一定回数失敗したら停止・dlq・管理画面で確認できるようにします。 &lt;strong&gt;event：&lt;/strong&gt;注文作成、決済成功、ユーザー更新などをイベント化する。 &lt;strong&gt;subscription：&lt;/strong&gt;顧客ごとに通知先url、購読イベント、secretを管理する。 &lt;strong&gt;署名：&lt;/strong&gt;payload + timestampをhmac署名し、受信側が検証する。 &lt;strong&gt;retry：&lt;/strong&gt;5xx/timeoutは再試行、4xxは設定ミスとして扱うなど方針を分ける。 &lt;strong&gt;冪等性：&lt;/strong&gt;event_idを付与し、受信側が重複処理できるようにする。 xでapi連携・integration系問題としてwebhookはよく出せます。あなたの外部システム連携経験とも接続しやすいです。webhookは「httpで送る」だけでなく、外部顧客のサーバー障害、不正url、遅延、重複、リプレイ攻撃まで考えます。 webhookは顧客側のエンドポイント品質に依存します。自社システムを守るため、タイムアウト、同時接続数、再試行回数、顧客単位のレート制限を必ず設けます。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Webhook</span> <span class="badge badge-A">A</span></div>
+<div class="num">XQ026</div>
+</div>
+<h3>Webhook配信システムを設計してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>外部顧客向けイベント配信で、再試行・署名・順序・重複・観測性を設計できるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">Webhookは、自社システム内のイベントを外部顧客のHTTPエンドポイントへ通知する仕組みです。イベント発生時にQueueへ積み、Delivery Workerが顧客URLへPOSTします。署名ヘッダで改ざん検知し、失敗時は指数バックオフで再試行し、一定回数失敗したら停止・DLQ・管理画面で確認できるようにします。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>Event：</strong>注文作成、決済成功、ユーザー更新などをイベント化する。</li>
+<li><strong>Subscription：</strong>顧客ごとに通知先URL、購読イベント、secretを管理する。</li>
+<li><strong>署名：</strong>payload + timestampをHMAC署名し、受信側が検証する。</li>
+<li><strong>Retry：</strong>5xx/timeoutは再試行、4xxは設定ミスとして扱うなど方針を分ける。</li>
+<li><strong>冪等性：</strong>event_idを付与し、受信側が重複処理できるようにする。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Internal Event → Webhook Queue → Delivery Worker → Customer Endpoint
+                         ↓                 ↓
+                   Retry / DLQ        Delivery Log</div>
+<h4>理解補足</h4>
+<div class="supplement">XでAPI連携・Integration系問題としてWebhookはよく出せます。あなたの外部システム連携経験とも接続しやすいです。Webhookは「HTTPで送る」だけでなく、外部顧客のサーバー障害、不正URL、遅延、重複、リプレイ攻撃まで考えます。</div>
+<h4>注意点</h4>
+<div class="caution">Webhookは顧客側のエンドポイント品質に依存します。自社システムを守るため、タイムアウト、同時接続数、再試行回数、顧客単位のレート制限を必ず設けます。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq027 x由来 / scheduler b 分散環境で定期ジョブを安全に実行するには？ 複数インスタンスで同じジョブが二重実行される問題に気づけるかを見る。 分散環境では、複数アプリインスタンスが同じcronを持つと二重実行される可能性があります。対策は、専用schedulerを1つ置く、db/redisの分散ロックを使う、ジョブテーブルで状態管理する、kubernetes cronjobやeventbridge schedulerのような外部スケジューラを使うことです。ジョブ自体も冪等に設計します。 &lt;strong&gt;問題：&lt;/strong&gt;アプリ3台すべてで同じ定期処理が走ると、二重請求・二重通知などが起きる。 &lt;strong&gt;lock：&lt;/strong&gt;db row lock、redis set nx、リース期限付きロックを使う。 &lt;strong&gt;job table：&lt;/strong&gt;pending/running/succeeded/failed状態をdbで管理する。 &lt;strong&gt;外部scheduler：&lt;/strong&gt;クラウドのスケジューラから1回だけイベントを送る。 &lt;strong&gt;冪等性：&lt;/strong&gt;ロックが破れても壊れないよう、処理側も二重実行に耐える。 xでは直接schedulerという名前でなくても、queue、batch、retry、idempotencyの文脈で出ます。実務では「定期処理をspringで書きました」だけだと、スケール時に二重実行問題が出ます。 分散ロックはロックの期限、処理時間超過、プロセスクラッシュ時の解放が難しいです。ロックだけに依存せず、処理を冪等にしてください。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Scheduler</span> <span class="badge badge-B">B</span></div>
+<div class="num">XQ027</div>
+</div>
+<h3>分散環境で定期ジョブを安全に実行するには？</h3>
+<p class="intent"><strong>面接官の意図：</strong>複数インスタンスで同じジョブが二重実行される問題に気づけるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">分散環境では、複数アプリインスタンスが同じCronを持つと二重実行される可能性があります。対策は、専用Schedulerを1つ置く、DB/Redisの分散ロックを使う、ジョブテーブルで状態管理する、Kubernetes CronJobやEventBridge Schedulerのような外部スケジューラを使うことです。ジョブ自体も冪等に設計します。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>問題：</strong>アプリ3台すべてで同じ定期処理が走ると、二重請求・二重通知などが起きる。</li>
+<li><strong>Lock：</strong>DB row lock、Redis SET NX、リース期限付きロックを使う。</li>
+<li><strong>Job Table：</strong>pending/running/succeeded/failed状態をDBで管理する。</li>
+<li><strong>外部Scheduler：</strong>クラウドのスケジューラから1回だけイベントを送る。</li>
+<li><strong>冪等性：</strong>ロックが破れても壊れないよう、処理側も二重実行に耐える。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Scheduler → Job Table/Queue → Worker
+                ↑
+          distributed lock / status transition</div>
+<h4>理解補足</h4>
+<div class="supplement">Xでは直接Schedulerという名前でなくても、queue、batch、retry、idempotencyの文脈で出ます。実務では「定期処理をSpringで書きました」だけだと、スケール時に二重実行問題が出ます。</div>
+<h4>注意点</h4>
+<div class="caution">分散ロックはロックの期限、処理時間超過、プロセスクラッシュ時の解放が難しいです。ロックだけに依存せず、処理を冪等にしてください。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq028 x由来 / reliability a リージョン障害に備える設計をどう考えますか？ 可用性要件、rto/rpo、データ複製、フェイルオーバーの現実性を理解しているかを見る。 リージョン障害対策は、まずrtoとrpoを確認します。短時間停止が許されるならバックアップ復旧やwarm standbyでよく、ほぼ無停止が必要ならactive-activeやmulti-region構成を検討します。ただし、データ整合性、コスト、運用複雑性が大きく上がるため、全システムに最初から入れるものではありません。 &lt;strong&gt;rto：&lt;/strong&gt;どれくらいの時間で復旧すべきか。 &lt;strong&gt;rpo：&lt;/strong&gt;どれくらいのデータ損失を許容するか。 &lt;strong&gt;backup/restore：&lt;/strong&gt;安いが復旧に時間がかかる。 &lt;strong&gt;warm standby：&lt;/strong&gt;待機環境を用意し、障害時に昇格する。 &lt;strong&gt;active-active：&lt;/strong&gt;複数リージョンで同時稼働。可用性は高いが整合性と運用が難しい。 xではregion outage、failure modes、failoverがstaff/senior向けの設計論点としてよく出ます。ここでは「マルチリージョンにします」と言うより、rto/rpoとコストを確認する方が実務的です。 マルチリージョンは万能ではありません。dbの書き込み整合性、ユーザーセッション、外部api、dns切替、運用訓練まで必要です。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Reliability</span> <span class="badge badge-A">A</span></div>
+<div class="num">XQ028</div>
+</div>
+<h3>リージョン障害に備える設計をどう考えますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>可用性要件、RTO/RPO、データ複製、フェイルオーバーの現実性を理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">リージョン障害対策は、まずRTOとRPOを確認します。短時間停止が許されるならバックアップ復旧やWarm Standbyでよく、ほぼ無停止が必要ならActive-ActiveやMulti-Region構成を検討します。ただし、データ整合性、コスト、運用複雑性が大きく上がるため、全システムに最初から入れるものではありません。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>RTO：</strong>どれくらいの時間で復旧すべきか。</li>
+<li><strong>RPO：</strong>どれくらいのデータ損失を許容するか。</li>
+<li><strong>Backup/Restore：</strong>安いが復旧に時間がかかる。</li>
+<li><strong>Warm Standby：</strong>待機環境を用意し、障害時に昇格する。</li>
+<li><strong>Active-Active：</strong>複数リージョンで同時稼働。可用性は高いが整合性と運用が難しい。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Single Region → Backup Restore
+Warm Standby → Primary Region + Standby Region
+Active-Active → Region A ↔ Region B with conflict strategy</div>
+<h4>理解補足</h4>
+<div class="supplement">Xではregion outage、failure modes、failoverがStaff/Senior向けの設計論点としてよく出ます。ここでは「マルチリージョンにします」と言うより、RTO/RPOとコストを確認する方が実務的です。</div>
+<h4>注意点</h4>
+<div class="caution">マルチリージョンは万能ではありません。DBの書き込み整合性、ユーザーセッション、外部API、DNS切替、運用訓練まで必要です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq029 x由来 / delivery b feature flagと段階的リリースをどう使いますか？ 安全なリリース、ロールバック、a/bテスト、運用制御を理解しているかを見る。 feature flagは、コードをデプロイした後に機能の有効/無効を設定で切り替える仕組みです。全ユーザーに一斉公開せず、社内ユーザー、1%、10%、全体のように段階的に広げます。問題が出たらデプロイを戻さずにflagをoffにできます。a/bテストやテナント別有効化にも使えます。 &lt;strong&gt;release toggle：&lt;/strong&gt;新機能を段階的に有効化する。 &lt;strong&gt;kill switch：&lt;/strong&gt;障害時に機能を即時停止する。 &lt;strong&gt;experiment：&lt;/strong&gt;a/bテストで効果を見る。 &lt;strong&gt;targeting：&lt;/strong&gt;社内ユーザー、特定テナント、一定割合で有効化する。 &lt;strong&gt;debt：&lt;/strong&gt;使い終わったflagを削除しないとコードが複雑化する。 xではリリースや障害対応の文脈でfeature flagが出ます。面接では、ci/cdとセットで「デプロイ」と「リリース」を分けて説明できると強いです。デプロイはコードを環境に置くこと、リリースはユーザーに機能を見せることです。 flag判定がリクエストごとに外部サービス依存になるとレイテンシや障害影響が出ます。ローカルキャッシュやデフォルト値も設計してください。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Delivery</span> <span class="badge badge-B">B</span></div>
+<div class="num">XQ029</div>
+</div>
+<h3>Feature Flagと段階的リリースをどう使いますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>安全なリリース、ロールバック、A/Bテスト、運用制御を理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">Feature Flagは、コードをデプロイした後に機能の有効/無効を設定で切り替える仕組みです。全ユーザーに一斉公開せず、社内ユーザー、1%、10%、全体のように段階的に広げます。問題が出たらデプロイを戻さずにFlagをOFFにできます。A/Bテストやテナント別有効化にも使えます。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>Release Toggle：</strong>新機能を段階的に有効化する。</li>
+<li><strong>Kill Switch：</strong>障害時に機能を即時停止する。</li>
+<li><strong>Experiment：</strong>A/Bテストで効果を見る。</li>
+<li><strong>Targeting：</strong>社内ユーザー、特定テナント、一定割合で有効化する。</li>
+<li><strong>Debt：</strong>使い終わったFlagを削除しないとコードが複雑化する。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">Deploy code with feature hidden
+Flag: internal → 1% → 10% → 100%
+Issue → turn flag off without rollback</div>
+<h4>理解補足</h4>
+<div class="supplement">Xではリリースや障害対応の文脈でFeature Flagが出ます。面接では、CI/CDとセットで「デプロイ」と「リリース」を分けて説明できると強いです。デプロイはコードを環境に置くこと、リリースはユーザーに機能を見せることです。</div>
+<h4>注意点</h4>
+<div class="caution">Flag判定がリクエストごとに外部サービス依存になるとレイテンシや障害影響が出ます。ローカルキャッシュやデフォルト値も設計してください。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="xq030 x由来 / interview strategy s xで見かける設計問題をどう練習に使うべきですか？ 問題を集めるだけでなく、自分の回答テンプレートに変換できるかを見る。 xの投稿は問題の入口としては有用ですが、短文なのでそのまま暗記しても実戦では弱いです。練習では、要件確認、api、データモデル、主要コンポーネント、ボトルネック、失敗時、トレードオフの型に落とし込みます。1問につき30秒回答、5分回答、深掘り質問3つを作ると、面接で使える知識になります。 &lt;strong&gt;要件確認：&lt;/strong&gt;誰が、何を、どの頻度で使うのかを確認する。 &lt;strong&gt;api：&lt;/strong&gt;主要エンドポイントと入出力を決める。 &lt;strong&gt;データ：&lt;/strong&gt;正本db、キャッシュ、検索、ログを分ける。 &lt;strong&gt;非機能：&lt;/strong&gt;可用性、性能、整合性、セキュリティ、運用を見る。 &lt;strong&gt;深掘り：&lt;/strong&gt;障害時、スケール時、データ不整合時の質問を自分で作る。 xの良いところは、実際の海外エンジニアが「面接で出る/勉強になる」と感じている論点が短く流れてくることです。一方、出典の厳密性や解答の品質はバラバラです。だから、問題収集はx、正確な理解は公式ドキュメントや技術書で補うのが安全です。 今回htmlに入れたxqは、特定投稿の文面を転載したものではなく、x上で頻繁に見かけるテーマを面接対策用に再構成したものです。">
+<div class="qa-head">
+<div><span class="cat">X由来 / Interview Strategy</span> <span class="badge badge-S">S</span></div>
+<div class="num">XQ030</div>
+</div>
+<h3>Xで見かける設計問題をどう練習に使うべきですか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>問題を集めるだけでなく、自分の回答テンプレートに変換できるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">Xの投稿は問題の入口としては有用ですが、短文なのでそのまま暗記しても実戦では弱いです。練習では、要件確認、API、データモデル、主要コンポーネント、ボトルネック、失敗時、トレードオフの型に落とし込みます。1問につき30秒回答、5分回答、深掘り質問3つを作ると、面接で使える知識になります。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>要件確認：</strong>誰が、何を、どの頻度で使うのかを確認する。</li>
+<li><strong>API：</strong>主要エンドポイントと入出力を決める。</li>
+<li><strong>データ：</strong>正本DB、キャッシュ、検索、ログを分ける。</li>
+<li><strong>非機能：</strong>可用性、性能、整合性、セキュリティ、運用を見る。</li>
+<li><strong>深掘り：</strong>障害時、スケール時、データ不整合時の質問を自分で作る。</li>
+</ul>
+<h4>簡易図</h4>
+<div class="diagram">X post theme → Interview question → 30s answer → 5min design → trade-offs → follow-up questions</div>
+<h4>理解補足</h4>
+<div class="supplement">Xの良いところは、実際の海外エンジニアが「面接で出る/勉強になる」と感じている論点が短く流れてくることです。一方、出典の厳密性や解答の品質はバラバラです。だから、問題収集はX、正確な理解は公式ドキュメントや技術書で補うのが安全です。</div>
+<h4>注意点</h4>
+<div class="caution">今回HTMLに入れたXQは、特定投稿の文面を転載したものではなく、X上で頻繁に見かけるテーマを面接対策用に再構成したものです。</div>
+</div>
+</details>
+</article>
+</section></main>
+</body>
+</html>

@@ -342,7 +342,36 @@
         padding: 22px;
       }
     }
-  </style>
+
+.index-back-button {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border: 1px solid rgba(35, 88, 197, 0.22);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1e40af;
+  padding: 8px 12px;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.16);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  text-decoration: none;
+}
+.index-back-button:hover {
+  border-color: #2358c5;
+  background: #eef4ff;
+}
+@media print {
+  .index-back-button { display: none; }
+}
+
+</style>
 
   <style id="top-size-fix">
     /* 先頭部分だけを本文寄りのサイズ感に強制調整 */
@@ -394,6 +423,7 @@
   <link rel="stylesheet" href="ddia-theme.css" />
 </head>
 <body>
+<a class="index-back-button" href="../index.html">Indexへ戻る</a>
   <header class="hero">
     <div class="hero-inner">
       <p class="eyebrow">Designing Data-Intensive Applications / Chapter 2</p>

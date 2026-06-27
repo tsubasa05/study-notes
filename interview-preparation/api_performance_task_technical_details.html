@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="APIパフォーマンス課題の戦略ページを支える詳細資料です。Latency、Traffic、Errors、Saturation、DB、外部API、改善策を深掘りします。">
+<title>APIパフォーマンス課題 技術理解の補足資料</title>
+<style>
+:root {
+  --bg: #f5f7fb;
+  --paper: #ffffff;
+  --ink: #172033;
+  --muted: #667085;
+  --line: #dce3ee;
+  --accent: #2358c5;
+  --accent2: #0f766e;
+  --soft: #eef4ff;
+  --warn: #b45309;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  line-height: 1.75;
+}
+a { color: var(--accent); }
+header {
+  background: linear-gradient(135deg, #102958 0%, #2358c5 58%, #0f766e 100%);
+  color: #fff;
+  padding: 42px 22px 34px;
+}
+.header-inner, main { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+h1 { margin: 0 0 14px; font-size: clamp(28px, 4.5vw, 46px); line-height: 1.2; }
+.lead { max-width: 880px; margin: 0; color: #e8eefc; }
+.meta { margin-top: 14px; color: #c8d8ff; font-size: 14px; }
+nav.page-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255,255,255,.96);
+  backdrop-filter: blur(8px);
+}
+.nav-inner { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 10px 0; display: flex; gap: 9px; flex-wrap: wrap; }
+.nav-inner a { border-radius: 999px; background: var(--soft); color: #1e40af; padding: 6px 10px; font-size: 13px; font-weight: 700; text-decoration: none; }
+main { padding: 26px 0 72px; }
+.panel, .qa-card, .note-card, .source-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(25, 43, 75, .07);
+}
+.panel { margin: 24px 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.link-card { min-height: 160px; }
+.link-card h3 { margin-top: 0; }
+.badge, .cat, .source-priority { display: inline-block; border-radius: 999px; padding: 2px 8px; font-size: 12px; font-weight: 800; }
+.badge-S { background: #fee2e2; color: #991b1b; }
+.badge-A { background: #ffedd5; color: #9a3412; }
+.badge-B { background: #dbeafe; color: #1e40af; }
+.cat { background: #f1f5f9; color: #334155; }
+.qa-card { margin: 14px 0; box-shadow: none; }
+.qa-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.num { color: var(--muted); font-weight: 800; font-size: 13px; }
+.intent { margin: 8px 0 10px; color: #475569; background: #f8fafc; padding: 10px 12px; border-radius: 8px; border-left: 4px solid #cbd5e1; }
+details { margin-top: 8px; background: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 12px; }
+summary { cursor: pointer; font-weight: 800; color: #1d4ed8; }
+.answer { margin-top: 10px; white-space: pre-line; }
+.answer.structured { white-space: normal; }
+.answer.structured h4 { margin: 14px 0 6px; font-size: 15px; color: #0f172a; }
+.answer.structured ul, .answer.structured ol { margin: 6px 0 10px 1.3em; padding: 0; }
+.answer.structured li { margin: 5px 0; }
+.answer.structured .short-answer { background: #eff6ff; border-left: 4px solid #2563eb; padding: 10px 12px; border-radius: 8px; margin: 8px 0 12px; }
+.answer.structured .supplement { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin: 10px 0; }
+.answer.structured .caution { background: #fffbeb; border-left: 4px solid #b45309; padding: 10px 12px; border-radius: 8px; margin: 10px 0; }
+.answer.structured .diagram, pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 14px;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+code { background: #e2e8f0; color: #0f172a; padding: 1px 5px; border-radius: 5px; }
+pre code { background: transparent; color: inherit; padding: 0; }
+.searchbox { width: 100%; padding: 13px 15px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; margin: 12px 0 16px; }
+button { border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; color: #1e40af; padding: 7px 11px; font-weight: 700; cursor: pointer; }
+.table-wrap { overflow-x: auto; margin: 14px 0; }
+table { width: 100%; border-collapse: collapse; background: white; }
+th, td { border: 1px solid var(--line); padding: 9px 10px; vertical-align: top; }
+th { background: #f1f5f9; text-align: left; }
+blockquote { margin: 14px 0; border-left: 5px solid var(--accent); background: #eef4ff; padding: 10px 14px; border-radius: 8px; }
+blockquote p { margin: 6px 0; }
+.toc { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.toc a { text-decoration: none; }
+.toc .level-3 { margin-left: 18px; font-size: .94rem; }
+.toc .level-4 { margin-left: 34px; font-size: .9rem; }
+.doc-body h2 { margin-top: 36px; padding-top: 12px; border-top: 1px solid var(--line); }
+.doc-body h3 { margin-top: 24px; }
+.back-links { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
+.back-links a { border-radius: 999px; background: rgba(255,255,255,.16); color: #fff; padding: 5px 10px; text-decoration: none; font-weight: 700; font-size: 13px; }
+.warn { border-left: 6px solid var(--warn); background: #fffbeb; }
+.ok { border-left: 6px solid var(--accent2); background: #ecfdf5; }
+.danger { border-left: 6px solid #b91c1c; background: #fef2f2; }
+@media (max-width: 720px) {
+  .header-inner, main, .nav-inner { width: min(100% - 28px, 1120px); }
+  .qa-head { align-items: flex-start; flex-direction: column; }
+}
+@media print {
+  nav.page-nav, .searchbox, button, .back-links { display: none; }
+  body { background: #fff; }
+  .panel, .qa-card, .note-card { box-shadow: none; break-inside: avoid; }
+}
+
+.index-back-button {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border: 1px solid rgba(35, 88, 197, 0.22);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1e40af;
+  padding: 8px 12px;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.16);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  text-decoration: none;
+}
+.index-back-button:hover {
+  border-color: #2358c5;
+  background: #eef4ff;
+}
+@media print {
+  .index-back-button { display: none; }
+}
+
+</style>
+<script>
+function filterCards() {
+  const input = document.getElementById('filter');
+  if (!input) return;
+  const q = input.value.toLowerCase().trim();
+  document.querySelectorAll('.qa-card').forEach((card) => {
+    const hit = (card.getAttribute('data-text') || card.textContent).toLowerCase().includes(q);
+    card.style.display = hit ? '' : 'none';
+  });
+}
+function openAll() {
+  document.querySelectorAll('details').forEach((d) => { d.open = true; });
+}
+function closeAll() {
+  document.querySelectorAll('details').forEach((d) => { d.open = false; });
+}
+</script>
+</head>
+<body>
+<a class="index-back-button" href="../index.html">Indexへ戻る</a>
+<header>
+  <div class="header-inner">
+    <h1>APIパフォーマンス課題 技術理解の補足資料</h1>
+    <p class="lead">APIパフォーマンス課題の戦略ページを支える詳細資料です。Latency、Traffic、Errors、Saturation、DB、外部API、改善策を深掘りします。</p>
+    <div class="meta">Markdown変換: 2026-06-27</div>
+    <div class="back-links">
+      <a href="../index.html">Study Notes</a>
+      <a href="web_backend_interview_qa_2026.html">Webバックエンド面接Q&A入口</a>
+    </div>
+  </div>
+</header>
+<nav class="page-nav"><div class="nav-inner"><a href="#toc">目次</a><a href="#apiパフォーマンス課題-技術理解の補足資料-2026-06-18">本文</a><a href="api_performance_task_strategy.html">戦略ページ</a></div></nav>
+<main>
+<section class="panel" id="toc"><h2>目次</h2><ul class="toc"><li class="level-1"><a href="#apiパフォーマンス課題-技術理解の補足資料-2026-06-18">APIパフォーマンス課題 技術理解の補足資料 2026-06-18</a></li>
+<li class="level-2"><a href="#0-この資料の位置づけ">0. この資料の位置づけ</a></li>
+<li class="level-2"><a href="#1-4つの指標を具体的に理解する">1. 4つの指標を具体的に理解する</a></li>
+<li class="level-3"><a href="#1-1-latency-レイテンシ">1-1. Latency: レイテンシ</a></li>
+<li class="level-3"><a href="#1-2-traffic-トラフィック">1-2. Traffic: トラフィック</a></li>
+<li class="level-3"><a href="#1-3-errors-エラー">1-3. Errors: エラー</a></li>
+<li class="level-3"><a href="#1-4-saturation-サチュレーション">1-4. Saturation: サチュレーション</a></li>
+<li class="level-3"><a href="#1-5-4指標の組み合わせで原因を絞る">1-5. 4指標の組み合わせで原因を絞る</a></li>
+<li class="level-2"><a href="#2-db周りの基本">2. DB周りの基本</a></li>
+<li class="level-3"><a href="#2-1-n1クエリとは何か">2-1. N+1クエリとは何か</a></li>
+<li class="level-3"><a href="#2-2-インデックス不足とは何か">2-2. インデックス不足とは何か</a></li>
+<li class="level-3"><a href="#2-3-どういうインデックスを貼るのか">2-3. どういうインデックスを貼るのか</a></li>
+<li class="level-3"><a href="#2-4-sqlの基本構成">2-4. SQLの基本構成</a></li>
+<li class="level-3"><a href="#2-5-joinとは何か">2-5. JOINとは何か</a></li>
+<li class="level-3"><a href="#2-6-order-byとは何か">2-6. ORDER BYとは何か</a></li>
+<li class="level-3"><a href="#2-7-group-byとは何か">2-7. GROUP BYとは何か</a></li>
+<li class="level-3"><a href="#2-8-explainで何を見るか">2-8. EXPLAINで何を見るか</a></li>
+<li class="level-3"><a href="#2-9-ロックとトランザクション">2-9. ロックとトランザクション</a></li>
+<li class="level-3"><a href="#2-10-dbコネクションプール">2-10. DBコネクションプール</a></li>
+<li class="level-3"><a href="#2-11-ページングとは何か">2-11. ページングとは何か</a></li>
+<li class="level-2"><a href="#3-アプリケーション処理が遅い場合の具体例">3. アプリケーション処理が遅い場合の具体例</a></li>
+<li class="level-3"><a href="#3-1-ループ内でdbや外部apiを呼ぶ">3-1. ループ内でDBや外部APIを呼ぶ</a></li>
+<li class="level-3"><a href="#3-2-jsonシリアライズ・デシリアライズが重い">3-2. JSONシリアライズ・デシリアライズが重い</a></li>
+<li class="level-3"><a href="#3-3-同期処理で重い処理を待っている">3-3. 同期処理で重い処理を待っている</a></li>
+<li class="level-3"><a href="#3-4-アプリ側で大量集計している">3-4. アプリ側で大量集計している</a></li>
+<li class="level-3"><a href="#3-5-ログ出力が過剰">3-5. ログ出力が過剰</a></li>
+<li class="level-3"><a href="#3-6-gcやメモリが原因">3-6. GCやメモリが原因</a></li>
+<li class="level-2"><a href="#4-外部apiマイクロサービス連携">4. 外部API・マイクロサービス連携</a></li>
+<li class="level-3"><a href="#4-1-タイムアウト">4-1. タイムアウト</a></li>
+<li class="level-3"><a href="#4-2-リトライ、バックオフ、ジッター">4-2. リトライ、バックオフ、ジッター</a></li>
+<li class="level-3"><a href="#4-3-冪等性">4-3. 冪等性</a></li>
+<li class="level-3"><a href="#4-4-サーキットブレーカーと縮退">4-4. サーキットブレーカーと縮退</a></li>
+<li class="level-2"><a href="#5-改善策の考え方を具体化する">5. 改善策の考え方を具体化する</a></li>
+<li class="level-3"><a href="#5-1-短期対応">5-1. 短期対応</a></li>
+<li class="level-3"><a href="#5-2-恒久対応">5-2. 恒久対応</a></li>
+<li class="level-3"><a href="#5-3-検証">5-3. 検証</a></li>
+<li class="level-2"><a href="#6-画面共有課題で見るものを詳細化する">6. 画面共有課題で見るものを詳細化する</a></li>
+<li class="level-3"><a href="#6-1-グラフが表示された場合">6-1. グラフが表示された場合</a></li>
+<li class="level-3"><a href="#6-2-ログが表示された場合">6-2. ログが表示された場合</a></li>
+<li class="level-3"><a href="#6-3-コードが表示された場合">6-3. コードが表示された場合</a></li>
+<li class="level-3"><a href="#6-4-sqlが表示された場合">6-4. SQLが表示された場合</a></li>
+<li class="level-2"><a href="#7-よくある課題パターンの詳細">7. よくある課題パターンの詳細</a></li>
+<li class="level-3"><a href="#7-1-データ量が増えて一覧apiが遅い">7-1. データ量が増えて一覧APIが遅い</a></li>
+<li class="level-3"><a href="#7-2-リリース後から急に遅い">7-2. リリース後から急に遅い</a></li>
+<li class="level-3"><a href="#7-3-p99だけ遅い">7-3. p99だけ遅い</a></li>
+<li class="level-3"><a href="#7-4-外部apiが遅い">7-4. 外部APIが遅い</a></li>
+<li class="level-3"><a href="#7-5-dbコネクションプールが枯渇している">7-5. DBコネクションプールが枯渇している</a></li>
+<li class="level-2"><a href="#9-最低限覚える用語メモ">9. 最低限覚える用語メモ</a></li>
+<li class="level-2"><a href="#10-参考情報">10. 参考情報</a></li></ul></section>
+<section class="panel doc-body"><h1 id="apiパフォーマンス課題-技術理解の補足資料-2026-06-18">APIパフォーマンス課題 技術理解の補足資料 2026-06-18</h1>
+<h2 id="0-この資料の位置づけ">0. この資料の位置づけ</h2>
+<p>この資料は、<code>api_performance_task_strategy.md</code> の詳細補足です。</p>
+<p>本編は面接直前に見るメモ、この資料は「用語や調査観点の意味を理解するための補助資料」として使います。</p>
+<p>面接では、ここに書いた内容をすべて話す必要はありません。聞かれたときに、次の3点を説明できれば十分です。</p>
+<ul><li>その指標や技術要素が何を意味するか</li><li>なぜAPI遅延につながるか</li><li>どう確認し、どう改善するか</li></ul>
+<p>目次:</p>
+<ul><li><a href="#1-4つの指標を具体的に理解する">1. 4つの指標を具体的に理解する</a></li><li><a href="#2-db周りの基本">2. DB周りの基本</a></li><li><a href="#3-アプリケーション処理が遅い場合の具体例">3. アプリケーション処理が遅い場合の具体例</a></li><li><a href="#4-外部apiマイクロサービス連携">4. 外部API・マイクロサービス連携</a></li><li><a href="#5-改善策の考え方を具体化する">5. 改善策の考え方を具体化する</a></li><li><a href="#6-画面共有課題で見るものを詳細化する">6. 画面共有課題で見るものを詳細化する</a></li><li><a href="#7-よくある課題パターンの詳細">7. よくある課題パターンの詳細</a></li><li><a href="#9-最低限覚える用語メモ">9. 最低限覚える用語メモ</a></li></ul>
+<p>---</p>
+<h2 id="1-4つの指標を具体的に理解する">1. 4つの指標を具体的に理解する</h2>
+<p>Google SREの代表的な考え方として、ユーザー向けシステムでは <code>Latency</code>、<code>Traffic</code>、<code>Errors</code>、<code>Saturation</code> を見る、という整理があります。</p>
+<p>面接では、まずこの4つで全体像をつかみます。</p>
+<pre><code class="language-text">遅い
+  -&gt; 本当に遅いのか: Latency
+  -&gt; 負荷が増えたのか: Traffic
+  -&gt; 失敗も増えているのか: Errors
+  -&gt; 何かが詰まっているのか: Saturation</code></pre>
+<h3 id="1-1-latency-レイテンシ">1-1. Latency: レイテンシ</h3>
+<p>レイテンシは、リクエストを送ってからレスポンスが返るまでの時間です。</p>
+<p>APIでいうと、たとえば次のような値です。</p>
+<ul><li><code>/accounts</code> の平均レスポンス時間が <code>200ms</code></li><li><code>/transactions</code> のp95が <code>1.2s</code></li><li><code>/transfer</code> のp99が <code>5s</code></li></ul>
+<p>重要なのは、平均だけを見ないことです。</p>
+<div class="table-wrap"><table><thead><tr><th>指標</th><th>意味</th><th>見え方</th></tr></thead><tbody><tr><td>平均</td><td>全リクエストの平均時間</td><td>全体傾向は分かるが、一部の極端な遅延が隠れる</td></tr><tr><td>p50</td><td>50%のリクエストがこの時間以内</td><td>中央値。普通のユーザー体験に近い</td></tr><tr><td>p95</td><td>95%のリクエストがこの時間以内</td><td>遅いユーザーが出ていないかを見る</td></tr><tr><td>p99</td><td>99%のリクエストがこの時間以内</td><td>ごく一部の深刻な遅延を見る</td></tr></tbody></table></div>
+<p>ここでいう <code>p</code> は <code>percentile</code>、つまりパーセンタイルの <code>p</code> です。</p>
+<p>パーセンタイルは、値を小さい順に並べたときに「何%地点にある値か」を表します。</p>
+<p>例として、100件のAPIレスポンスタイムがあるとします。</p>
+<pre><code class="language-text">100件のレスポンスタイムを速い順に並べる
+
+1番目    50ms
+2番目    55ms
+...
+50番目   120ms  -&gt; p50
+...
+95番目   800ms  -&gt; p95
+...
+99番目   3000ms -&gt; p99
+100番目  5000ms</code></pre>
+<p>この場合、p95が <code>800ms</code> なら「95%のリクエストは800ms以内に返っているが、残り5%は800msより遅い」という意味です。p99が <code>3000ms</code> なら「99%は3秒以内だが、残り1%は3秒より遅い」という意味です。</p>
+<p>平均だけを見ると、極端に遅い一部のリクエストが見えにくくなります。</p>
+<pre><code class="language-text">レスポンス時間:
+  100ms, 100ms, 100ms, 100ms, 5000ms
+
+平均:
+  1080ms
+
+実態:
+  ほとんどは速いが、1件だけ極端に遅い</code></pre>
+<p>逆に、平均だけだと「全体が少し遅い」のか「一部だけ極端に遅い」のかが分かりません。そのため、API性能では平均、p95、p99を分けて見ます。</p>
+<p>たとえば、平均が <code>200ms</code> でも、p99が <code>8s</code> なら、一部ユーザーにはかなり遅いAPIです。金融サービスでは「一部ユーザーだけ遅い」も無視しづらいです。残高照会、明細、振込、本人確認などで一部だけ極端に遅いと、問い合わせや再操作につながります。</p>
+<p>レイテンシが悪化する原因の例:</p>
+<ul><li>DBクエリが遅い</li><li>N+1でSQL発行回数が増えている</li><li>外部APIの応答が遅い</li><li>アプリ側で大量データを加工している</li><li>JSONレスポンスが大きすぎる</li><li>コネクションプール待ちが発生している</li><li>CPUやメモリが逼迫している</li><li>ロック待ちが発生している</li></ul>
+<p>面接での言い方:</p>
+<blockquote><p>まず平均だけではなく、p95やp99を見ます。平均が悪いなら全体的な遅さ、p99だけ悪いなら一部条件、ロック待ち、外部APIの揺らぎ、GC、コネクションプール待ちなどを疑います。</p></blockquote>
+<h3 id="1-2-traffic-トラフィック">1-2. Traffic: トラフィック</h3>
+<p>トラフィックは、システムに来ている負荷量です。</p>
+<p>APIで見る場合は、次のようなものです。</p>
+<ul><li>RPS: 1秒あたりのリクエスト数</li><li>QPS: 1秒あたりのクエリ数</li><li>同時接続数</li><li>対象APIの呼び出し数</li><li>パートナー別、ユーザー別、時間帯別の呼び出し数</li></ul>
+<h4 id="rpsとapi呼び出し数の違い">RPSとAPI呼び出し数の違い</h4>
+<p>RPSとAPI呼び出し数はかなり近い概念ですが、見ている粒度が違います。</p>
+<div class="table-wrap"><table><thead><tr><th>用語</th><th>意味</th><th>例</th></tr></thead><tbody><tr><td>API呼び出し数</td><td>ある期間にAPIが何回呼ばれたか</td><td>1分間に3,000回</td></tr><tr><td>RPS</td><td>1秒あたり何リクエスト来たか</td><td>50 requests/sec</td></tr><tr><td>RPM</td><td>1分あたり何リクエスト来たか</td><td>3,000 requests/min</td></tr><tr><td>QPS</td><td>1秒あたり何クエリ、または問い合わせが来たか</td><td>DBクエリが200 queries/sec</td></tr></tbody></table></div>
+<p>たとえば、1分間に3,000回APIが呼ばれていれば、平均すると <code>50 RPS</code> です。</p>
+<pre><code class="language-text">3,000 requests / 60 seconds = 50 RPS</code></pre>
+<p>ただし、現実にはきれいに均等ではありません。</p>
+<pre><code class="language-text">1分間で3,000リクエスト
+
+前半30秒:
+  ほぼ0リクエスト
+
+後半30秒:
+  3,000リクエスト
+  -&gt; 後半だけ見ると100 RPS</code></pre>
+<p>そのため、ダッシュボードでは「1分平均のRPS」「5分平均のRPS」「ピーク時RPS」のように、どの時間幅で見ているかが重要です。</p>
+<p>面接での言い方:</p>
+<blockquote><p>API呼び出し数は一定期間の総数で、RPSはそれを1秒あたりに直した負荷指標です。1分間に3,000回なら平均50 RPSですが、実際には瞬間的なピークがあるため、平均だけでなくピークや時間帯別にも見ます。</p></blockquote>
+<h4 id="同時接続数、同時リクエスト数とは何か">同時接続数、同時リクエスト数とは何か</h4>
+<p>同時接続数は、ざっくり言うと「同時に処理中、または接続中の数」です。</p>
+<p>RPSは「単位時間あたり何件来るか」、同時接続数は「今どれだけ同時に抱えているか」です。</p>
+<pre><code class="language-text">RPS:
+  1秒間に何件リクエストが来るか
+
+同時リクエスト数:
+  ある瞬間に何件のリクエストを処理中か</code></pre>
+<p>たとえば、同じ <code>100 RPS</code> でも、1リクエストがすぐ終わるか、長くかかるかで同時処理数は変わります。</p>
+<pre><code class="language-text">100 RPSで、1リクエストが平均100msで終わる:
+  同時処理中はざっくり10件程度
+
+100 RPSで、1リクエストが平均2秒かかる:
+  同時処理中はざっくり200件程度</code></pre>
+<p>同じRPSでも、レイテンシが悪化すると同時処理数が増え、スレッドやDB接続が埋まりやすくなります。これがさらにレイテンシを悪化させることがあります。</p>
+<p>面接での言い方:</p>
+<blockquote><p>RPSは入ってくるリクエストの速度で、同時接続数や同時リクエスト数は、その瞬間に処理中の数です。同じRPSでも、1件あたりの処理時間が長くなると同時処理数が増え、スレッドやDB接続が詰まりやすくなります。</p></blockquote>
+<h4 id="基準値はあるのか">基準値はあるのか</h4>
+<p>「何RPSなら多いか」はサービス設計次第です。</p>
+<p>同じ100 RPSでも、次の条件で重さがまったく違います。</p>
+<div class="table-wrap"><table><thead><tr><th>API</th><th>100 RPSの重さ</th></tr></thead><tbody><tr><td>静的なマスタ情報を返すAPI</td><td>軽い可能性が高い</td></tr><tr><td>DBを1回検索するAPI</td><td>普通</td></tr><tr><td>複数JOINして明細を返すAPI</td><td>重い可能性がある</td></tr><tr><td>外部APIを呼ぶAPI</td><td>相手先次第で重い</td></tr><tr><td>振込や更新系API</td><td>整合性やロックも考える必要がある</td></tr></tbody></table></div>
+<p>見る単位としては、次のように分けるのが一般的です。</p>
+<ul><li>システム全体のRPS</li><li>APIエンドポイント別のRPS</li><li>ユーザー別、パートナー別のRPS</li><li>インスタンス、Pod、TaskあたりのRPS</li><li>DBクエリのQPS</li><li>時間帯別、ピーク時のRPS</li></ul>
+<p>面接では、絶対値を暗記するより、基準線との比較を言える方が重要です。</p>
+<blockquote><p>RPSの絶対値だけでは重いか判断できないため、通常時のベースライン、ピーク時、対象APIの処理内容、1台あたりの負荷、DBや外部APIへの影響と合わせて見ます。</p></blockquote>
+<p>トラフィックが増えると、同じAPIでも遅くなることがあります。</p>
+<pre><code class="language-text">通常時:
+  100リクエスト/分
+  DB接続に余裕あり
+  平均200ms
+
+負荷増加時:
+  5,000リクエスト/分
+  DB接続が埋まる
+  待ち行列が発生
+  平均2秒、p99 10秒</code></pre>
+<p>トラフィック増加が原因になりやすいパターン:</p>
+<ul><li>キャンペーンや通知でアクセスが集中する</li><li>特定パートナーからのAPI呼び出しが急増する</li><li>バッチ処理が大量にAPIやDBへアクセスする</li><li>リトライが集中して、通常よりリクエスト数が増える</li><li>フロント側の不具合で同じAPIを何度も呼んでいる</li></ul>
+<p>面接での言い方:</p>
+<blockquote><p>レイテンシが上がっている場合、同じタイミングでリクエスト数も増えているかを見ます。トラフィック増加と遅延が連動していれば、どのリソースが先に詰まっているか、DB接続、CPU、外部API、スレッドなどを確認します。</p></blockquote>
+<h3 id="1-3-errors-エラー">1-3. Errors: エラー</h3>
+<p>エラーは、リクエストが正常に処理できなかった割合や内容です。</p>
+<p>APIで見るエラー:</p>
+<ul><li><code>4xx</code>: クライアント側のリクエスト不正、認証認可エラーなど</li><li><code>5xx</code>: サーバ側の異常</li><li>タイムアウト</li><li>DB接続エラー</li><li>外部APIエラー</li><li>業務エラー</li></ul>
+<p>ただし、<code>4xx</code> がすべて悪いわけではありません。たとえば認証切れや入力不正は通常の業務上起こり得ます。一方で、急に <code>401</code> や <code>403</code> が増えた場合は認証認可の変更ミスかもしれません。<code>5xx</code> やタイムアウトが増えた場合は、サーバ側の問題である可能性が高いです。</p>
+<p>エラーとレイテンシの組み合わせで見る例:</p>
+<div class="table-wrap"><table><thead><tr><th>状況</th><th>考えられること</th></tr></thead><tbody><tr><td>レイテンシだけ上がり、エラーは少ない</td><td>処理は成功しているが遅い。DB、外部API、CPU、プール待ちを疑う</td></tr><tr><td>レイテンシもエラー率も上がる</td><td>タイムアウト、リソース逼迫、下流障害を疑う</td></tr><tr><td>エラー率だけ上がる</td><td>設定ミス、認証認可、外部API仕様変更、バリデーション変更を疑う</td></tr><tr><td>4xxが急増</td><td>クライアント変更、認可スコープ、入力仕様変更を疑う</td></tr><tr><td>5xxが急増</td><td>アプリ例外、DB障害、外部API障害、インフラ障害を疑う</td></tr></tbody></table></div>
+<p>面接での言い方:</p>
+<blockquote><p>遅いだけなのか、タイムアウトや5xxも増えているのかを分けます。エラーが増えている場合は、単なる性能問題ではなく、下流障害、DB接続枯渇、設定変更、認証認可の変更も疑います。</p></blockquote>
+<h3 id="1-4-saturation-サチュレーション">1-4. Saturation: サチュレーション</h3>
+<p>サチュレーションは、リソースがどれだけ限界に近いか、つまり「詰まり具合」です。</p>
+<p>代表例:</p>
+<ul><li>CPU使用率が高い</li><li>メモリが足りない</li><li>GCが頻発している</li><li>DBコネクションプールが枯渇している</li><li>Tomcatのワーカースレッドが埋まっている</li><li>HTTPクライアントの接続プールが埋まっている</li><li>DBのI/Oが詰まっている</li><li>ロック待ちが増えている</li></ul>
+<p>サチュレーションのポイントは、限界に近づくと待ち行列が発生し、レイテンシが急に悪化しやすいことです。</p>
+<pre><code class="language-text">余裕あり:
+  すぐ処理できる
+  レスポンス 200ms
+
+詰まり始め:
+  DB接続待ちが少し発生
+  レスポンス 800ms
+
+限界:
+  ほぼ全リクエストが待つ
+  レスポンス 5s
+  タイムアウト増加</code></pre>
+<p>よくあるサチュレーション:</p>
+<div class="table-wrap"><table><thead><tr><th>詰まる場所</th><th>起きること</th><th>確認するもの</th></tr></thead><tbody><tr><td>DB接続プール</td><td>DB接続待ちでAPIが遅くなる</td><td>active、idle、pending</td></tr><tr><td>アプリスレッド</td><td>リクエストを処理するスレッドが空かない</td><td>active threads、queue</td></tr><tr><td>CPU</td><td>処理待ちが増える</td><td>CPU使用率、ロード、プロファイル</td></tr><tr><td>メモリ/GC</td><td>GC停止でレスポンスが揺れる</td><td>heap、GCログ、pause time</td></tr><tr><td>DB I/O</td><td>クエリが遅くなる</td><td>IOPS、スロークエリ、実行計画</td></tr><tr><td>外部API接続</td><td>外部API待ちで詰まる</td><td>timeout、retry、connection pool</td></tr></tbody></table></div>
+<p>面接での言い方:</p>
+<blockquote><p>サチュレーションは、CPUやDB接続数などのリソースが限界に近いかを見る指標です。どこかが詰まると待ち行列ができ、p95やp99が悪化しやすいので、レイテンシと合わせて見ます。</p></blockquote>
+<h3 id="1-5-4指標の組み合わせで原因を絞る">1-5. 4指標の組み合わせで原因を絞る</h3>
+<p>4つの指標は単独ではなく、組み合わせで見ます。</p>
+<div class="table-wrap"><table><thead><tr><th>見え方</th><th>疑うこと</th></tr></thead><tbody><tr><td>Traffic増加、Latency増加、Saturation増加</td><td>負荷増加でリソースが詰まっている</td></tr><tr><td>Trafficは同じ、Latencyだけ増加</td><td>リリース、SQL変更、外部API遅延、データ増加</td></tr><tr><td>Errors増加、Latency増加</td><td>タイムアウト、DB/外部API障害、プール枯渇</td></tr><tr><td>p99だけ悪い</td><td>一部データ、ロック、GC、外部APIの揺らぎ、キャッシュミス</td></tr><tr><td>CPU低いがLatency高い</td><td>DB待ち、外部API待ち、コネクションプール待ち</td></tr><tr><td>DB CPU高い、スロークエリ増加</td><td>SQL、インデックス、取得件数、JOIN/GROUP BY/ORDER BY</td></tr></tbody></table></div>
+<p>---</p>
+<h2 id="2-db周りの基本">2. DB周りの基本</h2>
+<p>API性能課題では、DBが原因になることがかなり多いです。ただし、面接ではDBだけに決めつけるのではなく、DBが疑わしい場合に何を見るかを説明できればよいです。</p>
+<h3 id="2-1-n1クエリとは何か">2-1. N+1クエリとは何か</h3>
+<p>N+1クエリは、最初に一覧を1回取得したあと、一覧の各行ごとに追加SQLを発行してしまう問題です。</p>
+<p>例として、取引明細一覧を取得するAPIを考えます。</p>
+<p>悪い例:</p>
+<pre><code class="language-text">1回目:
+  SELECT * FROM transactions WHERE user_id = ?
+
+明細が100件ある場合:
+  SELECT * FROM merchants WHERE id = ?  -- 1件目
+  SELECT * FROM merchants WHERE id = ?  -- 2件目
+  ...
+  SELECT * FROM merchants WHERE id = ?  -- 100件目</code></pre>
+<p>この場合、最初の1回に加えて、100件分の追加SQLが出ます。だから <code>N+1</code> です。</p>
+<p>データが少ないと問題が見えません。</p>
+<pre><code class="language-text">明細5件:
+  SQL 6回
+  そこまで遅くない
+
+明細1,000件:
+  SQL 1,001回
+  急に遅くなる</code></pre>
+<p>N+1が起きやすい実装:</p>
+<ul><li>一覧取得後、for文の中でDBアクセスしている</li><li>ORMの遅延ロードで関連テーブルを1件ずつ取りに行っている</li><li>DTO組み立て時に、関連情報を都度Repositoryから取得している</li></ul>
+<p>確認方法:</p>
+<ul><li>SQLログで、似たSQLが大量に出ていないか見る</li><li>1リクエストあたりのSQL発行回数を見る</li><li>データ件数を増やすと処理時間が比例して悪化するか見る</li><li>APMやトレースでDB呼び出し回数を見る</li></ul>
+<p>改善策:</p>
+<ul><li>JOINで必要な関連情報をまとめて取得する</li><li><code>WHERE id IN (...)</code> でまとめて取得する</li><li>ORMのfetch joinやbatch fetchを使う</li><li>APIで本当に必要な情報だけにDTOを絞る</li><li>ページングして1回の対象件数を減らす</li></ul>
+<h4 id="改善策1-joinでまとめて取得する">改善策1: JOINでまとめて取得する</h4>
+<p>N+1の悪い例では、まず取引明細を取得し、その後に加盟店情報を1件ずつ取得していました。</p>
+<p>悪い例:</p>
+<pre><code class="language-sql">SELECT id, amount, merchant_id
+FROM transactions
+WHERE account_id = ?
+ORDER BY occurred_at DESC
+LIMIT 100;
+
+-- ここから100回発行される
+SELECT id, name
+FROM merchants
+WHERE id = ?;</code></pre>
+<p>これをJOINでまとめると、1回のSQLで取引明細と加盟店名を取得できます。</p>
+<pre><code class="language-sql">SELECT
+  t.id,
+  t.amount,
+  t.occurred_at,
+  m.name AS merchant_name
+FROM transactions t
+JOIN merchants m
+  ON t.merchant_id = m.id
+WHERE t.account_id = ?
+ORDER BY t.occurred_at DESC
+LIMIT 100;</code></pre>
+<p>この形なら、明細100件に対して加盟店取得SQLを100回出す必要がありません。</p>
+<p>ただし、JOINしすぎるとSQLが複雑になり、逆に重くなることもあります。必要な関連情報だけJOINします。</p>
+<h4 id="改善策2-in句でまとめて取得する">改善策2: IN句でまとめて取得する</h4>
+<p>JOINではなく、2回のSQLに分けてまとめて取る方法もあります。</p>
+<pre><code class="language-sql">-- 1回目: 取引明細を取得
+SELECT id, amount, merchant_id
+FROM transactions
+WHERE account_id = ?
+ORDER BY occurred_at DESC
+LIMIT 100;
+
+-- アプリ側でmerchant_idを重複排除する
+-- merchant_id = (10, 20, 30, 40)
+
+-- 2回目: 必要な加盟店だけまとめて取得
+SELECT id, name
+FROM merchants
+WHERE id IN (10, 20, 30, 40);</code></pre>
+<p>アプリ側では、取得した加盟店一覧をMapにして、取引明細へ紐づけます。</p>
+<pre><code class="language-java">List&lt;Transaction&gt; transactions =
+    transactionRepository.findLatestByAccountId(accountId, limit);
+
+Set&lt;Long&gt; merchantIds = transactions.stream()
+    .map(Transaction::getMerchantId)
+    .collect(Collectors.toSet());
+
+Map&lt;Long, Merchant&gt; merchantMap =
+    merchantRepository.findByIdIn(merchantIds).stream()
+        .collect(Collectors.toMap(Merchant::getId, Function.identity()));
+
+List&lt;TransactionDto&gt; dtoList = transactions.stream()
+    .map(tx -&gt; toDto(tx, merchantMap.get(tx.getMerchantId())))
+    .toList();</code></pre>
+<p>SQL回数は、明細件数に関係なく基本的に2回です。</p>
+<pre><code class="language-text">悪い例:
+  明細100件 -&gt; SQL 101回
+
+IN句でまとめ取得:
+  明細100件 -&gt; SQL 2回</code></pre>
+<h4 id="改善策3-ormのfetch-joinを使う">改善策3: ORMのfetch joinを使う</h4>
+<p>JPAなどのORMを使っている場合、関連エンティティの遅延ロードでN+1が起きることがあります。</p>
+<p>イメージ:</p>
+<pre><code class="language-java">List&lt;Transaction&gt; transactions =
+    transactionRepository.findByAccountId(accountId);
+
+for (Transaction tx : transactions) {
+    // ここでtx.getMerchant()を呼ぶたびにSQLが出る可能性がある
+    String merchantName = tx.getMerchant().getName();
+}</code></pre>
+<p>fetch joinを使うと、関連情報を最初からまとめて取得できます。</p>
+<pre><code class="language-java">@Query(&quot;&quot;&quot;
+    SELECT t
+    FROM Transaction t
+    JOIN FETCH t.merchant
+    WHERE t.accountId = :accountId
+    ORDER BY t.occurredAt DESC
+    &quot;&quot;&quot;)
+List&lt;Transaction&gt; findWithMerchantByAccountId(Long accountId);</code></pre>
+<p>ただし、fetch joinも万能ではありません。1対多の関連を広くfetchすると、結果件数が膨らむことがあります。面接では「JOINやfetch joinでまとめる。ただし関連の多さと取得件数は確認する」と言えれば十分です。</p>
+<h4 id="改善策4-dtoを絞る">改善策4: DTOを絞る</h4>
+<p>そもそも一覧APIで加盟店の全情報が必要ないなら、必要な項目だけ返す設計にします。</p>
+<pre><code class="language-sql">SELECT
+  t.id,
+  t.amount,
+  t.occurred_at,
+  m.name AS merchant_name
+FROM transactions t
+JOIN merchants m
+  ON t.merchant_id = m.id
+WHERE t.account_id = ?
+ORDER BY t.occurred_at DESC
+LIMIT 100;</code></pre>
+<p>一覧では <code>merchant_name</code> だけ返し、加盟店詳細は詳細APIで取得する、という分け方です。</p>
+<h4 id="改善策5-ページングする">改善策5: ページングする</h4>
+<p>N+1を解消しても、1回で1万件返すAPIは重くなります。ページングで1回に返す件数を制限します。</p>
+<pre><code class="language-sql">SELECT
+  t.id,
+  t.amount,
+  t.occurred_at,
+  m.name AS merchant_name
+FROM transactions t
+JOIN merchants m
+  ON t.merchant_id = m.id
+WHERE t.account_id = ?
+ORDER BY t.occurred_at DESC
+LIMIT 100;</code></pre>
+<p>ページングの詳しい説明は、<a href="#2-11-ページングとは何か">2-11. ページングとは何か</a> を参照してください。</p>
+<p>面接での言い方:</p>
+<blockquote><p>N+1は、一覧を1回取得したあと、各レコードごとに追加SQLを発行してしまう問題です。件数が増えるほどSQL回数が増えるため、SQLログやトレースで1リクエストあたりのSQL回数を確認します。改善策としては、JOINやIN句によるまとめ取得、fetch設計、ページングを検討します。</p></blockquote>
+<h3 id="2-2-インデックス不足とは何か">2-2. インデックス不足とは何か</h3>
+<p>インデックスは、DBが目的の行を探しやすくするための索引です。</p>
+<p>インデックスがない場合、DBはテーブル全体を見に行くことがあります。これをフルスキャンと呼びます。</p>
+<pre><code class="language-sql">SELECT *
+FROM transactions
+WHERE account_id = 'A001'
+ORDER BY occurred_at DESC
+LIMIT 50;</code></pre>
+<p>このSQLで <code>account_id</code> や <code>occurred_at</code> に適切なインデックスがないと、DBは大量の取引明細から対象口座のデータを探し、さらに並べ替える必要があります。データが少ないうちは問題にならなくても、明細が増えると遅くなります。</p>
+<p>認識としては、ほぼ次で合っています。</p>
+<pre><code class="language-text">インデックスなし:
+  テーブルの行を順番に見る
+  条件に合う行を探す
+  必要なら並び替える
+  件数が増えるほど遅くなりやすい
+
+インデックスあり:
+  索引を使って対象範囲へ早く到達する
+  条件に合う行だけを効率よく読む
+  インデックス順を使えれば並び替えも軽くなる</code></pre>
+<p>ただし、インデックスを貼ったら必ず使われるわけではありません。DBのオプティマイザが、テーブルの統計情報や条件を見て「このインデックスを使う方が速そう」と判断した場合に使われます。だからEXPLAINで確認します。</p>
+<h4 id="インデックスの中身は何か">インデックスの中身は何か</h4>
+<p>MySQL/InnoDBで一般的に使われるインデックスは、B-tree系、より正確にはB+Tree系の構造として説明されることが多いです。</p>
+<p>面接では、深くアルゴリズムを説明する必要は薄いですが、イメージとしては「検索しやすいようにキーが並んだ索引」です。</p>
+<p>たとえば <code>account_id</code> にインデックスがあるとします。</p>
+<pre><code class="language-text">idx_account_id
+
+A001 -&gt; 該当行の場所
+A002 -&gt; 該当行の場所
+A003 -&gt; 該当行の場所
+...</code></pre>
+<p>DBはテーブル全体を上から順番に見るのではなく、インデックスをたどって <code>account_id = 'A001'</code> の範囲へ移動できます。</p>
+<p>本に例えると、本文を1ページ目から全部読むのではなく、巻末索引でキーワードを探して該当ページへ行くイメージです。</p>
+<p>重要なのは、インデックスは「値が並んだ構造」なので、等価検索だけでなく範囲検索や並び替えにも効く場合があることです。</p>
+<pre><code class="language-sql">WHERE account_id = ?
+WHERE occurred_at &gt;= ? AND occurred_at &lt; ?
+ORDER BY occurred_at DESC</code></pre>
+<p>このような条件で、適切なインデックスがあれば読み込む行数や並び替えコストを減らせます。</p>
+<h3 id="2-3-どういうインデックスを貼るのか">2-3. どういうインデックスを貼るのか</h3>
+<p>面接で大事なのは「検索条件、並び替え、利用頻度を見て判断する」と言えることです。</p>
+<p>基本方針:</p>
+<ul><li><code>WHERE</code> でよく使う列を候補にする</li><li><code>JOIN</code> の結合条件に使う列を候補にする</li><li><code>ORDER BY</code> と組み合わせて使う列を候補にする</li><li>選択性が高い列を優先する</li><li>複合インデックスでは左から順に効くことを意識する</li><li>更新が多いテーブルでは、貼りすぎに注意する</li></ul>
+<p>選択性とは、値のばらつきです。</p>
+<pre><code class="language-text">選択性が高い:
+  user_id, account_id, transaction_id
+  -&gt; 値で絞ると対象行がかなり減る
+
+選択性が低い:
+  gender, statusが2種類だけ、deleted_flag
+  -&gt; 値で絞っても対象行があまり減らない</code></pre>
+<p>たとえば取引明細APIなら、次のような検索があり得ます。</p>
+<pre><code class="language-sql">SELECT id, amount, occurred_at, description
+FROM transactions
+WHERE account_id = ?
+  AND occurred_at &gt;= ?
+  AND occurred_at &lt; ?
+ORDER BY occurred_at DESC
+LIMIT 50;</code></pre>
+<p>この場合の候補:</p>
+<pre><code class="language-sql">CREATE INDEX idx_transactions_account_occurred
+ON transactions (account_id, occurred_at);</code></pre>
+<p>理由:</p>
+<ul><li><code>account_id</code> で対象口座に絞る</li><li><code>occurred_at</code> で期間条件と並び替えに使う</li><li><code>LIMIT 50</code> で必要な件数だけ取る</li></ul>
+<h4 id="複合インデックスはどう効くか">複合インデックスはどう効くか</h4>
+<p>複合インデックスは、複数列を組み合わせたインデックスです。</p>
+<pre><code class="language-sql">CREATE INDEX idx_transactions_account_occurred
+ON transactions (account_id, occurred_at);</code></pre>
+<p>これは、ざっくり言うと次の順で並んだ索引です。</p>
+<pre><code class="language-text">account_id で並ぶ
+  同じ account_id の中で occurred_at で並ぶ</code></pre>
+<p>イメージ:</p>
+<pre><code class="language-text">(A001, 2026-06-01)
+(A001, 2026-06-02)
+(A001, 2026-06-03)
+(A002, 2026-06-01)
+(A002, 2026-06-02)</code></pre>
+<p>そのため、次のSQLには効きやすいです。</p>
+<pre><code class="language-sql">SELECT id, amount, occurred_at
+FROM transactions
+WHERE account_id = ?
+  AND occurred_at &gt;= ?
+  AND occurred_at &lt; ?
+ORDER BY occurred_at DESC
+LIMIT 50;</code></pre>
+<p>理由は、まず <code>account_id</code> で対象口座の範囲に移動し、その中で <code>occurred_at</code> の範囲を見られるからです。</p>
+<p>一方で、同じインデックスでも次のSQLには効きにくい場合があります。</p>
+<pre><code class="language-sql">SELECT id, amount, occurred_at
+FROM transactions
+WHERE occurred_at &gt;= ?
+  AND occurred_at &lt; ?
+ORDER BY occurred_at DESC;</code></pre>
+<p><code>idx_transactions_account_occurred (account_id, occurred_at)</code> は、最初に <code>account_id</code> で並んでいます。<code>account_id</code> を指定せずに <code>occurred_at</code> だけで検索したい場合、先頭列を使えていないため効きにくい、という考え方です。</p>
+<p>これを「複合インデックスは左から効く」と表現します。</p>
+<pre><code class="language-text">インデックス: (account_id, occurred_at)
+
+効きやすい:
+  WHERE account_id = ?
+  WHERE account_id = ? AND occurred_at &gt;= ?
+
+効きにくい:
+  WHERE occurred_at &gt;= ?</code></pre>
+<h4 id="インデックスとorder-by">インデックスとORDER BY</h4>
+<p>インデックスの並び順を使える場合、DB側のソート処理を減らせることがあります。</p>
+<pre><code class="language-sql">SELECT id, amount, occurred_at
+FROM transactions
+WHERE account_id = ?
+ORDER BY occurred_at DESC
+LIMIT 50;</code></pre>
+<p><code>(account_id, occurred_at)</code> のインデックスがあれば、DBは対象口座の明細を <code>occurred_at</code> 順に読みやすくなります。これにより、全件を集めてから並び替えるより軽くなる可能性があります。</p>
+<p>ただし、複雑な条件や関数を使うとインデックスが効きにくくなる場合があります。</p>
+<p>効きにくい例:</p>
+<pre><code class="language-sql">WHERE DATE(occurred_at) = '2026-06-01'</code></pre>
+<p>列に関数をかけると、インデックスをそのまま使いにくくなることがあります。次のように範囲条件にする方が一般的です。</p>
+<pre><code class="language-sql">WHERE occurred_at &gt;= '2026-06-01 00:00:00'
+  AND occurred_at &lt;  '2026-06-02 00:00:00'</code></pre>
+<p>ただし、インデックスは貼れば貼るほどよいわけではありません。</p>
+<p>インデックスのデメリット:</p>
+<ul><li>INSERT/UPDATE/DELETEが遅くなる場合がある</li><li>ストレージを使う</li><li>オプティマイザが常に期待どおり使うとは限らない</li><li>使われないインデックスが増えると運用が複雑になる</li></ul>
+<p>面接での言い方:</p>
+<blockquote><p>インデックスは、WHERE句、JOIN条件、ORDER BYでよく使われる列を見て候補を考えます。ただし貼れば常に良いわけではなく、更新性能やストレージにも影響するため、EXPLAINで実行計画を確認し、実際に使われるか、改善効果があるかを見て判断します。</p></blockquote>
+<h3 id="2-4-sqlの基本構成">2-4. SQLの基本構成</h3>
+<p>SQLの各句の意味を整理します。</p>
+<pre><code class="language-sql">SELECT account_id, COUNT(*) AS transaction_count, SUM(amount) AS total_amount
+FROM transactions
+WHERE occurred_at &gt;= '2026-06-01'
+  AND occurred_at &lt; '2026-07-01'
+GROUP BY account_id
+HAVING SUM(amount) &gt;= 100000
+ORDER BY total_amount DESC
+LIMIT 100;</code></pre>
+<div class="table-wrap"><table><thead><tr><th>句</th><th>意味</th></tr></thead><tbody><tr><td>SELECT</td><td>返す列を指定する</td></tr><tr><td>FROM</td><td>対象テーブルを指定する</td></tr><tr><td>WHERE</td><td>行を絞り込む</td></tr><tr><td>GROUP BY</td><td>指定した単位で集約する</td></tr><tr><td>HAVING</td><td>集約後の結果を絞り込む</td></tr><tr><td>ORDER BY</td><td>並び替える</td></tr><tr><td>LIMIT</td><td>返す件数を制限する</td></tr></tbody></table></div>
+<p>性能面では、特に <code>WHERE</code>、<code>JOIN</code>、<code>GROUP BY</code>、<code>ORDER BY</code>、<code>LIMIT</code> を見ます。</p>
+<h3 id="2-5-joinとは何か">2-5. JOINとは何か</h3>
+<p>JOINは、複数テーブルを結合して必要な情報を取得するためのものです。</p>
+<p>例:</p>
+<pre><code class="language-sql">SELECT t.id, t.amount, m.name AS merchant_name
+FROM transactions t
+JOIN merchants m
+  ON t.merchant_id = m.id
+WHERE t.account_id = ?
+ORDER BY t.occurred_at DESC
+LIMIT 50;</code></pre>
+<p>このSQLは、取引明細 <code>transactions</code> と加盟店 <code>merchants</code> を結合しています。</p>
+<p>JOINが重くなる原因:</p>
+<ul><li>結合対象の件数が多い</li><li>JOIN条件の列にインデックスがない</li><li>WHEREで先に絞れていない</li><li>不要なテーブルまでJOINしている</li><li>1対多のJOINで結果件数が膨らんでいる</li></ul>
+<p>確認方法:</p>
+<ul><li>EXPLAINでJOIN順を見る</li><li>JOIN条件の列にインデックスがあるか見る</li><li>結合前後の件数を確認する</li><li>本当にそのJOINがAPIレスポンスに必要か見る</li></ul>
+<h3 id="2-6-order-byとは何か">2-6. ORDER BYとは何か</h3>
+<p>ORDER BYは並び替えです。</p>
+<pre><code class="language-sql">SELECT *
+FROM transactions
+WHERE account_id = ?
+ORDER BY occurred_at DESC
+LIMIT 50;</code></pre>
+<p>並び替え対象が少なければ問題になりにくいですが、大量データを並び替えると重くなります。インデックスが使えない場合、DB側でソート処理が必要になります。</p>
+<p>ORDER BYが重くなる原因:</p>
+<ul><li>WHEREで絞る前の対象件数が多い</li><li>ORDER BY列に適切なインデックスがない</li><li>複数列ソートが複雑</li><li><code>ORDER BY</code> しているのに <code>LIMIT</code> がない</li><li>ソート対象の行やカラムが大きい</li></ul>
+<p>改善策:</p>
+<ul><li>WHEREで先に絞る</li><li>検索条件とソート条件に合う複合インデックスを検討する</li><li>LIMITで返す件数を制限する</li><li>不要なソートをやめる</li></ul>
+<h3 id="2-7-group-byとは何か">2-7. GROUP BYとは何か</h3>
+<p>GROUP BYは、データを指定した単位でまとめる処理です。</p>
+<pre><code class="language-sql">SELECT account_id, SUM(amount)
+FROM transactions
+WHERE occurred_at &gt;= ?
+  AND occurred_at &lt; ?
+GROUP BY account_id;</code></pre>
+<p>これは、口座ごとに金額を集計しています。</p>
+<p>GROUP BYが重くなる原因:</p>
+<ul><li>集計対象の件数が多い</li><li>GROUP BY列にインデックスがない</li><li>集計処理をAPIリクエストのたびに実行している</li><li>集計結果が大きい</li><li>WHEREで十分に絞れていない</li></ul>
+<p>改善策:</p>
+<ul><li>WHEREで期間や対象を絞る</li><li>必要なら集計済みテーブルやキャッシュを検討する</li><li>バッチで事前集計する</li><li>APIで毎回重い集計をしない設計にする</li></ul>
+<p>金融サービスでは、残高や明細など正確性が重要なデータは、安易なキャッシュや事前集計に注意が必要です。速度のために整合性を崩すと本末転倒です。</p>
+<h3 id="2-8-explainで何を見るか">2-8. EXPLAINで何を見るか</h3>
+<p>MySQLでは、EXPLAINでSQLの実行計画を確認できます。</p>
+<p>見る観点:</p>
+<ul><li>想定したインデックスが使われているか</li><li>フルスキャンになっていないか</li><li>JOIN順が不自然でないか</li><li>読み込む行数が多すぎないか</li><li><code>Using filesort</code> や <code>Using temporary</code> が出ていないか</li></ul>
+<p>ざっくりした見方:</p>
+<div class="table-wrap"><table><thead><tr><th>項目</th><th>見ること</th></tr></thead><tbody><tr><td>key</td><td>実際に使われたインデックス</td></tr><tr><td>rows</td><td>読みそうな行数の見積もり</td></tr><tr><td>type</td><td>アクセス方法。ALLは全表走査の可能性</td></tr><tr><td>Extra</td><td>filesort、temporaryなど追加処理</td></tr></tbody></table></div>
+<p>面接での言い方:</p>
+<blockquote><p>EXPLAINでは、想定したインデックスが使われているか、読み込み行数が多すぎないか、フルスキャンやfilesortになっていないかを見ます。実行計画と実測を見て、インデックス追加やSQL見直しの効果を判断します。</p></blockquote>
+<h3 id="2-9-ロックとトランザクション">2-9. ロックとトランザクション</h3>
+<p>DBは、データの整合性を守るためにロックを使います。たとえば同じ口座残高を複数処理が同時に更新すると不整合が起きるため、更新中の行を他の処理が勝手に変えないようにします。</p>
+<p>ロックが問題になる例:</p>
+<pre><code class="language-text">リクエストA:
+  口座Aの残高行を更新
+  長い処理をしている
+  トランザクションをまだ閉じない
+
+リクエストB:
+  同じ口座Aの残高行を更新したい
+  Aのロック解放待ち
+  APIが遅くなる</code></pre>
+<p>ロック待ちが起きやすい実装:</p>
+<ul><li>トランザクション内で外部APIを呼んでいる</li><li>トランザクション範囲が広すぎる</li><li>大量更新を1トランザクションで実行している</li><li>同じ行や範囲に更新が集中している</li></ul>
+<p>改善策:</p>
+<ul><li>トランザクション範囲を必要最小限にする</li><li>外部API呼び出しをトランザクション外に出せないか検討する</li><li>更新順序を統一する</li><li>長時間処理を分割する</li><li>ロック待ちをメトリクスやDB情報で確認する</li></ul>
+<p>金融サービスでは、ロックを単純に外せばよいわけではありません。整合性を守りながら、トランザクションの範囲を適切に小さくするのが重要です。</p>
+<h3 id="2-10-dbコネクションプール">2-10. DBコネクションプール</h3>
+<p>アプリはDBへ接続するためにコネクションを使います。毎回新規接続すると重いので、通常はコネクションプールを使います。</p>
+<p>HikariCPのようなプールでは、ざっくり次を見ます。</p>
+<ul><li>active: 使用中の接続</li><li>idle: 空いている接続</li><li>pending: 接続待ちのリクエスト</li><li>max pool size: 最大接続数</li></ul>
+<p>問題例:</p>
+<pre><code class="language-text">max pool size = 20
+active = 20
+idle = 0
+pending = 50</code></pre>
+<p>この状態は、DB接続が全部使われていて、後続リクエストが接続待ちになっています。</p>
+<p>ただし、プールサイズを増やすだけが正解ではありません。DB側が受けられる接続数やCPUには限界があります。遅いSQLや長いトランザクションで接続を長く保持しているなら、根本原因を直す必要があります。</p>
+<p>面接での言い方:</p>
+<blockquote><p>DBコネクションプールが枯渇している場合、単純にプールを増やすだけでなく、なぜ接続を長く保持しているかを見ます。遅いSQL、長いトランザクション、外部API待ちをトランザクション内で行っていないかを確認します。</p></blockquote>
+<h3 id="2-11-ページングとは何か">2-11. ページングとは何か</h3>
+<p>ページングは、一覧データを一度に全部返さず、一定件数ずつ返すことです。</p>
+<p>たとえば取引明細が10,000件あるユーザーに対して、1回のAPIで10,000件すべて返すと重くなります。</p>
+<pre><code class="language-text">悪い例:
+  取引明細10,000件を一度に取得
+  DB負荷が高い
+  JSON生成が重い
+  レスポンスサイズが大きい
+  画面側も扱いづらい</code></pre>
+<p>ページングする場合:</p>
+<pre><code class="language-text">1回目:
+  最新100件だけ返す
+
+2回目:
+  次の100件を返す
+
+3回目:
+  さらに次の100件を返す</code></pre>
+<p>代表的な方法は、<code>LIMIT/OFFSET</code> 方式と、カーソル方式です。</p>
+<h4 id="limitoffset方式">LIMIT/OFFSET方式</h4>
+<pre><code class="language-sql">SELECT id, amount, occurred_at
+FROM transactions
+WHERE account_id = ?
+ORDER BY occurred_at DESC
+LIMIT 100 OFFSET 0;</code></pre>
+<p>次のページ:</p>
+<pre><code class="language-sql">SELECT id, amount, occurred_at
+FROM transactions
+WHERE account_id = ?
+ORDER BY occurred_at DESC
+LIMIT 100 OFFSET 100;</code></pre>
+<p>分かりやすい一方で、後ろのページに行くほどスキップする件数が増え、重くなることがあります。</p>
+<pre><code class="language-text">OFFSET 0:
+  最初から100件
+
+OFFSET 10000:
+  10,000件分を飛ばしてから100件
+  -&gt; 重くなりやすい</code></pre>
+<h4 id="カーソル方式">カーソル方式</h4>
+<p>前回取得した最後の値を条件にして、次のページを取得する方法です。</p>
+<pre><code class="language-sql">-- 1ページ目
+SELECT id, amount, occurred_at
+FROM transactions
+WHERE account_id = ?
+ORDER BY occurred_at DESC, id DESC
+LIMIT 100;</code></pre>
+<p>1ページ目の最後が <code>occurred_at = '2026-06-10 10:00:00'</code>、<code>id = 5000</code> だった場合:</p>
+<pre><code class="language-sql">-- 2ページ目
+SELECT id, amount, occurred_at
+FROM transactions
+WHERE account_id = ?
+  AND (
+    occurred_at &lt; '2026-06-10 10:00:00'
+    OR (occurred_at = '2026-06-10 10:00:00' AND id &lt; 5000)
+  )
+ORDER BY occurred_at DESC, id DESC
+LIMIT 100;</code></pre>
+<p>カーソル方式は、深いページでも比較的安定しやすいです。明細やタイムラインのように「次の100件」を読むUIではよく使われます。</p>
+<p>ページングで注意すること:</p>
+<ul><li>並び順を安定させる</li><li><code>ORDER BY occurred_at DESC, id DESC</code> のように同時刻の順序も決める</li><li>1ページあたりの上限を決める</li><li>インデックスとセットで考える</li><li>金融明細では、抜けや重複がないように条件を設計する</li></ul>
+<p>面接での言い方:</p>
+<blockquote><p>ページングは、一覧を一度に全件返さず、一定件数ずつ返すことです。大量データの一覧APIでは、DB負荷、レスポンスサイズ、JSON生成を抑えるために重要です。単純なLIMIT/OFFSETは分かりやすい一方、深いページで重くなるため、明細のようなデータではカーソル方式も検討します。</p></blockquote>
+<p>---</p>
+<h2 id="3-アプリケーション処理が遅い場合の具体例">3. アプリケーション処理が遅い場合の具体例</h2>
+<p>DB以外でも、アプリケーション側の処理がAPI遅延の原因になります。</p>
+<h3 id="3-1-ループ内でdbや外部apiを呼ぶ">3-1. ループ内でDBや外部APIを呼ぶ</h3>
+<p>コード上では自然に見えても、件数が増えると急に遅くなる典型です。</p>
+<p>悪いイメージ:</p>
+<pre><code class="language-java">for (Transaction tx : transactions) {
+    Merchant merchant = merchantRepository.findById(tx.getMerchantId());
+    dtoList.add(toDto(tx, merchant));
+}</code></pre>
+<p>取引が100件なら、加盟店取得SQLが100回出ます。外部APIなら100回HTTP通信が発生します。</p>
+<p>確認方法:</p>
+<ul><li>SQLログで同じSQLが何度も出ていないか</li><li>外部API呼び出し回数がデータ件数に比例していないか</li><li>1件、100件、1,000件で処理時間が比例して増えていないか</li></ul>
+<p>改善策:</p>
+<ul><li>まとめて取得する</li><li>JOINやIN句を使う</li><li>外部APIなら一括取得APIがないか確認する</li><li>キャッシュ可能なマスタ情報はキャッシュする</li><li>返却項目を減らす</li></ul>
+<h4 id="ソースコード側ではどう直すか">ソースコード側ではどう直すか</h4>
+<p>ソースコード側でも直せます。むしろ、RepositoryやSQLだけでなく、Service層の組み立て方を変えることが多いです。</p>
+<p>悪い例:</p>
+<pre><code class="language-java">public List&lt;TransactionDto&gt; getTransactions(Long accountId) {
+    List&lt;Transaction&gt; transactions =
+        transactionRepository.findLatestByAccountId(accountId);
+
+    List&lt;TransactionDto&gt; result = new ArrayList&lt;&gt;();
+
+    for (Transaction tx : transactions) {
+        Merchant merchant = merchantRepository.findById(tx.getMerchantId());
+        result.add(toDto(tx, merchant));
+    }
+
+    return result;
+}</code></pre>
+<p>この実装は、取引明細の件数だけ <code>merchantRepository.findById()</code> が呼ばれます。</p>
+<p>改善例:</p>
+<pre><code class="language-java">public List&lt;TransactionDto&gt; getTransactions(Long accountId) {
+    List&lt;Transaction&gt; transactions =
+        transactionRepository.findLatestByAccountId(accountId, 100);
+
+    Set&lt;Long&gt; merchantIds = transactions.stream()
+        .map(Transaction::getMerchantId)
+        .collect(Collectors.toSet());
+
+    Map&lt;Long, Merchant&gt; merchantMap =
+        merchantRepository.findByIdIn(merchantIds).stream()
+            .collect(Collectors.toMap(Merchant::getId, Function.identity()));
+
+    return transactions.stream()
+        .map(tx -&gt; toDto(tx, merchantMap.get(tx.getMerchantId())))
+        .toList();
+}</code></pre>
+<p>この改善では、アプリ側で次のことをしています。</p>
+<ul><li>まず取引明細を取得する</li><li>必要な <code>merchant_id</code> を集める</li><li>加盟店情報をまとめて取得する</li><li>Map化してメモリ上で紐づける</li></ul>
+<p>つまり、SQLだけではなく、アプリ側の処理順序を変えています。</p>
+<p>外部APIの場合も同じ考え方です。</p>
+<p>悪い例:</p>
+<pre><code class="language-java">for (Transaction tx : transactions) {
+    Category category = categoryClient.getCategory(tx.getCategoryId());
+    result.add(toDto(tx, category));
+}</code></pre>
+<p>改善候補:</p>
+<pre><code class="language-java">Set&lt;Long&gt; categoryIds = transactions.stream()
+    .map(Transaction::getCategoryId)
+    .collect(Collectors.toSet());
+
+Map&lt;Long, Category&gt; categoryMap =
+    categoryClient.getCategories(categoryIds);
+
+return transactions.stream()
+    .map(tx -&gt; toDto(tx, categoryMap.get(tx.getCategoryId())))
+    .toList();</code></pre>
+<p>一括取得APIがない場合は、次のような対策を検討します。</p>
+<ul><li>本当に外部APIから毎回取る必要があるか確認する</li><li>キャッシュできるマスタ情報ならキャッシュする</li><li>返却項目を減らす</li><li>並列化する場合は、相手先に負荷をかけすぎないよう上限を設ける</li><li>API仕様として一括取得を追加できないか検討する</li></ul>
+<p>面接での言い方:</p>
+<blockquote><p>ループ内でDBや外部APIを呼んでいる場合、RepositoryやSQLだけでなく、Service層の組み立て方を変えます。必要なIDを先に集め、IN句や一括APIでまとめて取得し、Map化してDTOへ紐づける形にすると、件数に比例した呼び出し回数を抑えられます。</p></blockquote>
+<h3 id="3-2-jsonシリアライズ・デシリアライズが重い">3-2. JSONシリアライズ・デシリアライズが重い</h3>
+<p>シリアライズは、Java/KotlinのオブジェクトをJSON文字列に変換する処理です。デシリアライズは、JSONをオブジェクトに戻す処理です。</p>
+<p>APIでは必ず発生します。</p>
+<pre><code class="language-text">DB結果
+  -&gt; Entity
+  -&gt; DTO
+  -&gt; JSON
+  -&gt; HTTPレスポンス</code></pre>
+<p>重くなる原因:</p>
+<ul><li>レスポンス件数が多すぎる</li><li>DTOのネストが深い</li><li>不要な項目まで返している</li><li>大きい文字列や配列を返している</li><li>日付や金額の変換処理が大量にある</li></ul>
+<p>例:</p>
+<pre><code class="language-json">{
+  &quot;transactions&quot;: [
+    {
+      &quot;id&quot;: &quot;tx001&quot;,
+      &quot;amount&quot;: 1000,
+      &quot;merchant&quot;: {
+        &quot;id&quot;: &quot;m001&quot;,
+        &quot;name&quot;: &quot;sample&quot;,
+        &quot;category&quot;: {
+          &quot;id&quot;: &quot;c001&quot;,
+          &quot;name&quot;: &quot;food&quot;
+        }
+      },
+      &quot;rawDetail&quot;: &quot;very large text...&quot;
+    }
+  ]
+}</code></pre>
+<p>このように深いネストや大きい項目が多いと、DBは速くてもレスポンス生成が遅くなることがあります。</p>
+<p>確認方法:</p>
+<ul><li>レスポンスサイズを見る</li><li>DTO変換前後の処理時間をログに出す</li><li>APMでController/Service/Repository以外の時間を見る</li><li>CPU使用率が高いか見る</li></ul>
+<p>改善策:</p>
+<ul><li>必要な項目だけ返す</li><li>一覧APIと詳細APIを分ける</li><li>ページングする</li><li>DTOのネストを浅くする</li><li>巨大項目は必要時だけ取得する</li><li>圧縮を検討する</li></ul>
+<p>面接での言い方:</p>
+<blockquote><p>DBが速いのにAPIが遅い場合、DTO変換やJSONシリアライズ、レスポンスサイズも見ます。一覧APIで詳細情報まで返している場合は、一覧と詳細を分ける、必要項目に絞る、ページングするなどを検討します。</p></blockquote>
+<h3 id="3-3-同期処理で重い処理を待っている">3-3. 同期処理で重い処理を待っている</h3>
+<p>同期処理は、処理が終わるまでAPIが待つ形です。</p>
+<p>例:</p>
+<pre><code class="language-text">APIリクエスト
+  -&gt; DB更新
+  -&gt; 外部API呼び出し
+  -&gt; メール送信
+  -&gt; PDF生成
+  -&gt; レスポンス</code></pre>
+<p>この場合、メール送信やPDF生成が遅いとAPI全体が遅くなります。</p>
+<p>改善策:</p>
+<ul><li>レスポンスに不要な処理は非同期化する</li><li>キューに積んで後続処理にする</li><li>処理状態を返し、あとで確認する</li><li>外部API呼び出しのタイムアウトを適切にする</li></ul>
+<p>ただし、金融取引の確定処理など、同期的に完了確認が必要なものは安易に非同期化できません。業務要件と整合性を確認する必要があります。</p>
+<h3 id="3-4-アプリ側で大量集計している">3-4. アプリ側で大量集計している</h3>
+<p>DBから大量データを取り、アプリ側で集計していると遅くなります。</p>
+<p>悪い例:</p>
+<pre><code class="language-text">DBから10万件取得
+  -&gt; Java側で口座ごとに集計
+  -&gt; JSONで返却</code></pre>
+<p>改善候補:</p>
+<ul><li>DB側で集計する</li><li>事前集計テーブルを作る</li><li>検索条件を絞る</li><li>ページングする</li><li>API要件を見直す</li></ul>
+<p>ただし、DB側でGROUP BYすれば常に速いわけではありません。集計対象が大きければDB負荷が上がります。</p>
+<h4 id="db側集計とアプリ側集計の違い">DB側集計とアプリ側集計の違い</h4>
+<p>DB側集計は、SQLの <code>GROUP BY</code> や <code>SUM</code>、<code>COUNT</code> などでDBに集計させる方法です。</p>
+<pre><code class="language-sql">SELECT account_id, SUM(amount) AS total_amount
+FROM transactions
+WHERE occurred_at &gt;= ?
+  AND occurred_at &lt; ?
+GROUP BY account_id;</code></pre>
+<p>アプリ側集計は、DBからデータを取得して、Java/Kotlin側で集計する方法です。</p>
+<pre><code class="language-java">Map&lt;Long, BigDecimal&gt; totalByAccount = transactions.stream()
+    .collect(Collectors.groupingBy(
+        Transaction::getAccountId,
+        Collectors.reducing(
+            BigDecimal.ZERO,
+            Transaction::getAmount,
+            BigDecimal::add
+        )
+    ));</code></pre>
+<p>違い:</p>
+<div class="table-wrap"><table><thead><tr><th>観点</th><th>DB側集計</th><th>アプリ側集計</th></tr></thead><tbody><tr><td>データ転送量</td><td>少なくしやすい</td><td>大量データをアプリへ運びがち</td></tr><tr><td>DB負荷</td><td>上がる</td><td>相対的に下がる場合もある</td></tr><tr><td>アプリ負荷</td><td>下がる</td><td>CPU/メモリを使う</td></tr><tr><td>実装の単純さ</td><td>SQL次第</td><td>複雑な業務ロジックを書きやすい</td></tr><tr><td>整合性</td><td>DB内で一貫して扱いやすい</td><td>取得後のデータ扱いに注意</td></tr></tbody></table></div>
+<p>DB側集計が向いているケース:</p>
+<ul><li>集計対象が大量で、結果だけ返せばよい</li><li><code>COUNT</code>、<code>SUM</code>、<code>MAX</code>、<code>MIN</code> のような単純集計</li><li>DBで絞り込み条件を効かせられる</li><li>アプリへ大量データを運びたくない</li></ul>
+<p>例:</p>
+<pre><code class="language-sql">SELECT category_id, COUNT(*) AS transaction_count
+FROM transactions
+WHERE account_id = ?
+  AND occurred_at &gt;= ?
+  AND occurred_at &lt; ?
+GROUP BY category_id;</code></pre>
+<p>アプリ側集計が向いているケース:</p>
+<ul><li>すでに必要なデータを取得済みで、追加集計が軽い</li><li>集計ロジックが複雑でSQLに押し込むと読みにくい</li><li>外部API結果やアプリ内ロジックと組み合わせる必要がある</li><li>対象件数が少ない</li></ul>
+<p>ただし、10万件、100万件をアプリに持ってきて集計するのは避けるべきです。DB、アプリ、ネットワークのどこに負荷を寄せるかを考えます。</p>
+<p>面接での言い方:</p>
+<blockquote><p>単純な件数や合計で、集計対象が大きい場合はDB側でGROUP BYする方が、アプリへのデータ転送を減らせます。一方で、対象件数が少ない場合や、複雑な業務ロジック・外部API結果と組み合わせる場合はアプリ側集計もあり得ます。どちらが良いかは、件数、DB負荷、アプリ負荷、保守性で判断します。</p></blockquote>
+<h3 id="3-5-ログ出力が過剰">3-5. ログ出力が過剰</h3>
+<p>ログも出しすぎると遅くなります。</p>
+<p>問題例:</p>
+<ul><li>大量ループ内でログを出す</li><li>リクエスト/レスポンス全文を毎回出す</li><li>巨大JSONをログに出す</li><li>同期的なログ出力でI/Oが詰まる</li></ul>
+<p>金融では監査ログが重要ですが、監査に必要なログと、デバッグログを分けて考える必要があります。</p>
+<p>面接での言い方:</p>
+<blockquote><p>ログは調査や監査に重要ですが、大量出力や巨大JSONの出力は性能に影響します。必要な監査ログは残しつつ、デバッグログの粒度、出力条件、マスキング、非同期化を確認します。</p></blockquote>
+<h3 id="3-6-gcやメモリが原因">3-6. GCやメモリが原因</h3>
+<p>Java/Kotlinでは、不要になったオブジェクトをGCが回収します。大量のオブジェクトを作るとGCが増え、場合によっては一時的に処理が止まるように見えます。</p>
+<p>起きやすい原因:</p>
+<ul><li>大量データを一度にメモリへ載せる</li><li>巨大なListやMapを作る</li><li>DTO変換で大量の一時オブジェクトを作る</li><li>大きいJSONを組み立てる</li></ul>
+<p>確認方法:</p>
+<ul><li>ヒープ使用量</li><li>GC回数</li><li>GC pause time</li><li>p99の悪化タイミングとGCのタイミング</li></ul>
+<p>改善策:</p>
+<ul><li>ページングする</li><li>ストリーミング処理を検討する</li><li>不要な全件取得をやめる</li><li>レスポンス項目を減らす</li><li>オブジェクト生成が多い処理を見直す</li></ul>
+<p>---</p>
+<h2 id="4-外部apiマイクロサービス連携">4. 外部API・マイクロサービス連携</h2>
+<h3 id="4-1-タイムアウト">4-1. タイムアウト</h3>
+<p>タイムアウトは、相手の応答をどこまで待つかの設定です。</p>
+<p>長すぎると、相手が遅いときに自分のAPIも長く待たされます。短すぎると、本当は成功できた処理を失敗扱いにする可能性があります。</p>
+<p>見るポイント:</p>
+<ul><li>接続タイムアウト</li><li>読み取りタイムアウト</li><li>API全体のタイムアウト</li><li>DBクエリタイムアウト</li><li>リトライを含めた最大待ち時間</li></ul>
+<p>面接での言い方:</p>
+<blockquote><p>外部APIが遅い場合、タイムアウト値が長すぎるとアプリ側スレッドが長時間占有されます。逆に短すぎると成功できる処理まで失敗するため、相手APIの通常応答時間と業務要件を見て設定します。</p></blockquote>
+<h3 id="4-2-リトライ、バックオフ、ジッター">4-2. リトライ、バックオフ、ジッター</h3>
+<p>リトライは、失敗した処理を再実行することです。</p>
+<p>一時的なネットワークエラーには有効ですが、何も考えずにリトライすると障害を悪化させます。</p>
+<p>悪い例:</p>
+<pre><code class="language-text">外部APIが遅い
+  -&gt; 全リクエストが即リトライ
+  -&gt; 外部APIへの負荷が2倍、3倍になる
+  -&gt; さらに遅くなる</code></pre>
+<p>バックオフは、リトライ間隔を少しずつ長くすることです。</p>
+<pre><code class="language-text">1回目失敗 -&gt; 100ms待つ
+2回目失敗 -&gt; 500ms待つ
+3回目失敗 -&gt; 1s待つ</code></pre>
+<p>ジッターは、リトライのタイミングを少しランダムにずらすことです。全クライアントが同時に再実行して負荷が集中するのを防ぎます。</p>
+<p>面接での言い方:</p>
+<blockquote><p>リトライは一時障害には有効ですが、同時に集中すると下流サービスへさらに負荷をかけます。そのため、最大回数、タイムアウト、バックオフ、ジッターを設計します。金融APIでは、リトライによる二重処理を防ぐため、冪等性も合わせて考えます。</p></blockquote>
+<h3 id="4-3-冪等性">4-3. 冪等性</h3>
+<p>冪等性は、同じリクエストを複数回実行しても結果が変わらない性質です。</p>
+<p>金融APIでは特に重要です。</p>
+<p>問題例:</p>
+<pre><code class="language-text">振込APIを呼ぶ
+  -&gt; サーバ側では振込処理が成功
+  -&gt; しかしクライアントにはタイムアウト
+  -&gt; クライアントが再リトライ
+  -&gt; 二重振込になる可能性</code></pre>
+<p>対策例:</p>
+<ul><li>Idempotency-Keyを付ける</li><li>取引IDを先に発行する</li><li>処理状態をDBで管理する</li><li>同じキーの再リクエストには同じ結果を返す</li><li>状態が不明な場合に照会APIで確認できるようにする</li></ul>
+<p>面接での言い方:</p>
+<blockquote><p>金融APIでは、タイムアウト時に処理が成功したのか失敗したのか分からない状態が起きます。そのため、リトライ前提で冪等性キーや取引状態管理を設計し、同じ処理が二重に実行されないようにします。</p></blockquote>
+<h3 id="4-4-サーキットブレーカーと縮退">4-4. サーキットブレーカーと縮退</h3>
+<p>サーキットブレーカーは、下流サービスが失敗し続けているときに、一定時間呼び出しを止める考え方です。</p>
+<p>目的:</p>
+<ul><li>下流サービスをさらに追い込まない</li><li>自サービスのスレッドを無駄に占有しない</li><li>早く失敗を返す</li><li>代替レスポンスや機能制限に切り替える</li></ul>
+<p>縮退は、一部機能を制限してサービス全体を守ることです。</p>
+<p>例:</p>
+<ul><li>明細のリアルタイム更新は止めるが、過去明細は表示する</li><li>外部連携先の情報は一時的に表示しない</li><li>非重要な推薦・集計情報を返さない</li></ul>
+<p>金融サービスでは、縮退してよい機能と、正確性のために止めるべき機能を分ける必要があります。</p>
+<p>---</p>
+<h2 id="5-改善策の考え方を具体化する">5. 改善策の考え方を具体化する</h2>
+<p>改善策は、短期対応と恒久対応に分けます。</p>
+<h3 id="5-1-短期対応">5-1. 短期対応</h3>
+<p>短期対応は、まず本番影響を下げるための対応です。</p>
+<div class="table-wrap"><table><thead><tr><th>状況</th><th>短期対応</th><th>注意点</th></tr></thead><tbody><tr><td>リリース直後に悪化</td><td>切り戻し</td><td>データ変更がある場合は戻せるか確認</td></tr><tr><td>CPU/メモリ不足</td><td>スケールアウト</td><td>根本原因が重いSQLなら効果は限定的</td></tr><tr><td>特定APIだけ高負荷</td><td>レート制限、一時停止</td><td>影響ユーザーや業務影響を確認</td></tr><tr><td>外部API障害</td><td>タイムアウト短縮、縮退</td><td>二重処理や状態不明に注意</td></tr><tr><td>重いバッチと重なった</td><td>バッチ停止、時間変更</td><td>データ反映遅延の影響を確認</td></tr><tr><td>DB負荷が高い</td><td>重い処理の停止、参照系制限</td><td>金融業務に必要な処理を止めない</td></tr></tbody></table></div>
+<p>面接での言い方:</p>
+<blockquote><p>本番影響が大きい場合は、原因調査と並行して影響を下げます。直前リリースなら切り戻し、リソース逼迫なら一時的なスケール、外部APIならタイムアウトや縮退を検討します。ただし金融APIでは、整合性や二重処理に影響しないことを確認します。</p></blockquote>
+<h3 id="5-2-恒久対応">5-2. 恒久対応</h3>
+<p>恒久対応は、原因に対して構造的に直す対応です。</p>
+<p>DB起因:</p>
+<ul><li>N+1をJOIN/IN句/fetch設計で解消する</li><li>検索条件に合うインデックスを追加する</li><li>取得件数を制限する</li><li>不要なカラムを取らない</li><li>重い集計は事前集計やバッチ化を検討する</li><li>トランザクション範囲を小さくする</li></ul>
+<p>アプリ起因:</p>
+<ul><li>一覧APIと詳細APIを分ける</li><li>DTOを軽くする</li><li>ループ内処理をまとめる</li><li>不要な同期処理を非同期化する</li><li>キャッシュ可能なマスタ情報をキャッシュする</li><li>過剰ログを見直す</li></ul>
+<p>外部API起因:</p>
+<ul><li>タイムアウトを適切にする</li><li>リトライ回数を制限する</li><li>バックオフとジッターを入れる</li><li>サーキットブレーカーを検討する</li><li>冪等性キーと状態管理を入れる</li></ul>
+<p>インフラ起因:</p>
+<ul><li>オートスケール条件を見直す</li><li>CPU/メモリを増やす</li><li>DBスペックや接続数を見直す</li><li>メトリクス、ログ、トレースを追加する</li></ul>
+<h3 id="5-3-検証">5-3. 検証</h3>
+<p>改善したら、同じ条件で効果を確認します。</p>
+<p>確認観点:</p>
+<ul><li>p50、p95、p99が改善したか</li><li>エラー率が増えていないか</li><li>DB CPU、スロークエリ、読み込み行数が減ったか</li><li>SQL発行回数が減ったか</li><li>レスポンスサイズが減ったか</li><li>外部API呼び出し回数が減ったか</li><li>コネクションプール待ちが減ったか</li><li>二重処理やデータ不整合が起きていないか</li></ul>
+<p>面接での言い方:</p>
+<blockquote><p>対策後は、同じデータ量、同じリクエスト条件、同じ同時実行数で比較します。平均だけでなくp95、p99、エラー率、DB負荷、外部API呼び出し回数を見ます。金融APIでは、性能改善によって二重処理や不整合が起きていないことも確認します。</p></blockquote>
+<p>---</p>
+<h2 id="6-画面共有課題で見るものを詳細化する">6. 画面共有課題で見るものを詳細化する</h2>
+<h3 id="6-1-グラフが表示された場合">6-1. グラフが表示された場合</h3>
+<p>見る順番:</p>
+<ol><li>いつから悪くなったか</li><li>レイテンシ、トラフィック、エラー、サチュレーションのどれが変化したか</li><li>直前リリースや設定変更があるか</li><li>全APIか、特定APIか</li><li>全ユーザーか、一部条件か</li><li>DB、外部API、CPU、メモリ、プールのどれと相関しているか</li></ol>
+<p>発言例:</p>
+<blockquote><p>このグラフでは、レイテンシが上がった時間帯にリクエスト数も増えています。まず負荷増加に対して、CPU、DB接続数、スロークエリ、外部API応答時間のどれが一緒に悪化しているかを見たいです。</p></blockquote>
+<p>別パターン:</p>
+<blockquote><p>リクエスト数は増えていないのにレイテンシだけ上がっているので、単純な負荷増加ではなく、直前リリース、SQL変更、外部API遅延、データ量増加を疑います。</p></blockquote>
+<h3 id="6-2-ログが表示された場合">6-2. ログが表示された場合</h3>
+<p>見るもの:</p>
+<ul><li>エラー種別</li><li>発生時刻</li><li>トレースID</li><li>対象API</li><li>ユーザーや条件に偏りがあるか</li><li>DBや外部APIの処理時間</li><li>タイムアウトか例外か</li></ul>
+<p>発言例:</p>
+<blockquote><p>このログではタイムアウトが出ているので、どの区間でタイムアウトしているかを見たいです。DBクエリなのか、外部APIなのか、アプリ内処理なのかをトレースIDで追います。</p></blockquote>
+<h3 id="6-3-コードが表示された場合">6-3. コードが表示された場合</h3>
+<p>見るもの:</p>
+<ul><li>for文の中でDBや外部APIを呼んでいないか</li><li>全件取得していないか</li><li>ページングがあるか</li><li>トランザクション範囲が広すぎないか</li><li>外部API待ちをトランザクション内でしていないか</li><li>DTOが重すぎないか</li><li>ログを大量に出していないか</li></ul>
+<p>発言例:</p>
+<blockquote><p>一覧取得後にループ内でRepositoryを呼んでいるため、件数が増えるとN+1になる可能性があります。まずSQL発行回数を確認し、問題であればJOINやIN句でまとめて取得する形を検討します。</p></blockquote>
+<h3 id="6-4-sqlが表示された場合">6-4. SQLが表示された場合</h3>
+<p>見るもの:</p>
+<ul><li>WHEREで十分に絞れているか</li><li>JOIN条件が適切か</li><li>ORDER BYが重くないか</li><li>GROUP BYの対象件数が多くないか</li><li>LIMITがあるか</li><li>必要なカラムだけ取っているか</li><li>EXPLAINでインデックスが使われているか</li></ul>
+<p>発言例:</p>
+<blockquote><p>このSQLはWHERE条件とORDER BYに対してインデックスが効くかを確認したいです。EXPLAINでkey、rows、type、Extraを見て、フルスキャンやfilesortになっていないかを確認します。</p></blockquote>
+<p>---</p>
+<h2 id="7-よくある課題パターンの詳細">7. よくある課題パターンの詳細</h2>
+<h3 id="7-1-データ量が増えて一覧apiが遅い">7-1. データ量が増えて一覧APIが遅い</h3>
+<p>よくある原因:</p>
+<ul><li>以前は1ユーザーあたり100件だったデータが、1万件になった</li><li>ページングせず全件返している</li><li>取引明細ごとに関連情報を取りに行っている</li><li>ORDER BYのソート対象が多い</li><li>レスポンスJSONが巨大化している</li></ul>
+<p>調査:</p>
+<ul><li>ユーザーごとのデータ件数を見る</li><li>SQLの取得件数を見る</li><li>1リクエストあたりのSQL回数を見る</li><li>レスポンスサイズを見る</li><li>EXPLAINで読み込み行数を見る</li></ul>
+<p>改善:</p>
+<ul><li>ページング</li><li>LIMIT</li><li>必要カラムだけ取得</li><li>N+1解消</li><li>検索条件とソート条件に合うインデックス</li><li>一覧APIと詳細APIの分離</li></ul>
+<h3 id="7-2-リリース後から急に遅い">7-2. リリース後から急に遅い</h3>
+<p>よくある原因:</p>
+<ul><li>SQLが変わった</li><li>新しいJOINが増えた</li><li>外部API呼び出しが追加された</li><li>DTOに重い項目が追加された</li><li>キャッシュが効かなくなった</li><li>ログ出力が増えた</li><li>設定値が変わった</li></ul>
+<p>調査:</p>
+<ul><li>リリース差分を見る</li><li>遅くなったAPIのコード差分を見る</li><li>SQL発行回数を旧版と比較する</li><li>レスポンスサイズを比較する</li><li>外部API呼び出し回数を比較する</li></ul>
+<p>改善:</p>
+<ul><li>影響が大きければ切り戻し</li><li>問題処理を修正</li><li>負荷試験ケースに追加</li><li>リリース前の監視観点に追加</li></ul>
+<h3 id="7-3-p99だけ遅い">7-3. p99だけ遅い</h3>
+<p>よくある原因:</p>
+<ul><li>一部ユーザーだけデータ件数が多い</li><li>一部の口座や取引だけロック待ちがある</li><li>外部APIがたまに遅い</li><li>GCがたまに発生する</li><li>コネクションプールが瞬間的に枯渇する</li><li>キャッシュミス時だけ遅い</li></ul>
+<p>調査:</p>
+<ul><li>遅いリクエストの条件を集める</li><li>対象ユーザー、データ件数、時間帯を見る</li><li>GCやロック待ちのタイミングと突き合わせる</li><li>外部APIのp95/p99を見る</li></ul>
+<p>改善:</p>
+<ul><li>重いユーザー条件への対策</li><li>ページングや上限</li><li>ロック範囲見直し</li><li>キャッシュミス時の処理改善</li><li>外部APIのタイムアウト/リトライ見直し</li></ul>
+<h3 id="7-4-外部apiが遅い">7-4. 外部APIが遅い</h3>
+<p>よくある原因:</p>
+<ul><li>相手先サービスが遅い</li><li>ネットワークが不安定</li><li>タイムアウトが長すぎる</li><li>リトライが集中している</li><li>外部APIを同期的に待っている</li></ul>
+<p>調査:</p>
+<ul><li>外部APIごとの応答時間</li><li>タイムアウト数</li><li>リトライ回数</li><li>どのAPI呼び出しで待っているか</li><li>自社APIのスレッドや接続プールが詰まっていないか</li></ul>
+<p>改善:</p>
+<ul><li>タイムアウト設計</li><li>バックオフとジッター</li><li>サーキットブレーカー</li><li>縮退</li><li>非同期化</li><li>冪等性キーと状態管理</li></ul>
+<h3 id="7-5-dbコネクションプールが枯渇している">7-5. DBコネクションプールが枯渇している</h3>
+<p>よくある原因:</p>
+<ul><li>遅いSQLが接続を長く占有している</li><li>トランザクションが長い</li><li>外部API待ちをトランザクション内でしている</li><li>負荷に対してプールサイズが小さい</li><li>DB側の最大接続数が足りない</li></ul>
+<p>調査:</p>
+<ul><li>active、idle、pending</li><li>遅いSQL</li><li>トランザクション時間</li><li>DB側の接続数</li><li>APIの同時実行数</li></ul>
+<p>改善:</p>
+<ul><li>遅いSQLを直す</li><li>トランザクション範囲を小さくする</li><li>外部API呼び出しをトランザクション外へ出す</li><li>プールサイズとDB最大接続数を見直す</li><li>タイムアウトを設定する</li></ul>
+<p>---</p>
+<h2 id="9-最低限覚える用語メモ">9. 最低限覚える用語メモ</h2>
+<div class="table-wrap"><table><thead><tr><th>用語</th><th>意味</th></tr></thead><tbody><tr><td>レイテンシ</td><td>リクエストからレスポンスまでの時間</td></tr><tr><td>p50/p95/p99</td><td>percentileの略。50%/95%/99%のリクエストがその時間以内に収まる値</td></tr><tr><td>RPS</td><td>1秒あたりのリクエスト数</td></tr><tr><td>API呼び出し数</td><td>一定期間にAPIが呼ばれた総数</td></tr><tr><td>同時接続数/同時リクエスト数</td><td>ある瞬間に処理中、または接続中の数</td></tr><tr><td>トラフィック</td><td>リクエスト数、RPS、同時接続数などの負荷量</td></tr><tr><td>エラー率</td><td>失敗したリクエストの割合</td></tr><tr><td>サチュレーション</td><td>CPU、メモリ、DB接続などの詰まり具合</td></tr><tr><td>N+1</td><td>一覧取得後に各行ごとに追加SQLを出す問題</td></tr><tr><td>インデックス</td><td>DBが対象行を探しやすくする索引</td></tr><tr><td>複合インデックス</td><td>複数列を組み合わせたインデックス。左から効くことを意識する</td></tr><tr><td>JOIN</td><td>複数テーブルを結合するSQL</td></tr><tr><td>ORDER BY</td><td>並び替え</td></tr><tr><td>GROUP BY</td><td>集約</td></tr><tr><td>ページング</td><td>一覧データを一度に全件返さず、一定件数ずつ返すこと</td></tr><tr><td>EXPLAIN</td><td>SQLの実行計画を見るコマンド</td></tr><tr><td>スロークエリ</td><td>実行に時間がかかっているSQL</td></tr><tr><td>コネクションプール</td><td>DB接続を再利用する仕組み</td></tr><tr><td>タイムアウト</td><td>相手の応答を待つ上限時間</td></tr><tr><td>リトライ</td><td>失敗時に再実行すること</td></tr><tr><td>バックオフ</td><td>リトライ間隔を徐々に空けること</td></tr><tr><td>ジッター</td><td>リトライのタイミングをランダムにずらすこと</td></tr><tr><td>冪等性</td><td>同じ処理を複数回実行しても結果が変わらない性質</td></tr><tr><td>サーキットブレーカー</td><td>下流障害時に呼び出しを一時停止する仕組み</td></tr><tr><td>縮退</td><td>一部機能を制限してサービス全体を守ること</td></tr></tbody></table></div>
+<p>---</p>
+<h2 id="10-参考情報">10. 参考情報</h2>
+<ul><li>Google SRE Book: Monitoring Distributed Systems  </li></ul>
+<p>https://sre.google/sre-book/monitoring-distributed-systems/</p>
+<ul><li>AWS Builders Library: Timeouts, retries, and backoff with jitter  </li></ul>
+<p>https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/</p>
+<ul><li>MySQL 8.4 Reference Manual: Optimizing Queries with EXPLAIN  </li></ul>
+<p>https://dev.mysql.com/doc/refman/8.4/en/using-explain.html</p>
+<ul><li>MySQL 8.4 Reference Manual: The Slow Query Log  </li></ul>
+<p>https://dev.mysql.com/doc/refman/8.4/en/slow-query-log.html</p>
+<ul><li>Spring Boot Actuator Metrics  </li></ul>
+<p>https://docs.spring.io/spring-boot/reference/actuator/metrics.html</p>
+<ul><li>Micrometer Concepts  </li></ul>
+<p>https://docs.micrometer.io/micrometer/reference/concepts.html</p>
+</section>
+</main>
+</body>
+</html>

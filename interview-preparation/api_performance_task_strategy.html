@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="面接の画面共有課題でAPI性能劣化を調査するときの、最初の確認、原因分解、改善策、話し方をまとめた戦略ページです。">
+<title>APIパフォーマンス課題 対策資料</title>
+<style>
+:root {
+  --bg: #f5f7fb;
+  --paper: #ffffff;
+  --ink: #172033;
+  --muted: #667085;
+  --line: #dce3ee;
+  --accent: #2358c5;
+  --accent2: #0f766e;
+  --soft: #eef4ff;
+  --warn: #b45309;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  line-height: 1.75;
+}
+a { color: var(--accent); }
+header {
+  background: linear-gradient(135deg, #102958 0%, #2358c5 58%, #0f766e 100%);
+  color: #fff;
+  padding: 42px 22px 34px;
+}
+.header-inner, main { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+h1 { margin: 0 0 14px; font-size: clamp(28px, 4.5vw, 46px); line-height: 1.2; }
+.lead { max-width: 880px; margin: 0; color: #e8eefc; }
+.meta { margin-top: 14px; color: #c8d8ff; font-size: 14px; }
+nav.page-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255,255,255,.96);
+  backdrop-filter: blur(8px);
+}
+.nav-inner { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 10px 0; display: flex; gap: 9px; flex-wrap: wrap; }
+.nav-inner a { border-radius: 999px; background: var(--soft); color: #1e40af; padding: 6px 10px; font-size: 13px; font-weight: 700; text-decoration: none; }
+main { padding: 26px 0 72px; }
+.panel, .qa-card, .note-card, .source-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(25, 43, 75, .07);
+}
+.panel { margin: 24px 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.link-card { min-height: 160px; }
+.link-card h3 { margin-top: 0; }
+.badge, .cat, .source-priority { display: inline-block; border-radius: 999px; padding: 2px 8px; font-size: 12px; font-weight: 800; }
+.badge-S { background: #fee2e2; color: #991b1b; }
+.badge-A { background: #ffedd5; color: #9a3412; }
+.badge-B { background: #dbeafe; color: #1e40af; }
+.cat { background: #f1f5f9; color: #334155; }
+.qa-card { margin: 14px 0; box-shadow: none; }
+.qa-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.num { color: var(--muted); font-weight: 800; font-size: 13px; }
+.intent { margin: 8px 0 10px; color: #475569; background: #f8fafc; padding: 10px 12px; border-radius: 8px; border-left: 4px solid #cbd5e1; }
+details { margin-top: 8px; background: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 12px; }
+summary { cursor: pointer; font-weight: 800; color: #1d4ed8; }
+.answer { margin-top: 10px; white-space: pre-line; }
+.answer.structured { white-space: normal; }
+.answer.structured h4 { margin: 14px 0 6px; font-size: 15px; color: #0f172a; }
+.answer.structured ul, .answer.structured ol { margin: 6px 0 10px 1.3em; padding: 0; }
+.answer.structured li { margin: 5px 0; }
+.answer.structured .short-answer { background: #eff6ff; border-left: 4px solid #2563eb; padding: 10px 12px; border-radius: 8px; margin: 8px 0 12px; }
+.answer.structured .supplement { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin: 10px 0; }
+.answer.structured .caution { background: #fffbeb; border-left: 4px solid #b45309; padding: 10px 12px; border-radius: 8px; margin: 10px 0; }
+.answer.structured .diagram, pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 14px;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+code { background: #e2e8f0; color: #0f172a; padding: 1px 5px; border-radius: 5px; }
+pre code { background: transparent; color: inherit; padding: 0; }
+.searchbox { width: 100%; padding: 13px 15px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; margin: 12px 0 16px; }
+button { border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; color: #1e40af; padding: 7px 11px; font-weight: 700; cursor: pointer; }
+.table-wrap { overflow-x: auto; margin: 14px 0; }
+table { width: 100%; border-collapse: collapse; background: white; }
+th, td { border: 1px solid var(--line); padding: 9px 10px; vertical-align: top; }
+th { background: #f1f5f9; text-align: left; }
+blockquote { margin: 14px 0; border-left: 5px solid var(--accent); background: #eef4ff; padding: 10px 14px; border-radius: 8px; }
+blockquote p { margin: 6px 0; }
+.toc { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.toc a { text-decoration: none; }
+.toc .level-3 { margin-left: 18px; font-size: .94rem; }
+.toc .level-4 { margin-left: 34px; font-size: .9rem; }
+.doc-body h2 { margin-top: 36px; padding-top: 12px; border-top: 1px solid var(--line); }
+.doc-body h3 { margin-top: 24px; }
+.back-links { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
+.back-links a { border-radius: 999px; background: rgba(255,255,255,.16); color: #fff; padding: 5px 10px; text-decoration: none; font-weight: 700; font-size: 13px; }
+.warn { border-left: 6px solid var(--warn); background: #fffbeb; }
+.ok { border-left: 6px solid var(--accent2); background: #ecfdf5; }
+.danger { border-left: 6px solid #b91c1c; background: #fef2f2; }
+@media (max-width: 720px) {
+  .header-inner, main, .nav-inner { width: min(100% - 28px, 1120px); }
+  .qa-head { align-items: flex-start; flex-direction: column; }
+}
+@media print {
+  nav.page-nav, .searchbox, button, .back-links { display: none; }
+  body { background: #fff; }
+  .panel, .qa-card, .note-card { box-shadow: none; break-inside: avoid; }
+}
+
+.index-back-button {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border: 1px solid rgba(35, 88, 197, 0.22);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1e40af;
+  padding: 8px 12px;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.16);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  text-decoration: none;
+}
+.index-back-button:hover {
+  border-color: #2358c5;
+  background: #eef4ff;
+}
+@media print {
+  .index-back-button { display: none; }
+}
+
+</style>
+<script>
+function filterCards() {
+  const input = document.getElementById('filter');
+  if (!input) return;
+  const q = input.value.toLowerCase().trim();
+  document.querySelectorAll('.qa-card').forEach((card) => {
+    const hit = (card.getAttribute('data-text') || card.textContent).toLowerCase().includes(q);
+    card.style.display = hit ? '' : 'none';
+  });
+}
+function openAll() {
+  document.querySelectorAll('details').forEach((d) => { d.open = true; });
+}
+function closeAll() {
+  document.querySelectorAll('details').forEach((d) => { d.open = false; });
+}
+</script>
+</head>
+<body>
+<a class="index-back-button" href="../index.html">Indexへ戻る</a>
+<header>
+  <div class="header-inner">
+    <h1>APIパフォーマンス課題 対策資料</h1>
+    <p class="lead">面接の画面共有課題でAPI性能劣化を調査するときの、最初の確認、原因分解、改善策、話し方をまとめた戦略ページです。</p>
+    <div class="meta">Markdown変換: 2026-06-27</div>
+    <div class="back-links">
+      <a href="../index.html">Study Notes</a>
+      <a href="web_backend_interview_qa_2026.html">Webバックエンド面接Q&A入口</a>
+    </div>
+  </div>
+</header>
+<nav class="page-nav"><div class="nav-inner"><a href="#toc">目次</a><a href="#面接-apiパフォーマンス課題-対策資料-2026-06-18">本文</a><a href="api_performance_task_technical_details.html">詳細資料</a></div></nav>
+<main>
+<section class="panel" id="toc"><h2>目次</h2><ul class="toc"><li class="level-1"><a href="#面接-apiパフォーマンス課題-対策資料-2026-06-18">面接 APIパフォーマンス課題 対策資料 2026-06-18</a></li>
+<li class="level-2"><a href="#0-この資料の目的">0. この資料の目的</a></li>
+<li class="level-2"><a href="#1-面接での基本方針">1. 面接での基本方針</a></li>
+<li class="level-3"><a href="#最初に言うこと">最初に言うこと</a></li>
+<li class="level-3"><a href="#面接中に絶対に避けること">面接中に絶対に避けること</a></li>
+<li class="level-3"><a href="#見せるべき姿勢">見せるべき姿勢</a></li>
+<li class="level-2"><a href="#2-最初に確認する質問">2. 最初に確認する質問</a></li>
+<li class="level-3"><a href="#症状">症状</a></li>
+<li class="level-3"><a href="#影響範囲">影響範囲</a></li>
+<li class="level-3"><a href="#直前の変更">直前の変更</a></li>
+<li class="level-3"><a href="#見たい情報">見たい情報</a></li>
+<li class="level-2"><a href="#3-調査の型">3. 調査の型</a></li>
+<li class="level-3"><a href="#3-1-まず4つの指標で見る">3-1. まず4つの指標で見る</a></li>
+<li class="level-3"><a href="#3-2-api処理時間を分解する">3-2. API処理時間を分解する</a></li>
+<li class="level-3"><a href="#3-3-変更履歴と突き合わせる">3-3. 変更履歴と突き合わせる</a></li>
+<li class="level-2"><a href="#4-原因候補と確認方法">4. 原因候補と確認方法</a></li>
+<li class="level-3"><a href="#4-1-dbが遅い">4-1. DBが遅い</a></li>
+<li class="level-3"><a href="#4-2-アプリケーション処理が遅い">4-2. アプリケーション処理が遅い</a></li>
+<li class="level-3"><a href="#4-3-外部api・他マイクロサービスが遅い">4-3. 外部API・他マイクロサービスが遅い</a></li>
+<li class="level-3"><a href="#4-4-スレッド・コネクションプールが詰まっている">4-4. スレッド・コネクションプールが詰まっている</a></li>
+<li class="level-3"><a href="#4-5-インフラ・リソースが逼迫している">4-5. インフラ・リソースが逼迫している</a></li>
+<li class="level-2"><a href="#5-改善策の考え方">5. 改善策の考え方</a></li>
+<li class="level-3"><a href="#短期対応">短期対応</a></li>
+<li class="level-3"><a href="#恒久対応">恒久対応</a></li>
+<li class="level-3"><a href="#検証">検証</a></li>
+<li class="level-2"><a href="#6-画面共有課題での話し方">6. 画面共有課題での話し方</a></li>
+<li class="level-3"><a href="#6-1-最初の30秒">6-1. 最初の30秒</a></li>
+<li class="level-3"><a href="#6-2-画面にログやグラフが出ている場合">6-2. 画面にログやグラフが出ている場合</a></li>
+<li class="level-3"><a href="#6-3-コードが出ている場合">6-3. コードが出ている場合</a></li>
+<li class="level-3"><a href="#6-4-sqlが出ている場合">6-4. SQLが出ている場合</a></li>
+<li class="level-2"><a href="#7-よくある課題パターンと回答">7. よくある課題パターンと回答</a></li>
+<li class="level-3"><a href="#パターン1-データ量が増えて一覧apiが遅い">パターン1: データ量が増えて一覧APIが遅い</a></li>
+<li class="level-3"><a href="#パターン2-リリース後から急に遅い">パターン2: リリース後から急に遅い</a></li>
+<li class="level-3"><a href="#パターン3-平均は悪くないがp99だけ遅い">パターン3: 平均は悪くないがp99だけ遅い</a></li>
+<li class="level-3"><a href="#パターン4-外部apiが遅い">パターン4: 外部APIが遅い</a></li>
+<li class="level-3"><a href="#パターン5-dbコネクションプールが枯渇している">パターン5: DBコネクションプールが枯渇している</a></li>
+<li class="level-2"><a href="#9-暗記する回答">9. 暗記する回答</a></li>
+<li class="level-3"><a href="#30秒版">30秒版</a></li>
+<li class="level-3"><a href="#60秒版">60秒版</a></li>
+<li class="level-2"><a href="#10-逆質問に転用できる質問">10. 逆質問に転用できる質問</a></li>
+<li class="level-2"><a href="#11-参考にした公開情報">11. 参考にした公開情報</a></li>
+<li class="level-3"><a href="#技術参考情報">技術参考情報</a></li>
+<li class="level-3"><a href="#ローカル資料">ローカル資料</a></li></ul></section>
+<section class="panel doc-body"><h1 id="面接-apiパフォーマンス課題-対策資料-2026-06-18">面接 APIパフォーマンス課題 対策資料 2026-06-18</h1>
+<h2 id="0-この資料の目的">0. この資料の目的</h2>
+<p>過去に出た面接の次の質問に対する対策資料です。</p>
+<ul><li>画面共有による技術課題: パフォーマンス問題の原因調査と対策</li><li>APIのパフォーマンス劣化の調査方法と改善策を考える簡単な課題</li></ul>
+<p>この2つは、ほぼ同じ評価観点だと考えてよいです。</p>
+<p>面接官が見ているのは、正解を一発で当てる力ではなく、次の力です。</p>
+<ul><li>推測で対策に飛びつかず、事実を確認できるか</li><li>レイヤーを分けて原因を切り分けられるか</li><li>API、アプリ、DB、外部連携、インフラをつなげて考えられるか</li><li>金融サービスとして、速さだけでなく正しさ、二重処理防止、監査性を考えられるか</li><li>自分の経験範囲を盛らず、分かることと分からないことを切り分けて話せるか</li></ul>
+<p>用語やDB・SQL・アプリ処理の意味を補う詳細資料は、次を参照してください。</p>
+<p>---</p>
+<h2 id="1-面接での基本方針">1. 面接での基本方針</h2>
+<h3 id="最初に言うこと">最初に言うこと</h3>
+<blockquote><p>まず推測でインデックス追加やキャッシュ導入に飛びつかず、どのAPIが、いつから、どの条件で、どの指標として遅くなっているのかを確認します。  </p><p> </p><p>そのうえで、API全体の時間を、アプリケーション処理、DB、外部API、インフラ・リソースに分けて、どこで時間を使っているかを切り分けます。</p></blockquote>
+<h3 id="面接中に絶対に避けること">面接中に絶対に避けること</h3>
+<ul><li>最初から「インデックスを貼ります」と言う</li><li>最初から「キャッシュします」と言う</li><li>平均レスポンスだけを見る</li><li>DBだけ、アプリだけで原因を決めつける</li><li>金融APIなのに、リトライやキャッシュによる二重処理・不整合を考えない</li><li>経験していないパフォーマンスチューニングを経験済みのように話す</li></ul>
+<h3 id="見せるべき姿勢">見せるべき姿勢</h3>
+<blockquote><p>主担当として大規模な性能改善をやり切った経験は厚くありませんが、ログ、リクエスト、ソースコード、シーケンスから原因を切り分け、関係チームと修正・再デプロイ・動作確認まで進めた経験があります。  </p><p> </p><p>パフォーマンス課題でも、まず事実を集め、レイヤーごとに分解し、再現条件と改善効果を確認しながら進めたいです。</p></blockquote>
+<p>---</p>
+<h2 id="2-最初に確認する質問">2. 最初に確認する質問</h2>
+<p>画面共有課題では、すぐ答えを出すより、まず前提確認をします。</p>
+<h3 id="症状">症状</h3>
+<ul><li>どのAPIが遅いのか</li><li>いつから遅いのか</li><li>常に遅いのか、特定条件だけか</li><li>平均が遅いのか、p95/p99のようなテールレイテンシが悪いのか</li><li>エラー率も上がっているのか</li><li>レスポンスは遅いが成功しているのか、タイムアウトや5xxも出ているのか</li></ul>
+<h3 id="影響範囲">影響範囲</h3>
+<ul><li>全ユーザーか、一部ユーザーか</li><li>全APIか、特定APIか</li><li>特定のパートナー、支店、端末、地域、時間帯だけか</li><li>本番だけか、検証環境でも再現するか</li></ul>
+<h3 id="直前の変更">直前の変更</h3>
+<ul><li>アプリケーションのリリース</li><li>DBスキーマ変更</li><li>インデックス変更</li><li>外部API仕様変更</li><li>データ量の増加</li><li>インフラ設定変更</li><li>トラフィック増加</li><li>バッチや集計処理の追加</li></ul>
+<h3 id="見たい情報">見たい情報</h3>
+<ul><li>APIのレスポンスタイム分布</li><li>リクエスト数</li><li>エラー率</li><li>CPU、メモリ、GC</li><li>スレッドプール</li><li>DBコネクションプール</li><li>DBのスロークエリ</li><li>実行計画</li><li>外部APIの応答時間</li><li>タイムアウト・リトライ回数</li><li>ログ、トレースID、分散トレース</li></ul>
+<p>---</p>
+<h2 id="3-調査の型">3. 調査の型</h2>
+<h3 id="3-1-まず4つの指標で見る">3-1. まず4つの指標で見る</h3>
+<p>Google SREでは、ユーザー向けシステムで見るべき代表指標として、Latency、Traffic、Errors、Saturationの4つが整理されています。</p>
+<p>面接では、次の言い方で十分です。</p>
+<blockquote><p>まず、レイテンシ、リクエスト数、エラー率、リソース逼迫を見ます。平均値だけでなく、p95やp99を見て、一部のリクエストだけ極端に遅いのか、全体的に遅いのかを分けます。</p></blockquote>
+<div class="table-wrap"><table><thead><tr><th>指標</th><th>見るもの</th><th>例</th></tr></thead><tbody><tr><td>Latency</td><td>レスポンスタイム</td><td>平均、p95、p99、成功時と失敗時の時間</td></tr><tr><td>Traffic</td><td>負荷</td><td>RPS、同時接続数、対象APIの呼び出し数</td></tr><tr><td>Errors</td><td>失敗</td><td>4xx、5xx、タイムアウト、業務エラー</td></tr><tr><td>Saturation</td><td>逼迫</td><td>CPU、メモリ、GC、DB接続数、スレッド、I/O</td></tr></tbody></table></div>
+<p>詳細:</p>
+<ul><li><a href="api_performance_task_technical_details.html#1-4つの指標を具体的に理解する">4つの指標の具体説明</a></li></ul>
+<h3 id="3-2-api処理時間を分解する">3-2. API処理時間を分解する</h3>
+<p>まず、1リクエストの処理時間を次に分けます。</p>
+<pre><code class="language-text">クライアント
+  -&gt; LB / API Gateway
+  -&gt; Controller
+  -&gt; Service
+  -&gt; Repository / DB
+  -&gt; 外部API / 他マイクロサービス
+  -&gt; レスポンス生成</code></pre>
+<p>面接での言い方:</p>
+<blockquote><p>API全体が遅いと言っても、Controllerに入る前が遅いのか、アプリ内処理が遅いのか、DBが遅いのか、外部APIが遅いのかで対策が変わります。可能であればトレースIDやログで、処理区間ごとの時間を分けて見ます。</p></blockquote>
+<h3 id="3-3-変更履歴と突き合わせる">3-3. 変更履歴と突き合わせる</h3>
+<p>性能劣化は、次のどれかで起きやすいです。</p>
+<ul><li>リリース後から遅くなった</li><li>データ量が増えて遅くなった</li><li>トラフィックが増えて遅くなった</li><li>外部APIの応答が遅くなった</li><li>バッチや集計処理と時間帯が重なった</li><li>DBインデックスやクエリが変わった</li></ul>
+<p>面接での言い方:</p>
+<blockquote><p>いつから遅くなったかを確認し、直前のリリース、DB変更、データ量増加、外部API変更、トラフィック増加と突き合わせます。性能劣化のタイミングと変更点が一致すれば、調査の優先順位を付けやすくなります。</p></blockquote>
+<p>---</p>
+<h2 id="4-原因候補と確認方法">4. 原因候補と確認方法</h2>
+<p>この章は面接中に見る要約です。N+1、インデックス、JOIN、ORDER BY、GROUP BY、JSONシリアライズなどの詳しい意味は、次を参照してください。</p>
+<ul><li><a href="api_performance_task_technical_details.html#2-db周りの基本">DB周りの基本</a></li><li><a href="api_performance_task_technical_details.html#3-アプリケーション処理が遅い場合の具体例">アプリケーション処理が遅い場合の具体例</a></li><li><a href="api_performance_task_technical_details.html#4-外部apiマイクロサービス連携">外部API・マイクロサービス連携</a></li></ul>
+<h3 id="4-1-dbが遅い">4-1. DBが遅い</h3>
+<p>代表的な原因:</p>
+<ul><li>N+1クエリ</li><li>インデックス不足</li><li>検索条件やJOINが重い</li><li>ORDER BY、GROUP BYが重い</li><li>取得件数が多すぎる</li><li>不要なカラムを取りすぎている</li><li>トランザクションが長い</li><li>ロック競合</li><li>コネクションプール枯渇</li><li>DBのCPU、メモリ、I/O逼迫</li></ul>
+<p>確認すること:</p>
+<ul><li>スロークエリログ</li><li>実行計画</li><li>実行回数</li><li>取得件数</li><li>インデックス利用状況</li><li>ロック待ち</li><li>DB接続数</li></ul>
+<p>面接での回答:</p>
+<blockquote><p>DBが疑わしい場合は、まずスロークエリと実行計画を確認します。MySQLであればEXPLAINを使い、想定したインデックスが使われているか、フルスキャンになっていないか、JOIN順や取得件数が適切かを見ます。  </p><p> </p><p>ただし、インデックスは追加すれば常に良いわけではなく、更新性能やストレージにも影響します。そのため、どの検索条件で頻繁に使われるか、実行計画上の効果があるかを確認して判断します。</p></blockquote>
+<h3 id="4-2-アプリケーション処理が遅い">4-2. アプリケーション処理が遅い</h3>
+<p>代表的な原因:</p>
+<ul><li>ループ内でDBや外部APIを呼んでいる</li><li>JSONのシリアライズ・デシリアライズが重い</li><li>大きすぎるレスポンスを返している</li><li>同期処理で重い処理を待っている</li><li>不要な変換や集計をアプリ側で行っている</li><li>キャッシュできるマスタ情報を毎回取得している</li><li>ログ出力が過剰</li><li>メモリ使用量が多くGCが増えている</li></ul>
+<p>確認すること:</p>
+<ul><li>区間ごとの処理時間ログ</li><li>CPU使用率</li><li>メモリ使用量</li><li>GCログ</li><li>プロファイラ</li><li>レスポンスサイズ</li><li>ループ内処理</li></ul>
+<p>面接での回答:</p>
+<blockquote><p>アプリケーション側では、処理区間ごとのログを見て、どの処理で時間を使っているかを確認します。ループ内でDBや外部APIを呼んでいないか、大量データを一度に取得していないか、レスポンスサイズが大きすぎないか、GCやCPUが逼迫していないかを見ます。</p></blockquote>
+<h3 id="4-3-外部api・他マイクロサービスが遅い">4-3. 外部API・他マイクロサービスが遅い</h3>
+<p>代表的な原因:</p>
+<ul><li>外部APIの応答遅延</li><li>タイムアウト設定が長すぎる</li><li>リトライが多すぎる</li><li>リトライが同時に集中して負荷を増やしている</li><li>下流サービスの障害</li><li>ネットワーク遅延</li></ul>
+<p>確認すること:</p>
+<ul><li>外部APIごとの応答時間</li><li>タイムアウト回数</li><li>リトライ回数</li><li>リトライ間隔</li><li>成功率</li><li>呼び出し先のエラー</li><li>サーキットブレーカーの有無</li></ul>
+<p>面接での回答:</p>
+<blockquote><p>外部APIが疑わしい場合は、外部呼び出しの開始・終了ログ、タイムアウト、リトライ回数を確認します。リトライは有効な場合もありますが、AWS Builders Libraryでも説明されているように、タイムアウト、リトライ、バックオフ、ジッターを適切に設計しないと、障害時に下流へさらに負荷をかける可能性があります。  </p><p> </p><p>金融APIでは、リトライで二重振替や二重処理が起きないように、冪等性キーや処理状態の管理も重要です。</p></blockquote>
+<h3 id="4-4-スレッド・コネクションプールが詰まっている">4-4. スレッド・コネクションプールが詰まっている</h3>
+<p>代表的な原因:</p>
+<ul><li>DBコネクションプールの枯渇</li><li>HTTPクライアントの接続プール不足</li><li>Tomcatのワーカースレッド枯渇</li><li>遅い外部API待ちでスレッドが占有される</li><li>DB待ちでアプリ側スレッドが詰まる</li></ul>
+<p>確認すること:</p>
+<ul><li>アクティブスレッド数</li><li>キュー待ち</li><li>HikariCPなどのactive、idle、pending</li><li>HTTPクライアント接続数</li><li>タイムアウト設定</li></ul>
+<p>面接での回答:</p>
+<blockquote><p>CPUやDBが極端に高くないのにAPIが詰まる場合、スレッドやコネクションプールの枯渇も疑います。DBや外部APIの応答待ちでスレッドが長時間占有されると、後続リクエストが待たされます。Spring Boot ActuatorやMicrometerで、HTTP、JVM、DBコネクションプールのメトリクスを確認できる構成にしておくと切り分けやすいです。</p></blockquote>
+<h3 id="4-5-インフラ・リソースが逼迫している">4-5. インフラ・リソースが逼迫している</h3>
+<p>代表的な原因:</p>
+<ul><li>CPU使用率が高い</li><li>メモリ不足、GC増加</li><li>ディスクI/O</li><li>ネットワーク帯域</li><li>Pod / Task / Instance数不足</li><li>オートスケールの遅れ</li><li>ロードバランサの設定</li></ul>
+<p>確認すること:</p>
+<ul><li>CPU、メモリ、I/O</li><li>コンテナ数、タスク数</li><li>オートスケール履歴</li><li>ALB / API Gatewayのレイテンシ</li><li>アプリに入る前の遅延</li></ul>
+<p>面接での回答:</p>
+<blockquote><p>インフラ側では、CPU、メモリ、GC、I/O、ネットワーク、コンテナ数、オートスケール履歴を確認します。アプリに入る前のLBやAPI Gatewayの時間と、アプリ内部の時間を分けて見ることで、アプリ起因かインフラ起因かを切り分けます。</p></blockquote>
+<p>---</p>
+<h2 id="5-改善策の考え方">5. 改善策の考え方</h2>
+<h3 id="短期対応">短期対応</h3>
+<p>まず影響を下げます。</p>
+<ul><li>問題のあるリリースを切り戻す</li><li>特定機能を一時停止する</li><li>タイムアウト値を調整する</li><li>負荷の高い処理を一時的に止める</li><li>スケールアウトする</li><li>重いバッチの時間をずらす</li><li>外部API障害なら縮退する</li></ul>
+<p>面接での言い方:</p>
+<blockquote><p>本番影響がある場合は、原因調査と並行して、影響を下げる短期対応を考えます。直前リリースが原因なら切り戻し、リソース逼迫なら一時的なスケールアウト、外部APIが原因ならタイムアウトや縮退を検討します。</p></blockquote>
+<h3 id="恒久対応">恒久対応</h3>
+<p>原因に応じて直します。</p>
+<div class="table-wrap"><table><thead><tr><th>原因</th><th>恒久対応</th></tr></thead><tbody><tr><td>N+1</td><td>JOIN、fetch設計、バッチ取得、クエリ見直し</td></tr><tr><td>インデックス不足</td><td>検索条件・ソート条件に合うインデックス追加</td></tr><tr><td>取得件数過多</td><td>ページング、上限、必要カラムだけ取得</td></tr><tr><td>外部API遅延</td><td>タイムアウト、バックオフ、ジッター、サーキットブレーカー</td></tr><tr><td>二重処理リスク</td><td>冪等性キー、状態管理、重複排除</td></tr><tr><td>プール枯渇</td><td>プールサイズ、タイムアウト、処理時間短縮</td></tr><tr><td>大量同期処理</td><td>非同期化、キュー化、分割処理</td></tr><tr><td>レスポンス肥大</td><td>DTO見直し、圧縮、必要情報だけ返却</td></tr><tr><td>リソース不足</td><td>スケール、負荷試験、キャパシティ設計</td></tr><tr><td>原因が見えない</td><td>ログ、メトリクス、トレース追加</td></tr></tbody></table></div>
+<p>詳細:</p>
+<ul><li><a href="api_performance_task_technical_details.html#5-改善策の考え方を具体化する">改善策の考え方を具体化する</a></li></ul>
+<h3 id="検証">検証</h3>
+<p>対策後は、必ず同じ条件で確認します。</p>
+<ul><li>同じデータ量</li><li>同じリクエスト条件</li><li>同じ同時実行数</li><li>p50、p95、p99</li><li>エラー率</li><li>DB負荷</li><li>CPU、メモリ、GC</li><li>外部API呼び出し回数</li><li>金融APIなら二重処理がないこと</li></ul>
+<p>---</p>
+<h2 id="6-画面共有課題での話し方">6. 画面共有課題での話し方</h2>
+<p>この章は面接中の発言メモです。グラフ、ログ、コード、SQLを見たときの詳しい確認観点は次を参照してください。</p>
+<ul><li><a href="api_performance_task_technical_details.html#6-画面共有課題で見るものを詳細化する">画面共有課題で見るものを詳細化する</a></li></ul>
+<h3 id="6-1-最初の30秒">6-1. 最初の30秒</h3>
+<blockquote><p>まず、どのAPIがどの条件で遅いのかを確認します。平均だけでなくp95やp99、エラー率、リクエスト数、CPU・DB接続数なども見たいです。  </p><p> </p><p>そのうえで、処理時間をアプリ、DB、外部API、インフラに分け、どこで時間を使っているかを切り分けます。</p></blockquote>
+<h3 id="6-2-画面にログやグラフが出ている場合">6-2. 画面にログやグラフが出ている場合</h3>
+<p>見る順番:</p>
+<ol><li>時系列でいつから悪くなったか</li><li>レイテンシとリクエスト数が同時に上がっているか</li><li>エラー率も上がっているか</li><li>CPU、メモリ、DB接続数、スロークエリが同時に変化しているか</li><li>直前リリースがあるか</li><li>特定API、特定DBクエリ、特定外部APIに偏っているか</li></ol>
+<p>発言例:</p>
+<blockquote><p>このグラフだと、レイテンシが上がったタイミングとリクエスト数の増加が重なっています。まず負荷増加に対して、どのリソースが飽和しているかを確認したいです。CPU、DB接続数、スロークエリ、外部APIの応答時間を見ます。</p></blockquote>
+<h3 id="6-3-コードが出ている場合">6-3. コードが出ている場合</h3>
+<p>見る順番:</p>
+<ol><li>ループ内DBアクセス</li><li>ループ内外部APIアクセス</li><li>不要な全件取得</li><li>ページング不足</li><li>Transaction範囲が広すぎる</li><li>同期処理が長すぎる</li><li>キャッシュ可能なマスタ情報を毎回取得している</li><li>レスポンスDTOが重すぎる</li></ol>
+<p>発言例:</p>
+<blockquote><p>このコードだと、一覧取得後に各レコードごとに追加情報をDBから取得しているため、件数が増えるとN+1になりそうです。まず実際のSQL発行回数をログで確認し、問題であればJOINやIN句でのまとめ取得、必要に応じてDTO設計の見直しを検討します。</p></blockquote>
+<h3 id="6-4-sqlが出ている場合">6-4. SQLが出ている場合</h3>
+<p>見る順番:</p>
+<ol><li>WHERE条件</li><li>JOIN条件</li><li>ORDER BY</li><li>GROUP BY</li><li>LIMITの有無</li><li>インデックス候補</li><li>実行計画</li><li>取得件数</li></ol>
+<p>発言例:</p>
+<blockquote><p>このSQLは検索条件とソート条件に対してインデックスが効いているかを確認したいです。EXPLAINでフルスキャンになっていないか、JOIN順が妥当か、取得件数が多すぎないかを見ます。インデックス追加は更新性能にも影響するため、利用頻度と実行計画を見て判断します。</p></blockquote>
+<p>---</p>
+<h2 id="7-よくある課題パターンと回答">7. よくある課題パターンと回答</h2>
+<p>この章は回答の型です。各パターンの背景、調査、改善の詳細は次を参照してください。</p>
+<ul><li><a href="api_performance_task_technical_details.html#7-よくある課題パターンの詳細">よくある課題パターンの詳細</a></li></ul>
+<h3 id="パターン1-データ量が増えて一覧apiが遅い">パターン1: データ量が増えて一覧APIが遅い</h3>
+<p>原因候補:</p>
+<ul><li>全件取得</li><li>ページングなし</li><li>N+1</li><li>インデックス不足</li><li>ソートが重い</li><li>レスポンスサイズが大きい</li></ul>
+<p>回答:</p>
+<blockquote><p>まずデータ量増加前後で、APIの処理時間、SQL、取得件数、レスポンスサイズを比較します。DB側ではスロークエリとEXPLAINを確認し、インデックス、JOIN、ORDER BY、取得件数を見ます。アプリ側ではN+1や不要な全件取得、DTOの肥大化を確認します。  </p><p> </p><p>改善策としては、ページング、必要カラムのみ取得、N+1解消、適切なインデックス、検索条件の見直しを検討します。</p></blockquote>
+<h3 id="パターン2-リリース後から急に遅い">パターン2: リリース後から急に遅い</h3>
+<p>原因候補:</p>
+<ul><li>新しい処理追加</li><li>SQL変更</li><li>外部API呼び出し追加</li><li>キャッシュ無効化</li><li>設定変更</li><li>ログ増加</li></ul>
+<p>回答:</p>
+<blockquote><p>リリース前後で変わった処理を確認します。APMやログで、旧バージョンと新バージョンの処理時間を区間別に比較し、DBクエリ、外部API呼び出し回数、レスポンスサイズが増えていないかを見ます。  </p><p> </p><p>本番影響が大きければ、原因調査と並行して切り戻しを検討します。</p></blockquote>
+<h3 id="パターン3-平均は悪くないがp99だけ遅い">パターン3: 平均は悪くないがp99だけ遅い</h3>
+<p>原因候補:</p>
+<ul><li>一部の重いデータ</li><li>ロック待ち</li><li>GC</li><li>コネクションプール待ち</li><li>外部APIの一部遅延</li><li>キャッシュミス</li></ul>
+<p>回答:</p>
+<blockquote><p>平均だけでは一部の遅いリクエストが隠れるため、p95、p99、遅いリクエストの条件を見ます。遅いリクエストのユーザー、データ件数、外部API呼び出し、DBロック、GC、コネクションプール待ちを確認します。金融サービスでは一部ユーザーだけでも影響が大きいため、テールレイテンシを重視します。</p></blockquote>
+<h3 id="パターン4-外部apiが遅い">パターン4: 外部APIが遅い</h3>
+<p>原因候補:</p>
+<ul><li>外部API自体の遅延</li><li>タイムアウトが長い</li><li>リトライが集中</li><li>同期呼び出しで待っている</li><li>障害時の縮退がない</li></ul>
+<p>回答:</p>
+<blockquote><p>外部API呼び出し時間、タイムアウト、リトライ回数を確認します。短期的にはタイムアウトや縮退、必要なら機能制限を検討します。恒久的には、バックオフとジッター、サーキットブレーカー、非同期化、結果状態の管理を検討します。金融APIでは、リトライによる二重処理を防ぐため、冪等性キーや取引状態管理が重要です。</p></blockquote>
+<h3 id="パターン5-dbコネクションプールが枯渇している">パターン5: DBコネクションプールが枯渇している</h3>
+<p>原因候補:</p>
+<ul><li>遅いSQLで接続を長く保持</li><li>トランザクションが長い</li><li>外部API呼び出しまでトランザクション内に入っている</li><li>プールサイズが負荷に合っていない</li></ul>
+<p>回答:</p>
+<blockquote><p>DBコネクションプールのactive、idle、pendingを見ます。枯渇している場合、単純にプールを増やすだけでなく、接続を長く保持している原因を見ます。遅いSQL、長いトランザクション、外部API呼び出しをトランザクション内で待っていないかを確認します。</p></blockquote>
+<p>---</p>
+<h2 id="9-暗記する回答">9. 暗記する回答</h2>
+<h3 id="30秒版">30秒版</h3>
+<blockquote><p>まず、どのAPIが、いつから、どの条件で遅くなっているかを確認します。平均だけでなくp95、p99、エラー率、リクエスト数も見ます。  </p><p> </p><p>そのうえで、API全体の時間を、アプリケーション処理、DB、外部API、インフラに分け、どこで時間を使っているかを切り分けます。  </p><p> </p><p>DBであればスロークエリと実行計画、アプリであればN+1や重い同期処理、外部APIであればタイムアウトやリトライ、インフラであればCPU、メモリ、コネクションプールを確認します。金融APIでは、改善時に二重処理や不整合が起きないことも重視します。</p></blockquote>
+<h3 id="60秒版">60秒版</h3>
+<blockquote><p>まず推測で対策に飛びつかず、どのAPIが、いつから、どの条件で遅いのかを確認します。平均値だけでなく、p95やp99、エラー率、リクエスト数、CPUやDB接続数なども確認します。  </p><p> </p><p>次に、処理時間をアプリケーション、DB、外部API、インフラに分けます。DBが原因であれば、スロークエリとEXPLAINで、インデックス、JOIN、取得件数、ロックを見ます。アプリ側であれば、N+1、不要な全件取得、重い同期処理、レスポンスサイズ、GC、スレッドやコネクションプールを確認します。外部APIであれば、タイムアウト、リトライ、バックオフ、二重処理防止を見ます。  </p><p> </p><p>本番影響が大きければ、切り戻しやスケールアウトなどの短期対応も並行します。恒久対応後は、同じ条件で負荷試験を行い、p95、p99、エラー率、DB負荷、二重処理がないことを確認します。</p></blockquote>
+<p>---</p>
+<h2 id="10-逆質問に転用できる質問">10. 逆質問に転用できる質問</h2>
+<ol><li>APIやDBのパフォーマンス問題が起きた際、開発チームはログ、メトリクス、トレース、DB実行計画をどの程度自分たちで見て改善まで担当していますか。</li></ol>
+<ol><li>BaaSや外部パートナー連携のAPIでは、タイムアウト、リトライ、冪等性、監査ログなどをチーム共通でどのように設計されていますか。</li></ol>
+<ol><li>金融サービスとして、単にAPIを高速化するだけでなく、整合性や二重処理防止を守るために、性能改善時に特に注意している観点はありますか。</li></ol>
+<ol><li>Spring BootやMySQLまわりで、開発者が日常的に確認しているメトリクスや、性能劣化時の標準的な調査手順はありますか。</li></ol>
+<p>---</p>
+<h2 id="11-参考にした公開情報">11. 参考にした公開情報</h2>
+<h3 id="技術参考情報">技術参考情報</h3>
+<ul><li>Google SRE Book: Monitoring Distributed Systems  </li></ul>
+<p>https://sre.google/sre-book/monitoring-distributed-systems/</p>
+<ul><li>AWS Builders Library: Timeouts, retries, and backoff with jitter  </li></ul>
+<p>https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/</p>
+<ul><li>OpenTelemetry: Observability primer  </li></ul>
+<p>https://opentelemetry.io/docs/concepts/observability-primer/</p>
+<ul><li>Spring Boot Actuator Metrics  </li></ul>
+<p>https://docs.spring.io/spring-boot/reference/actuator/metrics.html</p>
+<ul><li>Micrometer Concepts  </li></ul>
+<p>https://docs.micrometer.io/micrometer/reference/concepts.html</p>
+<ul><li>MySQL 8.4 Reference Manual: Optimizing Queries with EXPLAIN  </li></ul>
+<p>https://dev.mysql.com/doc/refman/8.4/en/using-explain.html</p>
+<ul><li>MySQL 8.4 Reference Manual: The Slow Query Log  </li></ul>
+<p>https://dev.mysql.com/doc/refman/8.4/en/slow-query-log.html</p>
+</section>
+</main>
+</body>
+</html>

@@ -1,0 +1,1592 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>海外面接型 Q&amp;A</title>
+<style>
+:root {
+  --bg: #f7f7fb;
+  --paper: #ffffff;
+  --ink: #1f2937;
+  --muted: #64748b;
+  --line: #e5e7eb;
+  --accent: #2563eb;
+  --accent2: #0f766e;
+  --warn: #b45309;
+  --danger: #b91c1c;
+  --soft: #eef2ff;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+  line-height: 1.75;
+}
+header {
+  background: linear-gradient(135deg, #111827 0%, #1e3a8a 55%, #0f766e 100%);
+  color: white;
+  padding: 44px 24px 36px;
+}
+.header-inner { max-width: 1160px; margin: 0 auto; }
+h1 { font-size: clamp(26px, 4vw, 44px); line-height: 1.25; margin: 0 0 16px; }
+.lead { font-size: 17px; max-width: 920px; color: #e5e7eb; }
+.meta { margin-top: 16px; color: #bfdbfe; font-size: 14px; }
+nav {
+  position: sticky; top: 0; z-index: 10;
+  background: rgba(255,255,255,.96);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(8px);
+}
+.nav-inner {
+  max-width: 1160px; margin: 0 auto; padding: 10px 20px;
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+}
+nav a {
+  color: #1e40af; text-decoration: none; font-weight: 700; font-size: 13px;
+  padding: 6px 10px; border-radius: 999px; background: #eff6ff;
+}
+main { max-width: 1160px; margin: 0 auto; padding: 26px 20px 80px; }
+section { margin: 28px 0; }
+.panel {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 4px 20px rgba(15,23,42,.05);
+}
+h2 { margin: 0 0 16px; font-size: 26px; line-height: 1.35; }
+h3 { margin: 8px 0 8px; line-height: 1.45; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 16px; }
+.source-card, .qa-card, .note-card {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px;
+}
+.source-card { border-top: 5px solid var(--accent); }
+.source-top { display: flex; justify-content: space-between; }
+.source-priority, .cat, .badge {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 800;
+}
+.source-priority { background: #ecfeff; color: #155e75; }
+.cat { background: #f1f5f9; color: #334155; }
+.badge-S { background: #fee2e2; color: #991b1b; }
+.badge-A { background: #ffedd5; color: #9a3412; }
+.badge-B { background: #dbeafe; color: #1e40af; }
+.qa-card { margin: 14px 0; }
+.qa-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.num { color: var(--muted); font-weight: 800; font-size: 13px; }
+.intent {
+  margin: 8px 0 10px;
+  color: #475569;
+  background: #f8fafc;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border-left: 4px solid #cbd5e1;
+}
+details {
+  margin-top: 8px;
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+summary { cursor: pointer; font-weight: 800; color: #1d4ed8; }
+.answer { margin-top: 10px; white-space: pre-line; }
+.warn {
+  border-left: 6px solid var(--warn);
+  background: #fffbeb;
+}
+.danger {
+  border-left: 6px solid var(--danger);
+  background: #fef2f2;
+}
+.ok {
+  border-left: 6px solid var(--accent2);
+  background: #ecfdf5;
+}
+ul.tight li { margin: 4px 0; }
+.kpi {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;
+}
+.kpi div {
+  background: #f8fafc; padding: 14px; border-radius: 14px; border: 1px solid var(--line);
+}
+.kpi strong { display:block; font-size: 22px; color:#1d4ed8; }
+.searchbox {
+  width: 100%; padding: 14px 16px; border: 1px solid #cbd5e1;
+  border-radius: 14px; font-size: 16px; margin: 12px 0 16px;
+}
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; background: white; }
+th, td { border: 1px solid var(--line); padding: 10px; vertical-align: top; }
+th { background: #f1f5f9; text-align: left; }
+.code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: #0f172a; color: #e2e8f0; padding: 14px; border-radius: 14px;
+  overflow-x:auto; white-space: pre-wrap;
+}
+.footer {
+  color: var(--muted); font-size: 13px; margin-top: 40px;
+}
+
+.answer.structured { white-space: normal; }
+.answer.structured h4 { margin: 14px 0 6px; font-size: 15px; color: #0f172a; }
+.answer.structured ul, .answer.structured ol { margin: 6px 0 10px 1.3em; padding: 0; }
+.answer.structured li { margin: 5px 0; }
+.answer.structured .short-answer {
+  background: #eff6ff; border-left: 4px solid #2563eb; padding: 10px 12px;
+  border-radius: 10px; margin: 8px 0 12px;
+}
+.answer.structured .supplement {
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
+  padding: 10px 12px; margin: 10px 0;
+}
+.answer.structured .caution {
+  background: #fffbeb; border-left: 4px solid #b45309; padding: 10px 12px;
+  border-radius: 10px; margin: 10px 0;
+}
+.answer.structured code { background:#e2e8f0; color:#0f172a; padding:1px 5px; border-radius:5px; }
+
+
+.answer.structured .diagram {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: #0f172a; color: #e2e8f0; padding: 12px 14px;
+  border-radius: 12px; overflow-x: auto; white-space: pre; margin: 10px 0;
+}
+.answer.structured .mini-table { overflow-x:auto; margin:10px 0; }
+.answer.structured .mini-table table { font-size: 14px; }
+
+@media print {
+  nav, .searchbox { display:none; }
+  body { background:white; }
+  .panel, .qa-card, .source-card { box-shadow:none; break-inside: avoid; }
+  details[open] { break-inside: avoid; }
+}
+
+.index-back-button {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border: 1px solid rgba(35, 88, 197, 0.22);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1e40af;
+  padding: 8px 12px;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.16);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  text-decoration: none;
+}
+.index-back-button:hover {
+  border-color: #2358c5;
+  background: #eef4ff;
+}
+@media print {
+  .index-back-button { display: none; }
+}
+
+</style>
+<script>
+function filterCards() {
+  const q = document.getElementById('filter').value.toLowerCase().trim();
+  const cards = document.querySelectorAll('.qa-card');
+  cards.forEach(card => {
+    const hit = card.getAttribute('data-text').includes(q);
+    card.style.display = hit ? '' : 'none';
+  });
+}
+function openAll() {
+  document.querySelectorAll('details').forEach(d => d.open = true);
+}
+function closeAll() {
+  document.querySelectorAll('details').forEach(d => d.open = false);
+}
+</script>
+</head>
+<body>
+<a class="index-back-button" href="../index.html">Indexへ戻る</a>
+<header>
+<div class="header-inner">
+<h1>海外面接型 Q&amp;A</h1>
+<p class="lead">海外企業・海外資料の評価観点を、日本のWeb系バックエンド面接で答えやすい形に変換したQ&amp;Aページです。</p>
+<div class="meta">作成日: 2026-06-09 / 更新: 2026-06-27 / 分割ページ構成</div>
+</div>
+</header>
+<nav>
+<div class="nav-inner">
+<a href="web_backend_interview_qa_2026.html">入口</a>
+<a href="web_backend_interview_qa_overseas.html">海外面接型</a>
+<a href="web_backend_interview_qa_xderived.html">X由来・海外アカウント型</a>
+<a href="web_backend_interview_qa_priority.html">あなた向け優先</a>
+</div>
+</nav>
+<main>
+<section class="panel" id="overseas">
+<h2>海外面接型 Q&amp;A</h2>
+<p>Amazon/Meta/Monzo/Stripe系の面接観点、および Tech Interview Handbook / System Design Primer / Back-End Developer Interview Questions のような海外資料の論点を、日本語の質問・回答例として再構成したものです。実際の企業選考問題の転載ではなく、公開資料から読み取れる評価観点をもとに、Web系バックエンド面接で使いやすい形へ変換しています。</p>
+<div class="note-card ok" style="margin-top:12px;">
+<h3>このセクションの使い方</h3>
+<p>海外面接型では、単語の暗記よりも <strong>要件確認 → 方針 → トレードオフ → 検証</strong> の流れを口頭で説明できるかが重要です。まず30秒回答を覚え、次に「深掘りされたときに足す観点」から2〜3個を自分の言葉で話せる状態にしてください。</p>
+</div>
+<input class="searchbox" id="filter" oninput="filterCards()" placeholder="検索: 例 認証 / ECS / DB / Kafka / トランザクション / 障害 / API" type="search"/>
+<p><button onclick="openAll()">すべて開く</button> <button onclick="closeAll()">すべて閉じる</button></p>
+<article class="qa-card" data-text="amazon系 / cs基礎 s oq001 配列・listとhashmapをどう使い分けますか？ 面接官の意図： データ構造を、名前の暗記ではなくアクセスパターンから選べるかを見る。 回答例・補足を見る 30秒回答 配列・list・hashmapは「どのアクセスを速くしたいか」で選びます。listは順序を持つ集合を前から処理したり、インデックスで取り出したい場合に向きます。hashmapはキーから値を高速に引く場合に向きます。linkedhashmapや「双方向リスト＋hashmap」は、順序とキー検索を両方扱えますが、メモリ消費や実装複雑性が増えるので、listを常に上回る万能構造ではありません。 深掘りされたときに足す観点 arraylist： 内部的には配列で要素を保持する。挿入順を維持し、インデックスアクセスは速いが、途中挿入・途中削除は後続要素のずらしが発生しやすい。 linkedlist： 各要素が前後のノード参照を持つ。ノード位置が分かっていれば挿入・削除はしやすいが、インデックス指定でたどる場合は先頭/末尾から順に探索するため遅い。 hashmap： キーから値を引く構造。順序や重複要素の扱いより、id・コード・キーによる検索を高速化する用途に向く。 linkedhashmap： hashmapに順序付きのリンク構造を足したもの。キー検索と挿入順/アクセス順の反復を両立できる。 双方向リスト＋hashmap： lruキャッシュのように「キーで即座に探し、順序も更新し、末尾を即座に消す」用途で有効。 理解補足： javaの list はインターフェースです。代表実装の arraylist は内部配列で順序を保持し、 list.get(3) のようなインデックスアクセスが得意です。一方、 hashmap は map.get(userid) のようにキーで引く構造です。あなたの言う「リンクとhashmapを使えば順列＋キー探索ができる」は正しく、これは linkedhashmap やlruキャッシュの発想に近いです。ただし、キーが一意である前提が必要で、要素重複やインデックスアクセス、単純な順次処理ではlistの方が自然です。 用途で見る選び方 入力順に全件処理したい → list / arraylist 3番目・10番目を取りたい → arraylist userid から user を引きたい → hashmap&lt;userid, user&gt; キー検索 + 挿入順に走査したい → linkedhashmap キー検索 + 最近使った順に並べたい → linkedhashmap(accessorder=true) / 双方向リスト + hashmap 注意点： hashmap系は平均o(1)で便利ですが、メモリを追加で使います。また、キー設計、 equals / hashcode 、順序要件、重複要件を誤るとバグになります。面接では「hashmapの方が速い」ではなく、「アクセスパターンに応じて選ぶ」と答えるのが正確です。">
+<div class="qa-head">
+<div><span class="cat">Amazon系 / CS基礎</span> <span class="badge badge-S">S</span></div>
+<div class="num">OQ001</div>
+</div>
+<h3>配列・ListとHashMapをどう使い分けますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>データ構造を、名前の暗記ではなくアクセスパターンから選べるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">配列・List・HashMapは「どのアクセスを速くしたいか」で選びます。Listは順序を持つ集合を前から処理したり、インデックスで取り出したい場合に向きます。HashMapはキーから値を高速に引く場合に向きます。LinkedHashMapや「双方向リスト＋HashMap」は、順序とキー検索を両方扱えますが、メモリ消費や実装複雑性が増えるので、Listを常に上回る万能構造ではありません。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>ArrayList：</strong>内部的には配列で要素を保持する。挿入順を維持し、インデックスアクセスは速いが、途中挿入・途中削除は後続要素のずらしが発生しやすい。</li>
+<li><strong>LinkedList：</strong>各要素が前後のノード参照を持つ。ノード位置が分かっていれば挿入・削除はしやすいが、インデックス指定でたどる場合は先頭/末尾から順に探索するため遅い。</li>
+<li><strong>HashMap：</strong>キーから値を引く構造。順序や重複要素の扱いより、ID・コード・キーによる検索を高速化する用途に向く。</li>
+<li><strong>LinkedHashMap：</strong>HashMapに順序付きのリンク構造を足したもの。キー検索と挿入順/アクセス順の反復を両立できる。</li>
+<li><strong>双方向リスト＋HashMap：</strong>LRUキャッシュのように「キーで即座に探し、順序も更新し、末尾を即座に消す」用途で有効。</li>
+</ul>
+<div class="supplement"><strong>理解補足：</strong>Javaの<code>List</code>はインターフェースです。代表実装の<code>ArrayList</code>は内部配列で順序を保持し、<code>list.get(3)</code>のようなインデックスアクセスが得意です。一方、<code>HashMap</code>は<code>map.get(userId)</code>のようにキーで引く構造です。あなたの言う「リンクとHashMapを使えば順列＋キー探索ができる」は正しく、これは<code>LinkedHashMap</code>やLRUキャッシュの発想に近いです。ただし、キーが一意である前提が必要で、要素重複やインデックスアクセス、単純な順次処理ではListの方が自然です。</div>
+<div class="code">用途で見る選び方
+
+入力順に全件処理したい          → List / ArrayList
+3番目・10番目を取りたい         → ArrayList
+userId から User を引きたい      → HashMap&lt;UserId, User&gt;
+キー検索 + 挿入順に走査したい     → LinkedHashMap
+キー検索 + 最近使った順に並べたい → LinkedHashMap(accessOrder=true) / 双方向リスト + HashMap</div>
+<div class="caution"><strong>注意点：</strong>HashMap系は平均O(1)で便利ですが、メモリを追加で使います。また、キー設計、<code>equals</code>/<code>hashCode</code>、順序要件、重複要件を誤るとバグになります。面接では「HashMapの方が速い」ではなく、「アクセスパターンに応じて選ぶ」と答えるのが正確です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="amazon系 / cs基礎 計算量 o(n) と o(log n) の違いを説明してください。 処理時間が入力サイズに対してどう増えるかを説明できるかを見る。 o(n)は入力件数に比例して処理量が増える計算量です。o(log n)は、探索範囲を半分ずつ削るような処理で、入力件数が増えても処理量の増え方が緩やかです。線形探索はo(n)、ソート済み配列に対する二分探索はo(log n)です。 1,000件ならo(n)でも問題にならないことは多いが、1,000万件や高頻度apiでは差が大きくなる。 o(log n)は典型的には二分探索、b-treeインデックス、平衡木などで出てくる。 実務では、計算量だけでなくi/o、dbアクセス、ネットワーク、ロック待ちも支配的になる。 コーディング面接では、まず素朴解を出してから「この実装だとo(n^2)なので、hashsetを使ってo(n)にできます」のように改善できると評価されやすいです。webバックエンドでは、アプリ内の計算量よりdbクエリや外部api呼び出しの方が重いことも多いので、どこがボトルネックかを見る視点も重要です。 big-oは上限の増え方を表すもので、実測性能そのものではありません。小さい入力ではo(n)の単純実装の方が速いこともあります。">
+<div class="qa-head">
+<div><span class="cat">Amazon系 / CS基礎</span> <span class="badge badge-S">S</span></div>
+<div class="num">OQ002</div>
+</div>
+<h3>計算量 O(n) と O(log n) の違いを説明してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>処理時間が入力サイズに対してどう増えるかを説明できるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">O(n)は入力件数に比例して処理量が増える計算量です。O(log n)は、探索範囲を半分ずつ削るような処理で、入力件数が増えても処理量の増え方が緩やかです。線形探索はO(n)、ソート済み配列に対する二分探索はO(log n)です。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>1,000件ならO(n)でも問題にならないことは多いが、1,000万件や高頻度APIでは差が大きくなる。</li><li>O(log n)は典型的には二分探索、B-treeインデックス、平衡木などで出てくる。</li><li>実務では、計算量だけでなくI/O、DBアクセス、ネットワーク、ロック待ちも支配的になる。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>コーディング面接では、まず素朴解を出してから「この実装だとO(n^2)なので、HashSetを使ってO(n)にできます」のように改善できると評価されやすいです。Webバックエンドでは、アプリ内の計算量よりDBクエリや外部API呼び出しの方が重いことも多いので、どこがボトルネックかを見る視点も重要です。</div>
+<div class="caution"><strong>注意点：</strong>Big-Oは上限の増え方を表すもので、実測性能そのものではありません。小さい入力ではO(n)の単純実装の方が速いこともあります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="amazon系 / coding a oq003 2つの配列に共通する要素を求めるならどう実装しますか？ 面接官の意図： 素朴解から改善解へ進めるか、仕様確認を入れられるかを見る。 回答例・補足を見る 30秒回答 まず、共通要素を一意にするか、重複数を残すか、結果順をどうするか確認します。素朴に二重ループで比較するとo(n*m)です。改善案として、片方の配列をhashsetに入れる処理にo(n)、もう片方の配列を走査してsetに含まれるか確認する処理にo(m)かかるため、合計で平均o(n+m)になります。 深掘りされたときに足す観点 「片方がすでにhashsetとして存在している」前提なら、もう片方を走査するだけなのでo(m)と説明してよい。 ただし、配列からhashsetを作るところも含めて実装するなら、set構築分のo(n)が必要になる。 重複を考慮するなら map&lt;値, 出現回数&gt; を使い、片方の出現回数を減らしながら結果に追加する。 メモリを追加で使いたくない場合、両方をソートして2ポインタで走査する案もある。ただしソートにo(n log n + m log m)かかる。 理解補足： o(n+m)の理由は「setを作るコスト」と「検索するコスト」を足しているからです。例えば配列aがn件、配列bがm件なら、aを全部hashsetへ入れるのにn回、bを全部確認するのにm回処理します。hashsetの contains は平均o(1)なので、b側の確認はo(m)です。合計でo(n+m)です。 例：aとbの共通要素を求める 1. aをhashsetに入れる → n件処理 = o(n) 2. bを1件ずつ見る → m件処理 = o(m) 3. set.contains(b) は平均o(1) 合計：o(n) + o(m) = o(n+m) ※ すでにaがhashsetなら、1は不要なのでo(m) 注意点： hashsetのo(1)は平均計算量です。また、結果の順序や重複をどう扱うかで実装が変わります。面接では、計算量だけでなく「仕様確認」が重要です。">
+<div class="qa-head">
+<div><span class="cat">Amazon系 / Coding</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ003</div>
+</div>
+<h3>2つの配列に共通する要素を求めるならどう実装しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>素朴解から改善解へ進めるか、仕様確認を入れられるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">まず、共通要素を一意にするか、重複数を残すか、結果順をどうするか確認します。素朴に二重ループで比較するとO(n*m)です。改善案として、片方の配列をHashSetに入れる処理にO(n)、もう片方の配列を走査してSetに含まれるか確認する処理にO(m)かかるため、合計で平均O(n+m)になります。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li>「片方がすでにHashSetとして存在している」前提なら、もう片方を走査するだけなのでO(m)と説明してよい。</li>
+<li>ただし、配列からHashSetを作るところも含めて実装するなら、Set構築分のO(n)が必要になる。</li>
+<li>重複を考慮するなら<code>Map&lt;値, 出現回数&gt;</code>を使い、片方の出現回数を減らしながら結果に追加する。</li>
+<li>メモリを追加で使いたくない場合、両方をソートして2ポインタで走査する案もある。ただしソートにO(n log n + m log m)かかる。</li>
+</ul>
+<div class="supplement"><strong>理解補足：</strong>O(n+m)の理由は「Setを作るコスト」と「検索するコスト」を足しているからです。例えば配列Aがn件、配列Bがm件なら、Aを全部HashSetへ入れるのにn回、Bを全部確認するのにm回処理します。HashSetの<code>contains</code>は平均O(1)なので、B側の確認はO(m)です。合計でO(n+m)です。</div>
+<div class="code">例：AとBの共通要素を求める
+
+1. AをHashSetに入れる      → n件処理 = O(n)
+2. Bを1件ずつ見る           → m件処理 = O(m)
+3. set.contains(b) は平均O(1)
+
+合計：O(n) + O(m) = O(n+m)
+
+※ すでにAがHashSetなら、1は不要なのでO(m)</div>
+<div class="caution"><strong>注意点：</strong>HashSetのO(1)は平均計算量です。また、結果の順序や重複をどう扱うかで実装が変わります。面接では、計算量だけでなく「仕様確認」が重要です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text='amazon系 / ood a oq004 オブジェクト指向設計で、継承よりコンポジションを選ぶ理由は？ 面接官の意図： 変更に強い設計、責務分離、テスト容易性を理解しているかを見る。 回答例・補足を見る 30秒回答 コンポジションは、あるオブジェクトが別のオブジェクトを部品として持ち、その処理を委譲する設計です。javaで言うと、クラスのフィールドに別クラスやインターフェース型の依存を持たせる形です。継承はis-a関係、コンポジションはhas-a関係です。継承は親クラスの変更が子クラスへ波及しやすいため、振る舞いを差し替えたい場合は、インターフェース＋実装クラスを注入するコンポジションの方が変更に強くなります。 深掘りされたときに足す観点 継承： class dog extends animal のように「dogはanimalである」という分類関係を表す。 コンポジション： orderservice が paymentclient をフィールドとして持つように、「aはbを使う」という関係を表す。 インターフェース： コンポジションそのものではないが、差し替え可能な部品の契約としてよく使う。 springでは、 private final notificationsender sender; のようにインターフェース型をコンストラクタ注入する形が典型。 javaでのイメージ interface notificationsender { void send(string message); } class emailnotificationsender implements notificationsender { public void send(string message) { /* メール送信 */ } } class orderservice { private final notificationsender sender; // コンポジション：部品として持つ orderservice(notificationsender sender) { this.sender = sender; } void completeorder() { // 注文確定処理 sender.send("注文が完了しました"); // 振る舞いを委譲 } } 理解補足： 「コンポジション＝インターフェース」ではありません。コンポジションは、あるクラスが別のオブジェクトを保持して使う構造です。インターフェースは、その保持する部品を差し替えやすくするためによく使う道具です。java/springでは、 service が repository や外部apiクライアントをフィールドとして持つ設計もコンポジションです。 注意点： 継承が常に悪いわけではありません。ただし「コード再利用したいから継承する」は危険です。親クラスの実装詳細に子クラスが依存しやすく、変更に弱くなるためです。'>
+<div class="qa-head">
+<div><span class="cat">Amazon系 / OOD</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ004</div>
+</div>
+<h3>オブジェクト指向設計で、継承よりコンポジションを選ぶ理由は？</h3>
+<p class="intent"><strong>面接官の意図：</strong>変更に強い設計、責務分離、テスト容易性を理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">コンポジションは、あるオブジェクトが別のオブジェクトを部品として持ち、その処理を委譲する設計です。Javaで言うと、クラスのフィールドに別クラスやインターフェース型の依存を持たせる形です。継承はis-a関係、コンポジションはhas-a関係です。継承は親クラスの変更が子クラスへ波及しやすいため、振る舞いを差し替えたい場合は、インターフェース＋実装クラスを注入するコンポジションの方が変更に強くなります。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>継承：</strong><code>class Dog extends Animal</code> のように「DogはAnimalである」という分類関係を表す。</li>
+<li><strong>コンポジション：</strong><code>OrderService</code> が <code>PaymentClient</code> をフィールドとして持つように、「AはBを使う」という関係を表す。</li>
+<li><strong>インターフェース：</strong>コンポジションそのものではないが、差し替え可能な部品の契約としてよく使う。</li>
+<li>Springでは、<code>private final NotificationSender sender;</code> のようにインターフェース型をコンストラクタ注入する形が典型。</li>
+</ul>
+<div class="code">Javaでのイメージ
+
+interface NotificationSender {
+    void send(String message);
+}
+
+class EmailNotificationSender implements NotificationSender {
+    public void send(String message) { /* メール送信 */ }
+}
+
+class OrderService {
+    private final NotificationSender sender; // コンポジション：部品として持つ
+
+    OrderService(NotificationSender sender) {
+        this.sender = sender;
+    }
+
+    void completeOrder() {
+        // 注文確定処理
+        sender.send("注文が完了しました"); // 振る舞いを委譲
+    }
+}</div>
+<div class="supplement"><strong>理解補足：</strong>「コンポジション＝インターフェース」ではありません。コンポジションは、あるクラスが別のオブジェクトを保持して使う構造です。インターフェースは、その保持する部品を差し替えやすくするためによく使う道具です。Java/Springでは、<code>Service</code>が<code>Repository</code>や外部APIクライアントをフィールドとして持つ設計もコンポジションです。</div>
+<div class="caution"><strong>注意点：</strong>継承が常に悪いわけではありません。ただし「コード再利用したいから継承する」は危険です。親クラスの実装詳細に子クラスが依存しやすく、変更に弱くなるためです。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="amazon系 / db トランザクションのacidを説明してください。 dbの基本的な信頼性モデルを理解しているかを見る。 acidは、atomicity、consistency、isolation、durabilityの頭文字です。atomicityは全部成功か全部失敗、consistencyは制約を満たす一貫した状態を保つこと、isolationは並行実行されるトランザクション同士の干渉を制御すること、durabilityはコミット後の結果が永続化されることです。 注文作成と在庫減算は、片方だけ成功すると不整合になるためatomicityが重要。 外部キー、一意制約、チェック制約などを満たす状態を維持するのがconsistency。 isolationが弱いと、ダーティリード、ノンリピータブルリード、ファントムリードなどが問題になる。 durabilityは、障害後もコミット済みデータが失われないこと。 web系面接では、acidを言えるだけでは不十分です。「どこを1トランザクションにするか」が重要です。例えば、注文作成、在庫確保、決済api呼び出しを全部dbトランザクションに入れると、外部api待ちでロック時間が伸びます。外部apiを含む業務では、dbトランザクションと業務上の補償処理を分けて考える必要があります。 外部api呼び出しはdbトランザクションではロールバックできません。決済や外部連携では、ステータス管理、リトライ、補償処理、冪等性が必要になります。">
+<div class="qa-head">
+<div><span class="cat">Amazon系 / DB</span> <span class="badge badge-S">S</span></div>
+<div class="num">OQ005</div>
+</div>
+<h3>トランザクションのACIDを説明してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>DBの基本的な信頼性モデルを理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">ACIDは、Atomicity、Consistency、Isolation、Durabilityの頭文字です。Atomicityは全部成功か全部失敗、Consistencyは制約を満たす一貫した状態を保つこと、Isolationは並行実行されるトランザクション同士の干渉を制御すること、Durabilityはコミット後の結果が永続化されることです。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>注文作成と在庫減算は、片方だけ成功すると不整合になるためAtomicityが重要。</li><li>外部キー、一意制約、チェック制約などを満たす状態を維持するのがConsistency。</li><li>Isolationが弱いと、ダーティリード、ノンリピータブルリード、ファントムリードなどが問題になる。</li><li>Durabilityは、障害後もコミット済みデータが失われないこと。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>Web系面接では、ACIDを言えるだけでは不十分です。「どこを1トランザクションにするか」が重要です。例えば、注文作成、在庫確保、決済API呼び出しを全部DBトランザクションに入れると、外部API待ちでロック時間が伸びます。外部APIを含む業務では、DBトランザクションと業務上の補償処理を分けて考える必要があります。</div>
+<div class="caution"><strong>注意点：</strong>外部API呼び出しはDBトランザクションではロールバックできません。決済や外部連携では、ステータス管理、リトライ、補償処理、冪等性が必要になります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="amazon系 / db a oq006 sqlとnosqlをどう使い分けますか？ 面接官の意図： データモデル、整合性、アクセスパターンからストレージを選べるかを見る。 回答例・補足を見る 30秒回答 sql/rdbは、テーブル構造、制約、join、トランザクション、一貫性が重要なデータに向きます。nosqlは、スキーマ変更の柔軟性、大量データ、高スループット、特定アクセスパターンに最適化したい場合に向きます。注文、請求、権限などの中核データはrdbを優先し、ログ、イベント、キャッシュ、セッション、検索用データなどはnosqlや専用ストアを検討します。 深掘りされたときに足す観点 スキーマ： データの構造定義のこと。rdbではテーブル、カラム、型、制約、リレーションなどを指す。 rdbは、外部キー、一意制約、トランザクション、joinに強い。 nosqlは、key-value、document、wide-column、graphなど種類によって適性が違う。 nosqlは「スキーマが完全にない」ではなく、アプリケーション側が構造と整合性を管理する比率が上がることが多い。 アクセスパターンが明確で、joinよりキー検索・ドキュメント単位取得が中心ならnosqlが合う場合がある。 理解補足： スキーマは、雑に言えば「このデータはどういう形で保存されるか」という設計図です。rdbなら、 users テーブルに id 、 email 、 created_at があり、 email は一意で、 orders.user_id は users.id を参照する、というような定義がスキーマです。nosqlでも暗黙のデータ構造は存在するため、スキーマレスという言葉を「何も設計しなくてよい」と解釈すると危険です。 rdbスキーマの例 users - id: bigint, primary key - email: varchar, unique - name: varchar orders - id: bigint, primary key - user_id: bigint, foreign key -&gt; users.id - status: varchar - created_at: timestamp 注意点： 「nosqlは速いから使う」は浅い回答です。rdbでも適切なインデックス設計で十分速いケースは多いです。まず整合性要求、クエリの複雑さ、データ量、更新頻度、スケール要件から選ぶべきです。">
+<div class="qa-head">
+<div><span class="cat">Amazon系 / DB</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ006</div>
+</div>
+<h3>SQLとNoSQLをどう使い分けますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>データモデル、整合性、アクセスパターンからストレージを選べるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">SQL/RDBは、テーブル構造、制約、JOIN、トランザクション、一貫性が重要なデータに向きます。NoSQLは、スキーマ変更の柔軟性、大量データ、高スループット、特定アクセスパターンに最適化したい場合に向きます。注文、請求、権限などの中核データはRDBを優先し、ログ、イベント、キャッシュ、セッション、検索用データなどはNoSQLや専用ストアを検討します。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>スキーマ：</strong>データの構造定義のこと。RDBではテーブル、カラム、型、制約、リレーションなどを指す。</li>
+<li>RDBは、外部キー、一意制約、トランザクション、JOINに強い。</li>
+<li>NoSQLは、Key-Value、Document、Wide-column、Graphなど種類によって適性が違う。</li>
+<li>NoSQLは「スキーマが完全にない」ではなく、アプリケーション側が構造と整合性を管理する比率が上がることが多い。</li>
+<li>アクセスパターンが明確で、JOINよりキー検索・ドキュメント単位取得が中心ならNoSQLが合う場合がある。</li>
+</ul>
+<div class="supplement"><strong>理解補足：</strong>スキーマは、雑に言えば「このデータはどういう形で保存されるか」という設計図です。RDBなら、<code>users</code>テーブルに<code>id</code>、<code>email</code>、<code>created_at</code>があり、<code>email</code>は一意で、<code>orders.user_id</code>は<code>users.id</code>を参照する、というような定義がスキーマです。NoSQLでも暗黙のデータ構造は存在するため、スキーマレスという言葉を「何も設計しなくてよい」と解釈すると危険です。</div>
+<div class="code">RDBスキーマの例
+
+users
+- id: bigint, primary key
+- email: varchar, unique
+- name: varchar
+
+orders
+- id: bigint, primary key
+- user_id: bigint, foreign key -&gt; users.id
+- status: varchar
+- created_at: timestamp</div>
+<div class="caution"><strong>注意点：</strong>「NoSQLは速いから使う」は浅い回答です。RDBでも適切なインデックス設計で十分速いケースは多いです。まず整合性要求、クエリの複雑さ、データ量、更新頻度、スケール要件から選ぶべきです。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="amazon系 / distributed systems 分散システムで障害を前提に設計するとはどういうことですか？ ネットワーク・依存サービス・部分障害を前提に考えられるかを見る。 分散システムでは、単一プロセス内の例外だけでなく、タイムアウト、部分障害、依存apiの遅延、リトライによる重複、メッセージ欠落、ネットワーク分断を前提にします。失敗しない設計ではなく、失敗しても影響を限定し、検知し、復旧できる設計を目指します。 タイムアウトを設定しないと、依存先の遅延が呼び出し元へ波及する。 リトライには冪等性が必要。重複実行されても壊れない設計にする。 依存先障害に対して、サーキットブレーカー、キュー、フォールバック、縮退運転を検討する。 障害検知にはログ、メトリクス、トレース、アラートが必要。 あなたのマイクロサービス経験に接続するなら、認証認可基盤や外部apiが落ちた場合にapiをfail-closeにするか、キャッシュした権限で一時的に通すか、といった設計判断になります。セキュリティ系は基本fail-closeですが、可用性とのトレードオフがあります。 「リトライすればよい」は浅いです。リトライは依存先をさらに圧迫することがあります。バックオフ、最大回数、タイムアウト、冪等性、dlqまでセットで考える必要があります。">
+<div class="qa-head">
+<div><span class="cat">Amazon系 / Distributed Systems</span> <span class="badge badge-S">S</span></div>
+<div class="num">OQ007</div>
+</div>
+<h3>分散システムで障害を前提に設計するとはどういうことですか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>ネットワーク・依存サービス・部分障害を前提に考えられるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">分散システムでは、単一プロセス内の例外だけでなく、タイムアウト、部分障害、依存APIの遅延、リトライによる重複、メッセージ欠落、ネットワーク分断を前提にします。失敗しない設計ではなく、失敗しても影響を限定し、検知し、復旧できる設計を目指します。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>タイムアウトを設定しないと、依存先の遅延が呼び出し元へ波及する。</li><li>リトライには冪等性が必要。重複実行されても壊れない設計にする。</li><li>依存先障害に対して、サーキットブレーカー、キュー、フォールバック、縮退運転を検討する。</li><li>障害検知にはログ、メトリクス、トレース、アラートが必要。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>あなたのマイクロサービス経験に接続するなら、認証認可基盤や外部APIが落ちた場合にAPIをfail-closeにするか、キャッシュした権限で一時的に通すか、といった設計判断になります。セキュリティ系は基本fail-closeですが、可用性とのトレードオフがあります。</div>
+<div class="caution"><strong>注意点：</strong>「リトライすればよい」は浅いです。リトライは依存先をさらに圧迫することがあります。バックオフ、最大回数、タイムアウト、冪等性、DLQまでセットで考える必要があります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="amazon系 / data structures a oq008 lruキャッシュを設計するとしたら、どんなデータ構造を使いますか？ 面接官の意図： 複数のデータ構造を組み合わせて要件を満たせるかを見る。 回答例・補足を見る 30秒回答 lruキャッシュは、least recently used、つまり「最近使われていないデータから追い出す」キャッシュです。容量がいっぱいになったとき、最も長い間アクセスされていない要素を削除します。o(1)でget/put/削除を実現するには、キー検索用のhashmapと、利用順を管理する双方向リストを組み合わせます。javaなら linkedhashmap のaccessorderを使うと近い実装ができます。 深掘りされたときに足す観点 hashmap： key → リストノードを保持し、対象要素をo(1)で見つける。 双方向リスト： 先頭を最近使った要素、末尾を最近使っていない要素として管理する。 get(key) したら、そのノードを先頭へ移動する。 put(key, value) で容量超過したら、末尾ノードを削除し、hashmapからも消す。 lruのイメージ 最近使った ←----------------------→ 最近使っていない head [c] &lt;-&gt; [a] &lt;-&gt; [b] &lt;-&gt; [d] tail get(b) すると b を先頭へ移動 head [b] &lt;-&gt; [c] &lt;-&gt; [a] &lt;-&gt; [d] tail 容量超過時は tail の d を削除 理解補足： 単なるlistだけだと、keyから対象要素を探すのにo(n)かかります。単なるhashmapだけだと、どれが「最近使われていないか」を管理しづらいです。だから、hashmapで場所を即座に見つけ、双方向リストで利用順を管理します。あなたがoq001で言っていた「リンク＋hashmap」は、このlruキャッシュで典型的に使われる組み合わせです。 注意点： 実務の分散キャッシュでは、単一jvm内のlruだけでは不十分なことがあります。redis、ttl、キャッシュ無効化、キャッシュスタンピード、複数サーバー間の整合性も論点になります。">
+<div class="qa-head">
+<div><span class="cat">Amazon系 / Data Structures</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ008</div>
+</div>
+<h3>LRUキャッシュを設計するとしたら、どんなデータ構造を使いますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>複数のデータ構造を組み合わせて要件を満たせるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">LRUキャッシュは、Least Recently Used、つまり「最近使われていないデータから追い出す」キャッシュです。容量がいっぱいになったとき、最も長い間アクセスされていない要素を削除します。O(1)でget/put/削除を実現するには、キー検索用のHashMapと、利用順を管理する双方向リストを組み合わせます。Javaなら<code>LinkedHashMap</code>のaccessOrderを使うと近い実装ができます。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>HashMap：</strong>key → リストノードを保持し、対象要素をO(1)で見つける。</li>
+<li><strong>双方向リスト：</strong>先頭を最近使った要素、末尾を最近使っていない要素として管理する。</li>
+<li><code>get(key)</code>したら、そのノードを先頭へ移動する。</li>
+<li><code>put(key, value)</code>で容量超過したら、末尾ノードを削除し、HashMapからも消す。</li>
+</ul>
+<div class="code">LRUのイメージ
+
+最近使った  ←----------------------→  最近使っていない
+HEAD  [C] &lt;-&gt; [A] &lt;-&gt; [B] &lt;-&gt; [D]  TAIL
+
+get(B) すると B を先頭へ移動
+HEAD  [B] &lt;-&gt; [C] &lt;-&gt; [A] &lt;-&gt; [D]  TAIL
+
+容量超過時は TAIL の D を削除</div>
+<div class="supplement"><strong>理解補足：</strong>単なるListだけだと、keyから対象要素を探すのにO(n)かかります。単なるHashMapだけだと、どれが「最近使われていないか」を管理しづらいです。だから、HashMapで場所を即座に見つけ、双方向リストで利用順を管理します。あなたがOQ001で言っていた「リンク＋HashMap」は、このLRUキャッシュで典型的に使われる組み合わせです。</div>
+<div class="caution"><strong>注意点：</strong>実務の分散キャッシュでは、単一JVM内のLRUだけでは不十分なことがあります。Redis、TTL、キャッシュ無効化、キャッシュスタンピード、複数サーバー間の整合性も論点になります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="amazon系 / concurrency レースコンディションとは何ですか？どう防ぎますか？ 並行処理における共有状態の危険性を理解しているかを見る。 レースコンディションは、複数の処理が同じ共有データを同時に読み書きし、実行順序によって結果が変わる問題です。防ぐには、共有状態を減らす、ロックやsynchronizedを使う、atomic型を使う、db側でロックや一意制約を使う、処理を冪等にする、などの方法があります。 在庫数の更新、残高更新、同一ユーザーの二重申込などで起こりやすい。 アプリケーション内ロックだけでは、複数インスタンス構成では効かないことがある。 dbの一意制約や楽観ロックを使う方が堅い場合がある。 webアプリでは、同じapiが同時に複数回呼ばれる前提で考える必要があります。たとえば「購入ボタンを連打」「リトライで同じリクエストが再送」「複数サーバーで同時処理」などです。アプリコードだけでなくdb制約・トランザクション・冪等キーで守る設計が現実的です。 ロックを増やせば安全になるわけではありません。ロック範囲が広いと性能低下やデッドロックが発生します。">
+<div class="qa-head">
+<div><span class="cat">Amazon系 / Concurrency</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ009</div>
+</div>
+<h3>レースコンディションとは何ですか？どう防ぎますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>並行処理における共有状態の危険性を理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">レースコンディションは、複数の処理が同じ共有データを同時に読み書きし、実行順序によって結果が変わる問題です。防ぐには、共有状態を減らす、ロックやsynchronizedを使う、Atomic型を使う、DB側でロックや一意制約を使う、処理を冪等にする、などの方法があります。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>在庫数の更新、残高更新、同一ユーザーの二重申込などで起こりやすい。</li><li>アプリケーション内ロックだけでは、複数インスタンス構成では効かないことがある。</li><li>DBの一意制約や楽観ロックを使う方が堅い場合がある。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>Webアプリでは、同じAPIが同時に複数回呼ばれる前提で考える必要があります。たとえば「購入ボタンを連打」「リトライで同じリクエストが再送」「複数サーバーで同時処理」などです。アプリコードだけでなくDB制約・トランザクション・冪等キーで守る設計が現実的です。</div>
+<div class="caution"><strong>注意点：</strong>ロックを増やせば安全になるわけではありません。ロック範囲が広いと性能低下やデッドロックが発生します。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="amazon系 / internet topics httpリクエストがブラウザからサーバーに届くまでの流れを説明してください。 webの基本的な通信経路を理解しているかを見る。 ブラウザはurlを解釈し、dnsでドメイン名をipアドレスに解決し、tcp接続を確立します。httpsならtlsハンドシェイクを行い、httpリクエストを送信します。途中にcdn、ロードバランサ、リバースプロキシ、api gatewayなどが入ることがあります。サーバーはリクエストを処理し、ステータスコード、ヘッダ、ボディを含むレスポンスを返します。 dns、tcp、tls、httpの層を分けて説明できるとよい。 webバックエンドでは、albやnginx、api gateway、アプリサーバーのどこで何をしているかが重要。 認証cookie、authorizationヘッダ、cors、csrfなどはhttpレイヤと密接に関係する。 あなたの経験に寄せるなら、ブラウザ→bff→api gateway→各マイクロサービス、またはalb→ecsタスクのように具体構成で説明できると強いです。単に「サーバーに飛ぶ」ではなく、名前解決、tls、ロードバランシング、アプリ処理、レスポンスまで段階で話します。 web面接では、httpステータスコードやメソッドだけでなく、ネットワーク・tls・プロキシ・ロードバランサまで軽く聞かれることがあります。">
+<div class="qa-head">
+<div><span class="cat">Amazon系 / Internet Topics</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ010</div>
+</div>
+<h3>HTTPリクエストがブラウザからサーバーに届くまでの流れを説明してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>Webの基本的な通信経路を理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">ブラウザはURLを解釈し、DNSでドメイン名をIPアドレスに解決し、TCP接続を確立します。HTTPSならTLSハンドシェイクを行い、HTTPリクエストを送信します。途中にCDN、ロードバランサ、リバースプロキシ、API Gatewayなどが入ることがあります。サーバーはリクエストを処理し、ステータスコード、ヘッダ、ボディを含むレスポンスを返します。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>DNS、TCP、TLS、HTTPの層を分けて説明できるとよい。</li><li>Webバックエンドでは、ALBやnginx、API Gateway、アプリサーバーのどこで何をしているかが重要。</li><li>認証Cookie、Authorizationヘッダ、CORS、CSRFなどはHTTPレイヤと密接に関係する。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>あなたの経験に寄せるなら、ブラウザ→BFF→API Gateway→各マイクロサービス、またはALB→ECSタスクのように具体構成で説明できると強いです。単に「サーバーに飛ぶ」ではなく、名前解決、TLS、ロードバランシング、アプリ処理、レスポンスまで段階で話します。</div>
+<div class="caution"><strong>注意点：</strong>Web面接では、HTTPステータスコードやメソッドだけでなく、ネットワーク・TLS・プロキシ・ロードバランサまで軽く聞かれることがあります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="meta系 / coding コーディング面接で、実装前に何を確認しますか？ 問題解決を協調的に進められるか、前提確認ができるかを見る。 入力の型、入力サイズ、nullや空配列、重複、ソート済みかどうか、返却形式、エラー時の扱いを確認します。その後、小さい例を作り、まず素朴解を説明し、必要なら計算量を改善します。実装中も、今何をしているか、次に何を検証するかを言葉にします。 黙って書き始めるより、仕様確認を入れる方が評価されやすい。 正常系だけでなく、境界値・異常系・大規模入力も確認する。 最初から最適解を狙って固まるより、素朴解→改善案の順に進める。 海外面接では、コードそのものだけでなくコミュニケーションも評価されます。これは「おしゃべりする」という意味ではなく、仮定・方針・検証を共有することです。あなたは初見で黙りやすい可能性があるので、「まず前提を確認します」と口に出す型を作るべきです。 質問しすぎて進まないのも問題です。確認は1〜2分で行い、仮定を置いて実装に入る判断も必要です。">
+<div class="qa-head">
+<div><span class="cat">Meta系 / Coding</span> <span class="badge badge-S">S</span></div>
+<div class="num">OQ011</div>
+</div>
+<h3>コーディング面接で、実装前に何を確認しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>問題解決を協調的に進められるか、前提確認ができるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">入力の型、入力サイズ、nullや空配列、重複、ソート済みかどうか、返却形式、エラー時の扱いを確認します。その後、小さい例を作り、まず素朴解を説明し、必要なら計算量を改善します。実装中も、今何をしているか、次に何を検証するかを言葉にします。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>黙って書き始めるより、仕様確認を入れる方が評価されやすい。</li><li>正常系だけでなく、境界値・異常系・大規模入力も確認する。</li><li>最初から最適解を狙って固まるより、素朴解→改善案の順に進める。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>海外面接では、コードそのものだけでなくコミュニケーションも評価されます。これは「おしゃべりする」という意味ではなく、仮定・方針・検証を共有することです。あなたは初見で黙りやすい可能性があるので、「まず前提を確認します」と口に出す型を作るべきです。</div>
+<div class="caution"><strong>注意点：</strong>質問しすぎて進まないのも問題です。確認は1〜2分で行い、仮定を置いて実装に入る判断も必要です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="meta系 / coding a oq012 二分探索を書くとき、どのような点に注意しますか？ 面接官の意図： 基本アルゴリズムの境界条件を正確に扱えるかを見る。 回答例・補足を見る 30秒回答 二分探索では、配列がソート済みであること、探索範囲の境界を一貫して扱うこと、無限ループにならないことに注意します。典型的には、両端を含む [left, right] 方式なら while (left &lt;= right) 、右端を含まない [left, right) 方式なら while (left &lt; right) を使います。どちらかに統一することが重要です。 深掘りされたときに足す観点 両端含む方式： 存在確認に向く。初期値は left=0, right=n-1 。 半開区間方式： lower_bound、つまり「target以上の最初の位置」を探すときに扱いやすい。初期値は left=0, right=n 。 mid = left + (right - left) / 2 と書くと、巨大な値でのオーバーフローを避けやすい。 更新時に left = mid や right = mid を誤ると、範囲が縮まず無限ループになる。 両端含む [left, right]：targetが存在するか探す left = 0, right = n - 1 while left &lt;= right: mid = left + (right - left) / 2 if a[mid] == target: return mid if a[mid] &lt; target: left = mid + 1 else: right = mid - 1 return -1 半開区間 [left, right)：target以上の最初の位置を探す left = 0, right = n while left &lt; right: mid = left + (right - left) / 2 if a[mid] &lt; target: left = mid + 1 else: right = mid return left 理解補足： 二分探索で混乱しやすいのは、「rightが有効な添字なのか」「rightは範囲外の境界なのか」が曖昧になるからです。 [left, right] はrightも探索対象です。 [left, right) はright自体は探索対象ではなく、範囲の外側の境界です。慣れるまでは、存在確認は両端含む方式、挿入位置探索は半開区間方式、と使い分けると整理しやすいです。 注意点： 配列が未ソートなら二分探索は使えません。ソートしてから二分探索する場合、ソートコストo(n log n)も含めて考える必要があります。">
+<div class="qa-head">
+<div><span class="cat">Meta系 / Coding</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ012</div>
+</div>
+<h3>二分探索を書くとき、どのような点に注意しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>基本アルゴリズムの境界条件を正確に扱えるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">二分探索では、配列がソート済みであること、探索範囲の境界を一貫して扱うこと、無限ループにならないことに注意します。典型的には、両端を含む<code>[left, right]</code>方式なら<code>while (left &lt;= right)</code>、右端を含まない<code>[left, right)</code>方式なら<code>while (left &lt; right)</code>を使います。どちらかに統一することが重要です。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>両端含む方式：</strong>存在確認に向く。初期値は<code>left=0, right=n-1</code>。</li>
+<li><strong>半開区間方式：</strong>lower_bound、つまり「target以上の最初の位置」を探すときに扱いやすい。初期値は<code>left=0, right=n</code>。</li>
+<li><code>mid = left + (right - left) / 2</code>と書くと、巨大な値でのオーバーフローを避けやすい。</li>
+<li>更新時に<code>left = mid</code>や<code>right = mid</code>を誤ると、範囲が縮まず無限ループになる。</li>
+</ul>
+<div class="code">両端含む [left, right]：targetが存在するか探す
+
+left = 0, right = n - 1
+while left &lt;= right:
+    mid = left + (right - left) / 2
+    if a[mid] == target: return mid
+    if a[mid] &lt; target:  left = mid + 1
+    else:                right = mid - 1
+return -1
+
+半開区間 [left, right)：target以上の最初の位置を探す
+
+left = 0, right = n
+while left &lt; right:
+    mid = left + (right - left) / 2
+    if a[mid] &lt; target: left = mid + 1
+    else:               right = mid
+return left</div>
+<div class="supplement"><strong>理解補足：</strong>二分探索で混乱しやすいのは、「rightが有効な添字なのか」「rightは範囲外の境界なのか」が曖昧になるからです。<code>[left, right]</code>はrightも探索対象です。<code>[left, right)</code>はright自体は探索対象ではなく、範囲の外側の境界です。慣れるまでは、存在確認は両端含む方式、挿入位置探索は半開区間方式、と使い分けると整理しやすいです。</div>
+<div class="caution"><strong>注意点：</strong>配列が未ソートなら二分探索は使えません。ソートしてから二分探索する場合、ソートコストO(n log n)も含めて考える必要があります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="meta系 / system design システム設計問題を出されたら、最初に何から話しますか？ 広い問題を要件・制約・設計論点に分解できるかを見る。 最初にスコープを確認します。誰が使うのか、主要ユースケースは何か、読み書き比率、データ量、可用性、整合性、レイテンシ、セキュリティ要件を確認します。そのうえで、api、データモデル、主要コンポーネント、データフローを設計し、最後にボトルネックとトレードオフを議論します。 機能要件と非機能要件を分ける。 最初からdbやキャッシュに飛びつかない。 1つの完璧な設計ではなく、制約に応じた妥当な設計を作る。 system design primerでも、設計面接はオープンエンドな会話であり、最初にユースケース・制約・前提を確認し、ボトルネックとトレードオフを扱う流れが示されています。暗記するなら「要件→api→データ→構成→非機能→トレードオフ」の順番です。 いきなり「マイクロサービスにします」「kafkaを使います」と言うのは危険です。なぜ必要かを要件から説明できないと、技術名先行に見えます。">
+<div class="qa-head">
+<div><span class="cat">Meta系 / System Design</span> <span class="badge badge-S">S</span></div>
+<div class="num">OQ013</div>
+</div>
+<h3>システム設計問題を出されたら、最初に何から話しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>広い問題を要件・制約・設計論点に分解できるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">最初にスコープを確認します。誰が使うのか、主要ユースケースは何か、読み書き比率、データ量、可用性、整合性、レイテンシ、セキュリティ要件を確認します。そのうえで、API、データモデル、主要コンポーネント、データフローを設計し、最後にボトルネックとトレードオフを議論します。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>機能要件と非機能要件を分ける。</li><li>最初からDBやキャッシュに飛びつかない。</li><li>1つの完璧な設計ではなく、制約に応じた妥当な設計を作る。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>System Design Primerでも、設計面接はオープンエンドな会話であり、最初にユースケース・制約・前提を確認し、ボトルネックとトレードオフを扱う流れが示されています。暗記するなら「要件→API→データ→構成→非機能→トレードオフ」の順番です。</div>
+<div class="caution"><strong>注意点：</strong>いきなり「マイクロサービスにします」「Kafkaを使います」と言うのは危険です。なぜ必要かを要件から説明できないと、技術名先行に見えます。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="meta系 / system design チャットサービスを設計してください。最初に何を確認しますか？ リアルタイム性、保存、通知、順序性を分解できるかを見る。 まず、1対1チャットかグループチャットか、既読・未読、履歴保存、添付ファイル、通知、オンライン状態、想定ユーザー数、リアルタイム性の要求を確認します。その後、websocketまたはポーリング、メッセージ保存db、メッセージ配送、通知キュー、既読管理、順序保証を設計します。 リアルタイム配送にはwebsocketが候補。厳密なリアルタイムが不要ならポーリングやsseも候補。 メッセージは永続化が必要。配送失敗に備えて再送・未読管理を考える。 グループチャットでは、メッセージのfan-out、通知、既読管理が重くなる。 チャット設計では「送れたように見えるが保存されていない」「順序が入れ替わる」「通知だけ届いて本文がない」などが問題になります。ユーザー体験としては即時表示したいが、裏側では永続化・配送・再送を分けて考えます。 すべてのメッセージに厳密なグローバル順序を求めると設計が重くなります。多くの場合、会話単位・ルーム単位の順序で十分です。">
+<div class="qa-head">
+<div><span class="cat">Meta系 / System Design</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ014</div>
+</div>
+<h3>チャットサービスを設計してください。最初に何を確認しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>リアルタイム性、保存、通知、順序性を分解できるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">まず、1対1チャットかグループチャットか、既読・未読、履歴保存、添付ファイル、通知、オンライン状態、想定ユーザー数、リアルタイム性の要求を確認します。その後、WebSocketまたはポーリング、メッセージ保存DB、メッセージ配送、通知キュー、既読管理、順序保証を設計します。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>リアルタイム配送にはWebSocketが候補。厳密なリアルタイムが不要ならポーリングやSSEも候補。</li><li>メッセージは永続化が必要。配送失敗に備えて再送・未読管理を考える。</li><li>グループチャットでは、メッセージのfan-out、通知、既読管理が重くなる。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>チャット設計では「送れたように見えるが保存されていない」「順序が入れ替わる」「通知だけ届いて本文がない」などが問題になります。ユーザー体験としては即時表示したいが、裏側では永続化・配送・再送を分けて考えます。</div>
+<div class="caution"><strong>注意点：</strong>すべてのメッセージに厳密なグローバル順序を求めると設計が重くなります。多くの場合、会話単位・ルーム単位の順序で十分です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="meta系 / design a oq015 高トラフィックなフィード機能をどう設計しますか？ 面接官の意図： 読み書き比率、キャッシュ、非同期処理、ランキングを考えられるかを見る。 回答例・補足を見る 30秒回答 フィードとは、ユーザーごとに表示される投稿一覧やタイムラインのようなものです。xのホームタイムライン、instagramのホーム、社内snsの投稿一覧をイメージすると分かりやすいです。設計では、投稿、フォロー関係、フィード取得の読み書き比率を確認します。読み取りが多いなら投稿時にフォロワーのフィードを事前生成するfan-out on write、書き込みを軽くしたいなら取得時に集約するfan-out on readを比較します。 深掘りされたときに足す観点 fan-out on write： 投稿時に、その投稿idをフォロワー全員のフィード箱へ配る。読むときは速いが、フォロワーが多いユーザーの投稿が重い。 fan-out on read： ユーザーがフィードを開いたタイミングで、フォロー中ユーザーの投稿を集めて並べる。書き込みは軽いが、読むたびに集約コストがかかる。 ハイブリッド： 一般ユーザーはfan-out on write、有名人ユーザーはfan-out on readにするなど、ユーザー特性で分ける。 ランキング、重複排除、ブロック/ミュート、広告挿入、ページング、キャッシュも論点。 feed設計のイメージ 投稿者aが投稿 ↓ [投稿db] に保存 ↓ fan-out on write の場合 ↓ aのフォロワー1のfeed inboxへ postid追加 aのフォロワー2のfeed inboxへ postid追加 aのフォロワー3のfeed inboxへ postid追加 ↓ フォロワーが読むときは、自分のfeed inboxを見るだけなので速い fan-out on read の場合 ユーザーxがフィードを開く ↓ xがフォローしているユーザー一覧を取得 ↓ 各ユーザーの最近投稿を集める ↓ 時系列/ランキングで並べて返す 理解補足： この質問の本質は「フィード一覧をいつ作るか」です。投稿された瞬間に各ユーザー向けの一覧を作っておくのか、ユーザーが画面を開いた瞬間に作るのか、という違いです。読み取りが非常に多いsnsでは、読むたびに重い集約をすると耐えられないため、事前生成やキャッシュが重要になります。 注意点： フィードはドメインによって正解が変わります。時系列でよいのか、ランキングが必要か、投稿の反映遅延を許容できるか、ブロック/ミュート/公開範囲をどう扱うかを確認せずに設計を決めるのは危険です。">
+<div class="qa-head">
+<div><span class="cat">Meta系 / Design</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ015</div>
+</div>
+<h3>高トラフィックなフィード機能をどう設計しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>読み書き比率、キャッシュ、非同期処理、ランキングを考えられるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">フィードとは、ユーザーごとに表示される投稿一覧やタイムラインのようなものです。Xのホームタイムライン、Instagramのホーム、社内SNSの投稿一覧をイメージすると分かりやすいです。設計では、投稿、フォロー関係、フィード取得の読み書き比率を確認します。読み取りが多いなら投稿時にフォロワーのフィードを事前生成するfan-out on write、書き込みを軽くしたいなら取得時に集約するfan-out on readを比較します。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>fan-out on write：</strong>投稿時に、その投稿IDをフォロワー全員のフィード箱へ配る。読むときは速いが、フォロワーが多いユーザーの投稿が重い。</li>
+<li><strong>fan-out on read：</strong>ユーザーがフィードを開いたタイミングで、フォロー中ユーザーの投稿を集めて並べる。書き込みは軽いが、読むたびに集約コストがかかる。</li>
+<li><strong>ハイブリッド：</strong>一般ユーザーはfan-out on write、有名人ユーザーはfan-out on readにするなど、ユーザー特性で分ける。</li>
+<li>ランキング、重複排除、ブロック/ミュート、広告挿入、ページング、キャッシュも論点。</li>
+</ul>
+<div class="code">feed設計のイメージ
+
+投稿者Aが投稿
+   ↓
+[投稿DB] に保存
+   ↓
+fan-out on write の場合
+   ↓
+Aのフォロワー1のfeed inboxへ postId追加
+Aのフォロワー2のfeed inboxへ postId追加
+Aのフォロワー3のfeed inboxへ postId追加
+   ↓
+フォロワーが読むときは、自分のfeed inboxを見るだけなので速い
+
+fan-out on read の場合
+
+ユーザーXがフィードを開く
+   ↓
+Xがフォローしているユーザー一覧を取得
+   ↓
+各ユーザーの最近投稿を集める
+   ↓
+時系列/ランキングで並べて返す</div>
+<div class="supplement"><strong>理解補足：</strong>この質問の本質は「フィード一覧をいつ作るか」です。投稿された瞬間に各ユーザー向けの一覧を作っておくのか、ユーザーが画面を開いた瞬間に作るのか、という違いです。読み取りが非常に多いSNSでは、読むたびに重い集約をすると耐えられないため、事前生成やキャッシュが重要になります。</div>
+<div class="caution"><strong>注意点：</strong>フィードはドメインによって正解が変わります。時系列でよいのか、ランキングが必要か、投稿の反映遅延を許容できるか、ブロック/ミュート/公開範囲をどう扱うかを確認せずに設計を決めるのは危険です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="meta系 / behavioral a oq016 技術的に意見が対立した経験を説明してください。 面接官の意図： 協調性だけでなく、技術判断の比較軸を持っているかを見る。 回答例・補足を見る 30秒回答 starで話します。状況、対立した論点、判断基準、取った行動、結果、学びです。自分の正しさだけを主張するのではなく、性能、保守性、納期、運用負荷、セキュリティ、チームの習熟度などの判断軸を明確にして、比較・検証・合意形成をしたと話します。 深掘りされたときに足す観点 意見対立を人間関係の話だけにせず、技術的な判断軸に落とす。 最終的に自分の案が通らなかった場合でも、判断基準を共有できたなら良いエピソードになる。 小さなpoc、比較表、ログ・メトリクス、公式ドキュメントを使って判断した話は強い。 理解補足： あなたの場合は、kubernetes前提からecsへ切り替えた判断、認可情報を各サービスに分散させるか外部認可に寄せるか、keycloak側データとアプリdbデータの責務分担などが話しやすいです。「自分の主張が通った」よりも、「どの制約を見て、なぜその選択にしたか」を話す方が技術面接では評価されます。 話し方の型 s: 当初はkubernetes前提の手順だった t: 結合試験環境として短期間で安定稼働させる必要があった a: 既存環境との整合、運用負荷、習熟度、構築期限を比較し、ecs案を検討した r: ecsで構築し、試験に必要な環境を用意できた 学び: 手順書前提を深追いする前に、目的と制約から代替案を比較すべき 注意点： 「相手が分かっていなかった」「自分が正しかった」という語り方は避けるべきです。面接官は、技術判断と協働の両方を見ています。">
+<div class="qa-head">
+<div><span class="cat">Meta系 / Behavioral</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ016</div>
+</div>
+<h3>技術的に意見が対立した経験を説明してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>協調性だけでなく、技術判断の比較軸を持っているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">STARで話します。状況、対立した論点、判断基準、取った行動、結果、学びです。自分の正しさだけを主張するのではなく、性能、保守性、納期、運用負荷、セキュリティ、チームの習熟度などの判断軸を明確にして、比較・検証・合意形成をしたと話します。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li>意見対立を人間関係の話だけにせず、技術的な判断軸に落とす。</li>
+<li>最終的に自分の案が通らなかった場合でも、判断基準を共有できたなら良いエピソードになる。</li>
+<li>小さなPoC、比較表、ログ・メトリクス、公式ドキュメントを使って判断した話は強い。</li>
+</ul>
+<div class="supplement"><strong>理解補足：</strong>あなたの場合は、Kubernetes前提からECSへ切り替えた判断、認可情報を各サービスに分散させるか外部認可に寄せるか、Keycloak側データとアプリDBデータの責務分担などが話しやすいです。「自分の主張が通った」よりも、「どの制約を見て、なぜその選択にしたか」を話す方が技術面接では評価されます。</div>
+<div class="code">話し方の型
+
+S: 当初はKubernetes前提の手順だった
+T: 結合試験環境として短期間で安定稼働させる必要があった
+A: 既存環境との整合、運用負荷、習熟度、構築期限を比較し、ECS案を検討した
+R: ECSで構築し、試験に必要な環境を用意できた
+学び: 手順書前提を深追いする前に、目的と制約から代替案を比較すべき</div>
+<div class="caution"><strong>注意点：</strong>「相手が分かっていなかった」「自分が正しかった」という語り方は避けるべきです。面接官は、技術判断と協働の両方を見ています。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="monzo系 / project deep dive 最近のプロジェクトで、一番難しかった技術課題は何ですか？ 経験の深さ、技術的な所有範囲、振り返り力を見る。 あなたの場合は、共通認証・認可基盤をマイクロサービス全体に適用する設計を話すのが強いです。keycloak/oidc/openfga、ユーザ管理の責務分担、どのタイミングで認可確認するか、各社の実装前提を揃える必要があった点を説明します。単なる調整ではなく、認証・認可・責務境界の技術的整理だったと明確に話します。 課題の背景：複数社・複数マイクロサービス・共通認証認可基盤。 自分の役割：認証フロー、認可問い合わせ、ユーザ情報責務、api仕様の整理。 難しかった点：仕様が複数システムにまたがり、実装チームごとの理解ズレが後戻りにつながること。 成果：共通前提を整理し、設計・試験・実装の前提を揃えた。 monzoのようなプロジェクト深掘り型では、最近のプロジェクトについて、どう実装されたか、どんなトレードオフがあったか、振り返ると何を変えるかまで聞かれます。あなたは「調整しました」で止めず、「技術前提を整理し、認証認可の責務境界を定義した」と言うべきです。 実装量が少ないことを隠す必要はありません。ただし、設計判断・検証・不具合調査・環境構築まで具体的に話せないと、管理寄りに見えます。">
+<div class="qa-head">
+<div><span class="cat">Monzo系 / Project Deep Dive</span> <span class="badge badge-S">S</span></div>
+<div class="num">OQ017</div>
+</div>
+<h3>最近のプロジェクトで、一番難しかった技術課題は何ですか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>経験の深さ、技術的な所有範囲、振り返り力を見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">あなたの場合は、共通認証・認可基盤をマイクロサービス全体に適用する設計を話すのが強いです。Keycloak/OIDC/OpenFGA、ユーザ管理の責務分担、どのタイミングで認可確認するか、各社の実装前提を揃える必要があった点を説明します。単なる調整ではなく、認証・認可・責務境界の技術的整理だったと明確に話します。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>課題の背景：複数社・複数マイクロサービス・共通認証認可基盤。</li><li>自分の役割：認証フロー、認可問い合わせ、ユーザ情報責務、API仕様の整理。</li><li>難しかった点：仕様が複数システムにまたがり、実装チームごとの理解ズレが後戻りにつながること。</li><li>成果：共通前提を整理し、設計・試験・実装の前提を揃えた。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>Monzoのようなプロジェクト深掘り型では、最近のプロジェクトについて、どう実装されたか、どんなトレードオフがあったか、振り返ると何を変えるかまで聞かれます。あなたは「調整しました」で止めず、「技術前提を整理し、認証認可の責務境界を定義した」と言うべきです。</div>
+<div class="caution"><strong>注意点：</strong>実装量が少ないことを隠す必要はありません。ただし、設計判断・検証・不具合調査・環境構築まで具体的に話せないと、管理寄りに見えます。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="monzo系 / project deep dive その設計で、どんなトレードオフがありましたか？ 設計を一案でなく比較判断として語れるかを見る。 例として、認可情報を各サービスに持たせるか、openfgaのような外部認可基盤に寄せるかがあります。各サービス内で完結すればシンプルでレイテンシも抑えやすい一方、権限ロジックが分散します。外部認可は一元化・変更容易性・横断統制のメリットがある一方、依存先障害、ネットワーク遅延、可用性設計が必要になります。 各サービス内認可：局所的に分かりやすいが、ルール変更時に複数サービスへ修正が広がる。 外部認可：ルール集中管理ができるが、通信コストと依存先障害が増える。 jwtに権限を詰める：高速だが、権限変更の即時反映が難しい。 gateway認可：入口で止められるが、リソース詳細状態を確認するには追加情報が必要。 良い回答は「メリット・デメリットを両方言うこと」です。自分が選んだ案を正当化するだけでなく、捨てた案の良さも認めると、設計判断の成熟度が伝わります。 トレードオフを聞かれて「特にありません」は危険です。設計には必ず、性能、保守性、セキュリティ、運用、実装コストの交換関係があります。">
+<div class="qa-head">
+<div><span class="cat">Monzo系 / Project Deep Dive</span> <span class="badge badge-S">S</span></div>
+<div class="num">OQ018</div>
+</div>
+<h3>その設計で、どんなトレードオフがありましたか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>設計を一案でなく比較判断として語れるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">例として、認可情報を各サービスに持たせるか、OpenFGAのような外部認可基盤に寄せるかがあります。各サービス内で完結すればシンプルでレイテンシも抑えやすい一方、権限ロジックが分散します。外部認可は一元化・変更容易性・横断統制のメリットがある一方、依存先障害、ネットワーク遅延、可用性設計が必要になります。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>各サービス内認可：局所的に分かりやすいが、ルール変更時に複数サービスへ修正が広がる。</li><li>外部認可：ルール集中管理ができるが、通信コストと依存先障害が増える。</li><li>JWTに権限を詰める：高速だが、権限変更の即時反映が難しい。</li><li>Gateway認可：入口で止められるが、リソース詳細状態を確認するには追加情報が必要。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>良い回答は「メリット・デメリットを両方言うこと」です。自分が選んだ案を正当化するだけでなく、捨てた案の良さも認めると、設計判断の成熟度が伝わります。</div>
+<div class="caution"><strong>注意点：</strong>トレードオフを聞かれて「特にありません」は危険です。設計には必ず、性能、保守性、セキュリティ、運用、実装コストの交換関係があります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="monzo系 / pair coding a oq019 実務的な小プログラムをペアで作る場合、どう進めますか？ 面接官の意図： 実装力に加え、対話・検証・改善の進め方を見る。 回答例・補足を見る 30秒回答 ペアで小プログラムを作る場合は、最初に入力、出力、異常系、サンプル、制約を確認します。その後、いきなり大きな設計に入るのではなく、最小限のデータ構造・関数・クラスを決めて、まず正常系が動く実装を作ります。api設計課題ならエンドポイントと入出力、クラス設計課題なら責務とインターフェース、アルゴリズム課題なら関数の入出力を先に固めます。 深掘りされたときに足す観点 小プログラム面接は「大規模設計」ではなく、実務に近い小さな実装の進め方を見ることが多い。 最初にi/o契約を確認する。例：入力は配列かlistか、nullは来るか、返り値は何か。 必要なら簡単なクラスやdtoを置くが、過剰設計は避ける。 正常系 → 境界値 → 異常系 → リファクタリングの順で進める。 実装中は「ここではまず正常系だけ通します」「次に重複ケースを足します」のように短く実況する。 進め方のイメージ 1. 問題確認 - 入力は何か - 出力は何か - null / 空 / 重複 / 上限はあるか 2. 方針共有 - まず素朴解で作る - 必要ならhashmapで改善する 3. 最小実装 - 小さい関数、必要最小限のクラス 4. テスト - 正常系、空、重複、境界値 5. 改善 - 命名、関数分割、計算量、例外処理 理解補足： これは「api設計だけをする」というより、「小さい開発作業をどう進めるか」を見られる面接です。課題によって、apiの入出力を決める場合もあれば、クラス責務を決める場合も、単純な関数を実装する場合もあります。重要なのは、最初に契約を確認し、動くものを小さく作り、テストで確認しながら改善することです。 注意点： 完成しないこと自体より、黙って固まることの方が悪印象になりやすいです。自信がないときほど、今の仮定と次の作業を短く言葉にしてください。">
+<div class="qa-head">
+<div><span class="cat">Monzo系 / Pair Coding</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ019</div>
+</div>
+<h3>実務的な小プログラムをペアで作る場合、どう進めますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>実装力に加え、対話・検証・改善の進め方を見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">ペアで小プログラムを作る場合は、最初に入力、出力、異常系、サンプル、制約を確認します。その後、いきなり大きな設計に入るのではなく、最小限のデータ構造・関数・クラスを決めて、まず正常系が動く実装を作ります。API設計課題ならエンドポイントと入出力、クラス設計課題なら責務とインターフェース、アルゴリズム課題なら関数の入出力を先に固めます。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li>小プログラム面接は「大規模設計」ではなく、実務に近い小さな実装の進め方を見ることが多い。</li>
+<li>最初にI/O契約を確認する。例：入力は配列かListか、nullは来るか、返り値は何か。</li>
+<li>必要なら簡単なクラスやDTOを置くが、過剰設計は避ける。</li>
+<li>正常系 → 境界値 → 異常系 → リファクタリングの順で進める。</li>
+<li>実装中は「ここではまず正常系だけ通します」「次に重複ケースを足します」のように短く実況する。</li>
+</ul>
+<div class="code">進め方のイメージ
+
+1. 問題確認
+   - 入力は何か
+   - 出力は何か
+   - null / 空 / 重複 / 上限はあるか
+
+2. 方針共有
+   - まず素朴解で作る
+   - 必要ならHashMapで改善する
+
+3. 最小実装
+   - 小さい関数、必要最小限のクラス
+
+4. テスト
+   - 正常系、空、重複、境界値
+
+5. 改善
+   - 命名、関数分割、計算量、例外処理</div>
+<div class="supplement"><strong>理解補足：</strong>これは「API設計だけをする」というより、「小さい開発作業をどう進めるか」を見られる面接です。課題によって、APIの入出力を決める場合もあれば、クラス責務を決める場合も、単純な関数を実装する場合もあります。重要なのは、最初に契約を確認し、動くものを小さく作り、テストで確認しながら改善することです。</div>
+<div class="caution"><strong>注意点：</strong>完成しないこと自体より、黙って固まることの方が悪印象になりやすいです。自信がないときほど、今の仮定と次の作業を短く言葉にしてください。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="monzo系 / reliability 顧客向けapiで障害が起きた場合、どう調査しますか？ 運用、可観測性、優先順位付けを理解しているかを見る。 まず影響範囲、発生時刻、エラー率、対象ユーザー、直近リリース有無を確認します。次にログ、メトリクス、トレース、alb/ecs/アプリログ、db接続、外部api依存を確認します。一次対応として切り戻し、機能停止、リトライ制御、手動リカバリを検討し、恒久対応では監視、アラート、テスト、再発防止策に落とします。 最初に「原因」ではなく「影響範囲」と「ユーザー影響」を見る。 直近リリース、設定変更、依存サービス障害を確認する。 メトリクスで全体傾向、ログで個別事象、トレースで呼び出し経路を見る。 復旧後にポストモーテム、再発防止、監視追加を行う。 障害対応で評価されるのは、冷静に優先順位をつける力です。面接では「まず原因を調べます」だけでは弱いです。ユーザー影響の停止・軽減、復旧、原因調査、恒久対応の順に話すと現場感が出ます。 ログを見ます、だけでは浅いです。どのログを見るのか、どのメトリクスを見るのか、どの仮説を検証するのかまで言えると強いです。">
+<div class="qa-head">
+<div><span class="cat">Monzo系 / Reliability</span> <span class="badge badge-S">S</span></div>
+<div class="num">OQ020</div>
+</div>
+<h3>顧客向けAPIで障害が起きた場合、どう調査しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>運用、可観測性、優先順位付けを理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">まず影響範囲、発生時刻、エラー率、対象ユーザー、直近リリース有無を確認します。次にログ、メトリクス、トレース、ALB/ECS/アプリログ、DB接続、外部API依存を確認します。一次対応として切り戻し、機能停止、リトライ制御、手動リカバリを検討し、恒久対応では監視、アラート、テスト、再発防止策に落とします。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>最初に「原因」ではなく「影響範囲」と「ユーザー影響」を見る。</li><li>直近リリース、設定変更、依存サービス障害を確認する。</li><li>メトリクスで全体傾向、ログで個別事象、トレースで呼び出し経路を見る。</li><li>復旧後にポストモーテム、再発防止、監視追加を行う。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>障害対応で評価されるのは、冷静に優先順位をつける力です。面接では「まず原因を調べます」だけでは弱いです。ユーザー影響の停止・軽減、復旧、原因調査、恒久対応の順に話すと現場感が出ます。</div>
+<div class="caution"><strong>注意点：</strong>ログを見ます、だけでは浅いです。どのログを見るのか、どのメトリクスを見るのか、どの仮説を検証するのかまで言えると強いです。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="monzo系 / security プロジェクト深掘りで、セキュリティ観点を聞かれたら何を話しますか？ 認証認可・秘密情報・入力検証・権限境界を実務に接続できるかを見る。 認証認可、トークン管理、秘密情報管理、入力検証、監査ログ、最小権限、外部api連携の保護を話します。あなたの経験なら、oidcによる認証、openfgaによる認可、api gatewayでのアクセス制御、ユーザー情報の責務分担、アクセストークンの扱い、権限変更時の反映が中心になります。 認証：操作しているユーザーが誰かを確認する。 認可：そのユーザーが対象リソースに何をできるか判断する。 トークン：漏洩した場合の影響を考え、保存場所・有効期限・失効・更新を設計する。 監査ログ：誰が、いつ、何にアクセスしたかを追跡できるようにする。 web系バックエンドでは、セキュリティは専門職だけの仕事ではありません。api設計、db設計、ログ設計、エラー設計のすべてに関係します。面接では、自分の経験を「認証認可の設計判断」として語れると強いです。 「httpsにしています」だけでは不十分です。認証済みユーザーが不正に他人のリソースへアクセスできないか、という認可の観点が重要です。">
+<div class="qa-head">
+<div><span class="cat">Monzo系 / Security</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ021</div>
+</div>
+<h3>プロジェクト深掘りで、セキュリティ観点を聞かれたら何を話しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>認証認可・秘密情報・入力検証・権限境界を実務に接続できるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">認証認可、トークン管理、秘密情報管理、入力検証、監査ログ、最小権限、外部API連携の保護を話します。あなたの経験なら、OIDCによる認証、OpenFGAによる認可、API Gatewayでのアクセス制御、ユーザー情報の責務分担、アクセストークンの扱い、権限変更時の反映が中心になります。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>認証：操作しているユーザーが誰かを確認する。</li><li>認可：そのユーザーが対象リソースに何をできるか判断する。</li><li>トークン：漏洩した場合の影響を考え、保存場所・有効期限・失効・更新を設計する。</li><li>監査ログ：誰が、いつ、何にアクセスしたかを追跡できるようにする。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>Web系バックエンドでは、セキュリティは専門職だけの仕事ではありません。API設計、DB設計、ログ設計、エラー設計のすべてに関係します。面接では、自分の経験を「認証認可の設計判断」として語れると強いです。</div>
+<div class="caution"><strong>注意点：</strong>「HTTPSにしています」だけでは不十分です。認証済みユーザーが不正に他人のリソースへアクセスできないか、という認可の観点が重要です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="stripe系 / bug bash 既存コードにバグがあると言われたら、どう調査しますか？ 闇雲に直さず、再現・仮説・検証で進められるかを見る。 まず再現条件を固定します。期待値と実際の差分を確認し、入力、状態、外部依存、境界値、直近変更を切り分けます。ログやテストを追加して、どこで値や状態が崩れるかを追います。修正は最小差分で行い、回帰テストを追加します。 再現できないバグは、まず再現性を上げる。 期待値と実際の差分を言語化する。 二分探索的に原因箇所を狭める。 修正後は、同じバグが再発しないテストを追加する。 stripe系の実務再現型面接では、アルゴリズム難問より、既存コードの理解、デバッグ、テスト追加、外部api連携の堅さが見られることがあります。あなたの場合、結合試験で不具合を見つけて一部ソース改修した経験を、再現→原因特定→修正→確認の流れで語るとよいです。 「怪しいところを直しました」は危険です。なぜそこが原因だと判断したか、修正後にどう検証したかが重要です。">
+<div class="qa-head">
+<div><span class="cat">Stripe系 / Bug Bash</span> <span class="badge badge-S">S</span></div>
+<div class="num">OQ022</div>
+</div>
+<h3>既存コードにバグがあると言われたら、どう調査しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>闇雲に直さず、再現・仮説・検証で進められるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">まず再現条件を固定します。期待値と実際の差分を確認し、入力、状態、外部依存、境界値、直近変更を切り分けます。ログやテストを追加して、どこで値や状態が崩れるかを追います。修正は最小差分で行い、回帰テストを追加します。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>再現できないバグは、まず再現性を上げる。</li><li>期待値と実際の差分を言語化する。</li><li>二分探索的に原因箇所を狭める。</li><li>修正後は、同じバグが再発しないテストを追加する。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>Stripe系の実務再現型面接では、アルゴリズム難問より、既存コードの理解、デバッグ、テスト追加、外部API連携の堅さが見られることがあります。あなたの場合、結合試験で不具合を見つけて一部ソース改修した経験を、再現→原因特定→修正→確認の流れで語るとよいです。</div>
+<div class="caution"><strong>注意点：</strong>「怪しいところを直しました」は危険です。なぜそこが原因だと判断したか、修正後にどう検証したかが重要です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="stripe系 / integration 外部api連携を実装するとき、何に注意しますか？ 実務的なapi連携の失敗パターンを理解しているかを見る。 認証方式、タイムアウト、リトライ、冪等性、レート制限、エラーコード、レスポンス互換性、監査ログ、秘密情報管理を確認します。注文や決済のような処理では、重複実行が致命的になるため、idempotency keyや状態遷移を明確にします。外部apiは落ちる前提で、失敗時のユーザー体験と再処理方法まで設計します。 タイムアウト：無限待ちを避ける。 リトライ：一時障害には有効だが、重複実行と負荷増加に注意。 冪等性：同じリクエストが複数回実行されても結果が壊れないようにする。 レート制限：呼び出しすぎで拒否されないように制御する。 監査ログ：問い合わせや障害時に追跡できるようにする。 あなたの外部システム連携経験にかなり直結します。dipsのような外部apiをラップする場合、アクセストークンの保存・更新、apiキーや認証情報の管理、エラー時の再処理、連携先の仕様変更への対応が論点になります。 外部api連携では、正常系だけ実装しても不十分です。タイムアウト、4xx/5xx、レスポンス形式変更、トークン期限切れ、再送、二重実行まで見られます。">
+<div class="qa-head">
+<div><span class="cat">Stripe系 / Integration</span> <span class="badge badge-S">S</span></div>
+<div class="num">OQ023</div>
+</div>
+<h3>外部API連携を実装するとき、何に注意しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>実務的なAPI連携の失敗パターンを理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">認証方式、タイムアウト、リトライ、冪等性、レート制限、エラーコード、レスポンス互換性、監査ログ、秘密情報管理を確認します。注文や決済のような処理では、重複実行が致命的になるため、Idempotency Keyや状態遷移を明確にします。外部APIは落ちる前提で、失敗時のユーザー体験と再処理方法まで設計します。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>タイムアウト：無限待ちを避ける。</li><li>リトライ：一時障害には有効だが、重複実行と負荷増加に注意。</li><li>冪等性：同じリクエストが複数回実行されても結果が壊れないようにする。</li><li>レート制限：呼び出しすぎで拒否されないように制御する。</li><li>監査ログ：問い合わせや障害時に追跡できるようにする。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>あなたの外部システム連携経験にかなり直結します。DIPSのような外部APIをラップする場合、アクセストークンの保存・更新、APIキーや認証情報の管理、エラー時の再処理、連携先の仕様変更への対応が論点になります。</div>
+<div class="caution"><strong>注意点：</strong>外部API連携では、正常系だけ実装しても不十分です。タイムアウト、4xx/5xx、レスポンス形式変更、トークン期限切れ、再送、二重実行まで見られます。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="stripe系 / practical coding 標準的なleetcodeではなく、業務ロジック実装問題が出たらどう戦いますか？ 抽象アルゴリズムではなく、仕様理解と堅実な実装を見ている。 まず仕様を小さく分けます。正常系、異常系、境界値、状態遷移、入出力形式を確認し、シンプルなデータ構造で最小実装を作ります。その後、テストケースを増やしながら、責務分割、命名、例外処理を整えます。業務ロジック問題では、最短コードより仕様漏れの少なさが重要です。 状態遷移がある場合は、状態一覧と許可される遷移を明確にする。 金額、数量、日付、時刻、丸め、タイムゾーンはバグが出やすい。 実装後に、サンプル入力と境界値で動作確認する。 web系自社開発のコーディングテストでは、「配列アルゴリズム」より「api・json・状態管理・バリデーション・db更新」のような実務寄り問題が出ることがあります。あなたはjavaで受けるなら、クラス分割、map/listの使い方、例外、テストの書き方を準備すべきです。 過剰に抽象化しすぎると、時間内に動かないコードになります。まず正しく動く最小実装、その後に改善、の順が安全です。">
+<div class="qa-head">
+<div><span class="cat">Stripe系 / Practical Coding</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ024</div>
+</div>
+<h3>標準的なLeetCodeではなく、業務ロジック実装問題が出たらどう戦いますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>抽象アルゴリズムではなく、仕様理解と堅実な実装を見ている。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">まず仕様を小さく分けます。正常系、異常系、境界値、状態遷移、入出力形式を確認し、シンプルなデータ構造で最小実装を作ります。その後、テストケースを増やしながら、責務分割、命名、例外処理を整えます。業務ロジック問題では、最短コードより仕様漏れの少なさが重要です。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>状態遷移がある場合は、状態一覧と許可される遷移を明確にする。</li><li>金額、数量、日付、時刻、丸め、タイムゾーンはバグが出やすい。</li><li>実装後に、サンプル入力と境界値で動作確認する。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>Web系自社開発のコーディングテストでは、「配列アルゴリズム」より「API・JSON・状態管理・バリデーション・DB更新」のような実務寄り問題が出ることがあります。あなたはJavaで受けるなら、クラス分割、Map/Listの使い方、例外、テストの書き方を準備すべきです。</div>
+<div class="caution"><strong>注意点：</strong>過剰に抽象化しすぎると、時間内に動かないコードになります。まず正しく動く最小実装、その後に改善、の順が安全です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="stripe系 / communication 制約が途中で変わった場合、どう対応しますか？ 変更への耐性、影響範囲の切り分け、段階的対応ができるかを見る。 まず変更内容が、機能要件、非機能要件、データモデル、api契約、認証認可、運用のどこに影響するかを切り分けます。次に既存設計との差分、壊れる前提、移行手段、互換性維持の必要性を確認します。その上で短期対応と恒久対応を分け、必要ならfeature flagや段階リリースでリスクを下げます。 api契約が変わるなら、既存クライアントへの互換性が問題になる。 dbスキーマが変わるなら、マイグレーションとロールバックを考える。 認可条件が変わるなら、既存ユーザーの権限影響を確認する。 非機能要件が変わるなら、性能・可用性・監視も見直す。 この質問は、sier的な変更管理ではなく、エンジニアとして変更をどう安全に取り込むかを見ています。あなたは要件整理経験があるので、変更の影響範囲を技術レイヤに落とす形で話せると強いです。 「相談します」だけでは弱いです。相談前に、どこに影響するか、選択肢は何か、リスクは何かを整理する姿勢を示しましょう。">
+<div class="qa-head">
+<div><span class="cat">Stripe系 / Communication</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ025</div>
+</div>
+<h3>制約が途中で変わった場合、どう対応しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>変更への耐性、影響範囲の切り分け、段階的対応ができるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">まず変更内容が、機能要件、非機能要件、データモデル、API契約、認証認可、運用のどこに影響するかを切り分けます。次に既存設計との差分、壊れる前提、移行手段、互換性維持の必要性を確認します。その上で短期対応と恒久対応を分け、必要ならFeature Flagや段階リリースでリスクを下げます。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>API契約が変わるなら、既存クライアントへの互換性が問題になる。</li><li>DBスキーマが変わるなら、マイグレーションとロールバックを考える。</li><li>認可条件が変わるなら、既存ユーザーの権限影響を確認する。</li><li>非機能要件が変わるなら、性能・可用性・監視も見直す。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>この質問は、SIer的な変更管理ではなく、エンジニアとして変更をどう安全に取り込むかを見ています。あなたは要件整理経験があるので、変更の影響範囲を技術レイヤに落とす形で話せると強いです。</div>
+<div class="caution"><strong>注意点：</strong>「相談します」だけでは弱いです。相談前に、どこに影響するか、選択肢は何か、リスクは何かを整理する姿勢を示しましょう。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="system design primer系 s oq026 url短縮サービスを設計してください。 面接官の意図： 基本的なシステム設計の型を理解しているかを見る。 回答例・補足を見る 30秒回答 url短縮サービスは、長いurlを短いurlに変換し、その短いurlへアクセスすると元のurlへリダイレクトするサービスです。bit.lyやtinyurlのようなものです。apiは、短縮url作成の post /urls と、短縮キーにアクセスしたときの get /{key} を考えます。dbには key 、 original_url 、 owner_id 、 expires_at などを保存し、読み取りが多いため key → original_url をキャッシュします。 深掘りされたときに足す観点 作成： 長いurlを受け取り、短いキーを生成してdbへ保存する。 アクセス： 短いキーで元urlを引き、http 301/302でリダイレクトする。 キー生成： 連番idのbase62変換、ランダム文字列生成＋衝突チェックなど。 非機能： 読み取り高頻度、低レイテンシ、高可用性、不正url対策、期限切れ処理。 分析： クリック数、アクセス元、作成者別集計などを非同期で処理する。 処理フロー 短縮url作成 client --post /urls {originalurl}--&gt; api api --key生成--&gt; db保存(key, original_url) api --短縮url返却--&gt; client 短縮urlアクセス browser --get /abc123--&gt; redirect api redirect api --key=abc123で検索--&gt; cache/db redirect api --302 location: original_url--&gt; browser browser --元urlへアクセス--&gt; original site 理解補足： この問題は、システム設計の基本型を練習する代表問題です。難所は「短いキーをどう一意に作るか」「読み取りが多いリダイレクトをどう高速化するか」「不正urlや期限切れをどう扱うか」です。連番をbase62変換すると短くできますが、推測されやすいです。ランダム生成は推測されにくい一方、衝突チェックが必要です。 注意点： 短縮キーを単純な連番にすると、他人のurlを推測される可能性があります。公開urlなのか、限定共有なのか、認証が必要なのかで設計は変わります。">
+<div class="qa-head">
+<div><span class="cat">System Design Primer系</span> <span class="badge badge-S">S</span></div>
+<div class="num">OQ026</div>
+</div>
+<h3>URL短縮サービスを設計してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>基本的なシステム設計の型を理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">URL短縮サービスは、長いURLを短いURLに変換し、その短いURLへアクセスすると元のURLへリダイレクトするサービスです。bit.lyやTinyURLのようなものです。APIは、短縮URL作成の<code>POST /urls</code>と、短縮キーにアクセスしたときの<code>GET /{key}</code>を考えます。DBには<code>key</code>、<code>original_url</code>、<code>owner_id</code>、<code>expires_at</code>などを保存し、読み取りが多いため<code>key → original_url</code>をキャッシュします。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>作成：</strong>長いURLを受け取り、短いキーを生成してDBへ保存する。</li>
+<li><strong>アクセス：</strong>短いキーで元URLを引き、HTTP 301/302でリダイレクトする。</li>
+<li><strong>キー生成：</strong>連番IDのBase62変換、ランダム文字列生成＋衝突チェックなど。</li>
+<li><strong>非機能：</strong>読み取り高頻度、低レイテンシ、高可用性、不正URL対策、期限切れ処理。</li>
+<li><strong>分析：</strong>クリック数、アクセス元、作成者別集計などを非同期で処理する。</li>
+</ul>
+<div class="code">処理フロー
+
+短縮URL作成
+Client --POST /urls {originalUrl}--&gt; API
+API --key生成--&gt; DB保存(key, original_url)
+API --短縮URL返却--&gt; Client
+
+短縮URLアクセス
+Browser --GET /abc123--&gt; Redirect API
+Redirect API --key=abc123で検索--&gt; Cache/DB
+Redirect API --302 Location: original_url--&gt; Browser
+Browser --元URLへアクセス--&gt; Original Site</div>
+<div class="supplement"><strong>理解補足：</strong>この問題は、システム設計の基本型を練習する代表問題です。難所は「短いキーをどう一意に作るか」「読み取りが多いリダイレクトをどう高速化するか」「不正URLや期限切れをどう扱うか」です。連番をBase62変換すると短くできますが、推測されやすいです。ランダム生成は推測されにくい一方、衝突チェックが必要です。</div>
+<div class="caution"><strong>注意点：</strong>短縮キーを単純な連番にすると、他人のURLを推測される可能性があります。公開URLなのか、限定共有なのか、認証が必要なのかで設計は変わります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="system design primer系 a oq027 通知システムを設計してください。 面接官の意図： 非同期処理、配信チャネル、再送、ユーザー設定を考えられるかを見る。 回答例・補足を見る 30秒回答 通知システムでは、業務イベントの発生、通知作成、キュー投入、配信ワーカー、外部配信サービス、通知履歴、ユーザー設定を分けて考えます。注文完了やコメント追加などのイベントが発生したら、api処理内で直接メールやpushを送るのではなく、通知イベントをキューに積み、ワーカーが非同期で配信します。 深掘りされたときに足す観点 イベント発生元： 注文、コメント、承認依頼、障害検知など。 通知サービス： 誰に、何を、どのチャネルで送るかを決める。 キュー： 業務処理と配信処理を分離し、外部サービス遅延の影響を小さくする。 配信ワーカー： email、push、sms、slackなどのプロバイダへ送る。 失敗処理： リトライ、指数バックオフ、dlq、失敗履歴、手動再送。 重複防止： 通知idや冪等キーで同じ通知の二重送信を防ぐ。 通知システムの構成イメージ [業務サービス] 注文完了 / コメント追加 / 承認依頼 ↓ event [通知サービス] 宛先・テンプレート・チャネル・ユーザー設定を確認 ↓ message [queue / topic] ↓ [配信worker群] ├─ email provider ├─ push provider └─ slack/sms provider ↓ [通知履歴db] sent / failed / retrying / dead 理解補足： 通知は「送るだけ」ではありません。実務では、ユーザーがメール通知をoffにしている、テンプレートが多言語化されている、外部メールapiが一時障害、同じイベントが再送される、という問題が出ます。だから、通知作成と配信を分け、状態管理と再送設計を持たせます。 注意点： 業務トランザクション内で外部メールapiを直接呼ぶと、外部サービス遅延で本処理が遅くなります。さらにdbはロールバックしたのにメールだけ送られる、という不整合も起き得ます。">
+<div class="qa-head">
+<div><span class="cat">System Design Primer系</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ027</div>
+</div>
+<h3>通知システムを設計してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>非同期処理、配信チャネル、再送、ユーザー設定を考えられるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">通知システムでは、業務イベントの発生、通知作成、キュー投入、配信ワーカー、外部配信サービス、通知履歴、ユーザー設定を分けて考えます。注文完了やコメント追加などのイベントが発生したら、API処理内で直接メールやPushを送るのではなく、通知イベントをキューに積み、ワーカーが非同期で配信します。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>イベント発生元：</strong>注文、コメント、承認依頼、障害検知など。</li>
+<li><strong>通知サービス：</strong>誰に、何を、どのチャネルで送るかを決める。</li>
+<li><strong>キュー：</strong>業務処理と配信処理を分離し、外部サービス遅延の影響を小さくする。</li>
+<li><strong>配信ワーカー：</strong>Email、Push、SMS、Slackなどのプロバイダへ送る。</li>
+<li><strong>失敗処理：</strong>リトライ、指数バックオフ、DLQ、失敗履歴、手動再送。</li>
+<li><strong>重複防止：</strong>通知IDや冪等キーで同じ通知の二重送信を防ぐ。</li>
+</ul>
+<div class="code">通知システムの構成イメージ
+
+[業務サービス]
+  注文完了 / コメント追加 / 承認依頼
+        ↓ event
+[通知サービス]
+  宛先・テンプレート・チャネル・ユーザー設定を確認
+        ↓ message
+[Queue / Topic]
+        ↓
+[配信Worker群]
+  ├─ Email Provider
+  ├─ Push Provider
+  └─ Slack/SMS Provider
+        ↓
+[通知履歴DB]
+  sent / failed / retrying / dead</div>
+<div class="supplement"><strong>理解補足：</strong>通知は「送るだけ」ではありません。実務では、ユーザーがメール通知をOFFにしている、テンプレートが多言語化されている、外部メールAPIが一時障害、同じイベントが再送される、という問題が出ます。だから、通知作成と配信を分け、状態管理と再送設計を持たせます。</div>
+<div class="caution"><strong>注意点：</strong>業務トランザクション内で外部メールAPIを直接呼ぶと、外部サービス遅延で本処理が遅くなります。さらにDBはロールバックしたのにメールだけ送られる、という不整合も起き得ます。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="system design primer系 a oq028 レートリミッターを設計してください。 面接官の意図： api保護、アルゴリズム、分散環境での制御を理解しているかを見る。 回答例・補足を見る 30秒回答 レートリミッターは、ユーザー、ip、apiキーなどを単位に、一定時間あたりのリクエスト数を制限する仕組みです。代表方式にはfixed window、sliding window、token bucket、leaky bucketがあります。単一アプリのメモリではなく、複数インスタンスで共有できるredisやapi gatewayで実装することが多いです。 方式ごとの違い fixed window： 「1分あたり100回」のように固定時間枠でカウントする。簡単だが、分境界の前後で200回近く通ることがある。 sliding window log： 各リクエスト時刻を記録し、直近60秒の件数を見る。正確だがメモリを使う。 sliding window counter： 現在ウィンドウと前ウィンドウを重みづけして概算する。fixed windowより滑らかで、logより軽い。 token bucket： 一定速度でトークンが補充され、リクエストごとに1トークン消費する。バケット容量分の短期バーストを許容できる。 leaky bucket： リクエストをキューに入れ、一定速度で処理する。出力を平滑化しやすいが、キューが溢れると拒否する。 token bucket のイメージ bucket capacity = 10 refill rate = 1 token/sec リクエスト到着 ├─ tokenあり → tokenを1つ消費して許可 └─ tokenなし → 429 too many requests 特徴：通常は1秒1回程度に制限しつつ、最大10回までの短期バーストは許容できる 理解補足： fixed windowは「13:00:00〜13:00:59に100回」のように数えるため、12:59:59に100回、13:00:00に100回のような境界バーストが起きます。token bucketは「普段は一定速度、ただし貯まっている分だけ一時的に多めに通す」方式なので、api利用制限でよく使われます。 注意点： アプリインスタンスごとのメモリで制限すると、10台にスケールした瞬間に実質10倍リクエストを許可してしまいます。分散環境では共有ストアかgatewayレイヤで制御する必要があります。">
+<div class="qa-head">
+<div><span class="cat">System Design Primer系</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ028</div>
+</div>
+<h3>レートリミッターを設計してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>API保護、アルゴリズム、分散環境での制御を理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">レートリミッターは、ユーザー、IP、APIキーなどを単位に、一定時間あたりのリクエスト数を制限する仕組みです。代表方式にはFixed Window、Sliding Window、Token Bucket、Leaky Bucketがあります。単一アプリのメモリではなく、複数インスタンスで共有できるRedisやAPI Gatewayで実装することが多いです。</div>
+<h4>方式ごとの違い</h4>
+<ul>
+<li><strong>Fixed Window：</strong>「1分あたり100回」のように固定時間枠でカウントする。簡単だが、分境界の前後で200回近く通ることがある。</li>
+<li><strong>Sliding Window Log：</strong>各リクエスト時刻を記録し、直近60秒の件数を見る。正確だがメモリを使う。</li>
+<li><strong>Sliding Window Counter：</strong>現在ウィンドウと前ウィンドウを重みづけして概算する。Fixed Windowより滑らかで、Logより軽い。</li>
+<li><strong>Token Bucket：</strong>一定速度でトークンが補充され、リクエストごとに1トークン消費する。バケット容量分の短期バーストを許容できる。</li>
+<li><strong>Leaky Bucket：</strong>リクエストをキューに入れ、一定速度で処理する。出力を平滑化しやすいが、キューが溢れると拒否する。</li>
+</ul>
+<div class="code">Token Bucket のイメージ
+
+bucket capacity = 10
+refill rate = 1 token/sec
+
+リクエスト到着
+  ├─ tokenあり  → tokenを1つ消費して許可
+  └─ tokenなし  → 429 Too Many Requests
+
+特徴：通常は1秒1回程度に制限しつつ、最大10回までの短期バーストは許容できる</div>
+<div class="supplement"><strong>理解補足：</strong>Fixed Windowは「13:00:00〜13:00:59に100回」のように数えるため、12:59:59に100回、13:00:00に100回のような境界バーストが起きます。Token Bucketは「普段は一定速度、ただし貯まっている分だけ一時的に多めに通す」方式なので、API利用制限でよく使われます。</div>
+<div class="caution"><strong>注意点：</strong>アプリインスタンスごとのメモリで制限すると、10台にスケールした瞬間に実質10倍リクエストを許可してしまいます。分散環境では共有ストアかGatewayレイヤで制御する必要があります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="system design primer系 a oq029 ジョブキュー・非同期処理基盤を設計してください。 面接官の意図： 同期処理と非同期処理の切り分け、失敗時の再処理を考えられるかを見る。 回答例・補足を見る 30秒回答 ジョブキューは、時間がかかる処理や失敗しやすい外部連携を、apiリクエストから切り離して非同期に実行する仕組みです。apiはジョブを作成してキューに積み、ジョブidを返します。ワーカーがキューから取り出して処理し、成功・失敗・リトライ回数・エラー内容をジョブ状態として管理します。重複実行に備えて冪等性を持たせます。 深掘りされたときに足す観点 対象処理： メール送信、画像変換、外部api連携、集計、csv出力、通知配信。 api応答： 同期完了を待たず、 202 accepted と jobid を返す設計がある。 状態管理： queued 、 running 、 succeeded 、 failed 、 dead 。 失敗処理： リトライ、指数バックオフ、最大回数、dlq、手動再実行。 冪等性： 同じジョブが2回実行されても、二重請求・二重送信にならないようにする。 非同期ジョブの構成イメージ client --post /reports--&gt; api api --job作成--&gt; job db(status=queued) api --message投入--&gt; queue api --202 accepted {jobid}--&gt; client worker --message取得--&gt; queue worker --status=running--&gt; job db worker --処理実行--&gt; 外部api / s3 / db worker --status=succeeded or failed--&gt; job db client --get /jobs/{jobid}--&gt; 進捗確認 理解補足： 非同期化するとapiは速く返せますが、「処理が本当に完了したか」を別で扱う必要があります。ユーザーに進捗を見せるのか、完了通知を送るのか、失敗したら再実行できるのかを設計します。また、キューは多くの場合at-least-once配信なので、ワーカーは同じメッセージを複数回受け取る前提で作るべきです。 注意点： キューに入れれば安全になるわけではありません。キュー詰まり、リトライ嵐、dlq放置、順序性、重複実行、処理結果の不整合が起きます。監視と運用設計が必須です。">
+<div class="qa-head">
+<div><span class="cat">System Design Primer系</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ029</div>
+</div>
+<h3>ジョブキュー・非同期処理基盤を設計してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>同期処理と非同期処理の切り分け、失敗時の再処理を考えられるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">ジョブキューは、時間がかかる処理や失敗しやすい外部連携を、APIリクエストから切り離して非同期に実行する仕組みです。APIはジョブを作成してキューに積み、ジョブIDを返します。ワーカーがキューから取り出して処理し、成功・失敗・リトライ回数・エラー内容をジョブ状態として管理します。重複実行に備えて冪等性を持たせます。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>対象処理：</strong>メール送信、画像変換、外部API連携、集計、CSV出力、通知配信。</li>
+<li><strong>API応答：</strong>同期完了を待たず、<code>202 Accepted</code>と<code>jobId</code>を返す設計がある。</li>
+<li><strong>状態管理：</strong><code>queued</code>、<code>running</code>、<code>succeeded</code>、<code>failed</code>、<code>dead</code>。</li>
+<li><strong>失敗処理：</strong>リトライ、指数バックオフ、最大回数、DLQ、手動再実行。</li>
+<li><strong>冪等性：</strong>同じジョブが2回実行されても、二重請求・二重送信にならないようにする。</li>
+</ul>
+<div class="code">非同期ジョブの構成イメージ
+
+Client --POST /reports--&gt; API
+API --job作成--&gt; Job DB(status=queued)
+API --message投入--&gt; Queue
+API --202 Accepted {jobId}--&gt; Client
+
+Worker --message取得--&gt; Queue
+Worker --status=running--&gt; Job DB
+Worker --処理実行--&gt; 外部API / S3 / DB
+Worker --status=succeeded or failed--&gt; Job DB
+
+Client --GET /jobs/{jobId}--&gt; 進捗確認</div>
+<div class="supplement"><strong>理解補足：</strong>非同期化するとAPIは速く返せますが、「処理が本当に完了したか」を別で扱う必要があります。ユーザーに進捗を見せるのか、完了通知を送るのか、失敗したら再実行できるのかを設計します。また、キューは多くの場合at-least-once配信なので、ワーカーは同じメッセージを複数回受け取る前提で作るべきです。</div>
+<div class="caution"><strong>注意点：</strong>キューに入れれば安全になるわけではありません。キュー詰まり、リトライ嵐、DLQ放置、順序性、重複実行、処理結果の不整合が起きます。監視と運用設計が必須です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="system design primer系 a oq030 ファイルアップロード機能を設計してください。 面接官の意図： 大きなデータをアプリサーバーで直接扱わない設計を理解しているかを見る。 回答例・補足を見る 30秒回答 ファイルアップロードでは、大容量ファイルをアプリサーバーで直接受けると負荷が高いため、s3などのオブジェクトストレージへ直接アップロードする設計がよく使われます。アプリは認証・認可を確認して署名付きurlを発行し、クライアントがそのurlを使ってストレージへアップロードします。完了後、dbにファイルメタデータを保存し、必要ならウイルススキャンやサムネイル生成を非同期で実行します。 深掘りされたときに足す観点 直接アップロード： クライアント → s3。アプリサーバーの帯域・メモリ負荷を減らせる。 署名付きurl： 一定時間だけ特定オブジェクトへのアップロード権限を与える。 メタデータ： file_id、owner_id、storage_key、size、mime_type、status、created_at。 状態： upload_pending 、 uploaded 、 scanning 、 available 、 rejected 。 セキュリティ： 拡張子/mime検証、サイズ制限、ウイルススキャン、公開範囲、認可確認。 署名付きurl方式 client --アップロード開始要求--&gt; api api --認証認可確認--&gt; db(file status=upload_pending) api --署名付きurl発行--&gt; client client --put file--&gt; s3 s3/event --アップロード完了通知--&gt; worker worker --スキャン/サムネイル生成--&gt; status=available client --get metadata--&gt; api 理解補足： この問題では「ファイル本体」と「ファイルの管理情報」を分けて考えるのが重要です。ファイル本体はs3のようなストレージへ置き、dbには所有者、保存キー、サイズ、状態、公開範囲などを持ちます。ユーザーがアップロードした直後にすぐ公開せず、スキャン完了後に公開する設計もあります。 注意点： ユーザーが指定したファイル名やmime typeを信用してはいけません。また、署名付きurlの有効期限やアップロード可能なキー範囲を誤ると、他人の領域へアップロードされる危険があります。">
+<div class="qa-head">
+<div><span class="cat">System Design Primer系</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ030</div>
+</div>
+<h3>ファイルアップロード機能を設計してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>大きなデータをアプリサーバーで直接扱わない設計を理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">ファイルアップロードでは、大容量ファイルをアプリサーバーで直接受けると負荷が高いため、S3などのオブジェクトストレージへ直接アップロードする設計がよく使われます。アプリは認証・認可を確認して署名付きURLを発行し、クライアントがそのURLを使ってストレージへアップロードします。完了後、DBにファイルメタデータを保存し、必要ならウイルススキャンやサムネイル生成を非同期で実行します。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>直接アップロード：</strong>クライアント → S3。アプリサーバーの帯域・メモリ負荷を減らせる。</li>
+<li><strong>署名付きURL：</strong>一定時間だけ特定オブジェクトへのアップロード権限を与える。</li>
+<li><strong>メタデータ：</strong>file_id、owner_id、storage_key、size、mime_type、status、created_at。</li>
+<li><strong>状態：</strong><code>upload_pending</code>、<code>uploaded</code>、<code>scanning</code>、<code>available</code>、<code>rejected</code>。</li>
+<li><strong>セキュリティ：</strong>拡張子/MIME検証、サイズ制限、ウイルススキャン、公開範囲、認可確認。</li>
+</ul>
+<div class="code">署名付きURL方式
+
+Client --アップロード開始要求--&gt; API
+API --認証認可確認--&gt; DB(file status=upload_pending)
+API --署名付きURL発行--&gt; Client
+Client --PUT file--&gt; S3
+S3/Event --アップロード完了通知--&gt; Worker
+Worker --スキャン/サムネイル生成--&gt; status=available
+Client --GET metadata--&gt; API</div>
+<div class="supplement"><strong>理解補足：</strong>この問題では「ファイル本体」と「ファイルの管理情報」を分けて考えるのが重要です。ファイル本体はS3のようなストレージへ置き、DBには所有者、保存キー、サイズ、状態、公開範囲などを持ちます。ユーザーがアップロードした直後にすぐ公開せず、スキャン完了後に公開する設計もあります。</div>
+<div class="caution"><strong>注意点：</strong>ユーザーが指定したファイル名やMIME typeを信用してはいけません。また、署名付きURLの有効期限やアップロード可能なキー範囲を誤ると、他人の領域へアップロードされる危険があります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="system design primer系 api gatewayを設計する場合、どの責務を持たせますか？ 入口集約のメリットと責務肥大化の危険を理解しているかを見る。 api gatewayには、ルーティング、認証、粗い認可、レートリミット、cors、リクエスト/レスポンス変換、ログ、メトリクス、トレース付与などを持たせることがあります。一方で、業務ロジックやリソース詳細に依存する判断を持たせすぎると、gatewayが肥大化し、各サービスの責務が曖昧になります。 入口で共通処理を集約できる。 各サービスに共通処理を重複実装しなくて済む。 詳細な業務認可は、サービス側や外部認可基盤との連携が必要になることがある。 障害時はgatewayが単一障害点になり得るため、可用性設計が重要。 あなたの認証認可経験にかなり直結します。gatewayでjwt検証やapiキー確認を行い、openfgaに問い合わせる構成はあり得ます。ただし、対象リソースの所有者や状態を見ないと判断できない認可は、gateway単独では不足することがあります。 gatewayに全てを集めると便利ですが、gatewayが巨大なモノリスになります。共通処理と業務処理の境界を明確にする必要があります。">
+<div class="qa-head">
+<div><span class="cat">System Design Primer系</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ031</div>
+</div>
+<h3>API Gatewayを設計する場合、どの責務を持たせますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>入口集約のメリットと責務肥大化の危険を理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">API Gatewayには、ルーティング、認証、粗い認可、レートリミット、CORS、リクエスト/レスポンス変換、ログ、メトリクス、トレース付与などを持たせることがあります。一方で、業務ロジックやリソース詳細に依存する判断を持たせすぎると、Gatewayが肥大化し、各サービスの責務が曖昧になります。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>入口で共通処理を集約できる。</li><li>各サービスに共通処理を重複実装しなくて済む。</li><li>詳細な業務認可は、サービス側や外部認可基盤との連携が必要になることがある。</li><li>障害時はGatewayが単一障害点になり得るため、可用性設計が重要。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>あなたの認証認可経験にかなり直結します。GatewayでJWT検証やAPIキー確認を行い、OpenFGAに問い合わせる構成はあり得ます。ただし、対象リソースの所有者や状態を見ないと判断できない認可は、Gateway単独では不足することがあります。</div>
+<div class="caution"><strong>注意点：</strong>Gatewayに全てを集めると便利ですが、Gatewayが巨大なモノリスになります。共通処理と業務処理の境界を明確にする必要があります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="system design primer系 a oq032 検索機能を設計してください。 面接官の意図： rdb検索、全文検索エンジン、インデックス、同期方式を比較できるかを見る。 回答例・補足を見る 30秒回答 検索機能では、まず検索の種類を確認します。idやメールアドレスの完全一致なのか、前方一致なのか、部分一致なのか、全文検索なのか、絞り込み・ソート・ランキングが必要なのかで設計が変わります。小規模ならrdbのインデックスやlikeで足りますが、大量データ・日本語全文検索・ランキングが必要ならelasticsearch/opensearchのような検索エンジンを検討します。 検索パターンごとの考え方 完全一致： where email = ? 。b-treeインデックスで高速化しやすい。 前方一致： where name like 'abc%' 。条件によってはインデックスが効きやすい。 部分一致： where name like '%abc%' 。通常のb-treeインデックスが効きにくい。 全文検索： 文章中の単語検索、形態素解析、スコアリングが必要。検索エンジンが向く。 ファセット検索： カテゴリ、価格帯、ステータスなどで絞り込む検索。 オートコンプリート： 入力途中で候補を出す。前方一致、n-gram、専用インデックスを検討する。 検索設計の選択肢 小規模・完全一致中心 → rdb + index 管理画面の簡単な部分一致 → rdb like でも可。ただしデータ量に注意 大量データ・全文検索・ランキング → opensearch / elasticsearch db更新と検索インデックス db更新 → event/cdc → indexer → search index更新 理解補足： 検索は「where句を書けば終わり」ではありません。日本語検索では単語の分かち書き、表記揺れ、スコアリング、ソート、権限制御、削除反映が問題になります。特に権限付き検索では、検索結果に出してよいデータだけを返す必要があります。認可を後段でフィルタすると、ページング件数が崩れることもあります。 注意点： 検索エンジンを使うと、rdbと検索インデックスの同期遅延が発生します。削除済みデータや権限変更済みデータが検索結果に残らないよう、更新イベント、再インデックス、認可フィルタを設計する必要があります。">
+<div class="qa-head">
+<div><span class="cat">System Design Primer系</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ032</div>
+</div>
+<h3>検索機能を設計してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>RDB検索、全文検索エンジン、インデックス、同期方式を比較できるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">検索機能では、まず検索の種類を確認します。IDやメールアドレスの完全一致なのか、前方一致なのか、部分一致なのか、全文検索なのか、絞り込み・ソート・ランキングが必要なのかで設計が変わります。小規模ならRDBのインデックスやLIKEで足りますが、大量データ・日本語全文検索・ランキングが必要ならElasticsearch/OpenSearchのような検索エンジンを検討します。</div>
+<h4>検索パターンごとの考え方</h4>
+<ul>
+<li><strong>完全一致：</strong><code>where email = ?</code>。B-treeインデックスで高速化しやすい。</li>
+<li><strong>前方一致：</strong><code>where name like 'abc%'</code>。条件によってはインデックスが効きやすい。</li>
+<li><strong>部分一致：</strong><code>where name like '%abc%'</code>。通常のB-treeインデックスが効きにくい。</li>
+<li><strong>全文検索：</strong>文章中の単語検索、形態素解析、スコアリングが必要。検索エンジンが向く。</li>
+<li><strong>ファセット検索：</strong>カテゴリ、価格帯、ステータスなどで絞り込む検索。</li>
+<li><strong>オートコンプリート：</strong>入力途中で候補を出す。前方一致、N-gram、専用インデックスを検討する。</li>
+</ul>
+<div class="code">検索設計の選択肢
+
+小規模・完全一致中心
+  → RDB + Index
+
+管理画面の簡単な部分一致
+  → RDB LIKE でも可。ただしデータ量に注意
+
+大量データ・全文検索・ランキング
+  → OpenSearch / Elasticsearch
+
+DB更新と検索インデックス
+  DB更新 → Event/CDC → Indexer → Search Index更新</div>
+<div class="supplement"><strong>理解補足：</strong>検索は「WHERE句を書けば終わり」ではありません。日本語検索では単語の分かち書き、表記揺れ、スコアリング、ソート、権限制御、削除反映が問題になります。特に権限付き検索では、検索結果に出してよいデータだけを返す必要があります。認可を後段でフィルタすると、ページング件数が崩れることもあります。</div>
+<div class="caution"><strong>注意点：</strong>検索エンジンを使うと、RDBと検索インデックスの同期遅延が発生します。削除済みデータや権限変更済みデータが検索結果に残らないよう、更新イベント、再インデックス、認可フィルタを設計する必要があります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="system design primer系 a oq033 ページングapiを設計してください。offset方式とcursor方式の違いは？ 面接官の意図： 大量データ取得、安定したページング、性能劣化を理解しているかを見る。 回答例・補足を見る 30秒回答 offset方式は、 limit と offset で「何件飛ばして何件取るか」を指定するページングです。実装は簡単ですが、offsetが大きいとdbが多くの行を読み飛ばすため遅くなります。cursor方式は、最後に取得したレコードのidや時刻を次回リクエストに渡し、「その続き」を取得する方式です。大量データや無限スクロールではcursor方式が向きます。 深掘りされたときに足す観点 offset： page=3&amp;limit=20 なら、40件飛ばして20件取る。ページ番号uiに向く。 cursor： 前回最後の created_at や id を基準に次の20件を取る。無限スクロールや時系列一覧に向く。 offsetは、途中でデータが追加・削除されると重複や抜けが起きやすい。 cursorには安定したソートキーが必要。 created_at + id のように一意性を持たせる。 cursorは内部キーをそのまま出さず、base64等でopaque tokenにすることが多い。 offset方式 get /notifications?limit=20&amp;offset=40 sql: order by created_at desc limit 20 offset 40 意味：上位40件を読み飛ばして、次の20件を返す 問題：offset=100000 などが遅い cursor方式 get /notifications?limit=20&amp;cursor=2026-06-01t10:00:00z_12345 sql: where (created_at, id) &lt; (:createdat, :id) order by created_at desc, id desc limit 20 意味：前回最後に見たレコードより後続の20件を返す 理解補足： offsetは人間に分かりやすい「ページ番号」に向いていますが、db内部では指定件数を読み飛ばす必要があります。cursorは「最後に見た地点から次を取る」ため、大量データでも性能が安定しやすいです。ただし、任意のページ番号へジャンプする用途には向きません。 注意点： created_at だけをcursorにすると、同時刻のデータが複数ある場合に順序が不安定になります。必ず created_at と id のように一意に並ぶキーを使います。">
+<div class="qa-head">
+<div><span class="cat">System Design Primer系</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ033</div>
+</div>
+<h3>ページングAPIを設計してください。OFFSET方式とCursor方式の違いは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>大量データ取得、安定したページング、性能劣化を理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">OFFSET方式は、<code>limit</code>と<code>offset</code>で「何件飛ばして何件取るか」を指定するページングです。実装は簡単ですが、offsetが大きいとDBが多くの行を読み飛ばすため遅くなります。Cursor方式は、最後に取得したレコードのIDや時刻を次回リクエストに渡し、「その続き」を取得する方式です。大量データや無限スクロールではCursor方式が向きます。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>OFFSET：</strong><code>page=3&amp;limit=20</code>なら、40件飛ばして20件取る。ページ番号UIに向く。</li>
+<li><strong>Cursor：</strong>前回最後の<code>created_at</code>や<code>id</code>を基準に次の20件を取る。無限スクロールや時系列一覧に向く。</li>
+<li>OFFSETは、途中でデータが追加・削除されると重複や抜けが起きやすい。</li>
+<li>Cursorには安定したソートキーが必要。<code>created_at + id</code>のように一意性を持たせる。</li>
+<li>Cursorは内部キーをそのまま出さず、Base64等でopaque tokenにすることが多い。</li>
+</ul>
+<div class="code">OFFSET方式
+
+GET /notifications?limit=20&amp;offset=40
+SQL: order by created_at desc limit 20 offset 40
+
+意味：上位40件を読み飛ばして、次の20件を返す
+問題：offset=100000 などが遅い
+
+Cursor方式
+
+GET /notifications?limit=20&amp;cursor=2026-06-01T10:00:00Z_12345
+SQL: where (created_at, id) &lt; (:createdAt, :id)
+     order by created_at desc, id desc
+     limit 20
+
+意味：前回最後に見たレコードより後続の20件を返す</div>
+<div class="supplement"><strong>理解補足：</strong>OFFSETは人間に分かりやすい「ページ番号」に向いていますが、DB内部では指定件数を読み飛ばす必要があります。Cursorは「最後に見た地点から次を取る」ため、大量データでも性能が安定しやすいです。ただし、任意のページ番号へジャンプする用途には向きません。</div>
+<div class="caution"><strong>注意点：</strong><code>created_at</code>だけをCursorにすると、同時刻のデータが複数ある場合に順序が不安定になります。必ず<code>created_at</code>と<code>id</code>のように一意に並ぶキーを使います。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="system design primer系 apiの後方互換性をどう保ちますか？ 既存クライアントを壊さずに変更できるかを見る。 apiの後方互換性を保つには、既存フィールドの意味を変えない、必須フィールドを急に増やさない、レスポンスから既存フィールドを削除しない、列挙値追加の影響を確認する、バージョニングやfeature flagを使う、移行期間を設ける、という対応を取ります。 追加は比較的安全だが、削除・意味変更・型変更は危険。 クライアントが未知フィールドを無視できる設計にする。 api versionをurl、ヘッダ、メディアタイプで管理する方法がある。 破壊的変更は移行期間と告知が必要。 プロダクト開発では、自分たちのapiを他チームや外部ユーザーが使います。api契約を壊すと、リリース後に広範囲へ影響します。面接では、api設計だけでなく、変更の運用まで話せると強いです。 「フロントと同時に直せばよい」は、小規模なら成立しますが、外部公開apiや複数クライアントがある場合は危険です。">
+<div class="qa-head">
+<div><span class="cat">System Design Primer系</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ034</div>
+</div>
+<h3>APIの後方互換性をどう保ちますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>既存クライアントを壊さずに変更できるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">APIの後方互換性を保つには、既存フィールドの意味を変えない、必須フィールドを急に増やさない、レスポンスから既存フィールドを削除しない、列挙値追加の影響を確認する、バージョニングやFeature Flagを使う、移行期間を設ける、という対応を取ります。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>追加は比較的安全だが、削除・意味変更・型変更は危険。</li><li>クライアントが未知フィールドを無視できる設計にする。</li><li>API versionをURL、ヘッダ、メディアタイプで管理する方法がある。</li><li>破壊的変更は移行期間と告知が必要。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>プロダクト開発では、自分たちのAPIを他チームや外部ユーザーが使います。API契約を壊すと、リリース後に広範囲へ影響します。面接では、API設計だけでなく、変更の運用まで話せると強いです。</div>
+<div class="caution"><strong>注意点：</strong>「フロントと同時に直せばよい」は、小規模なら成立しますが、外部公開APIや複数クライアントがある場合は危険です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="system design primer系 キャッシュを入れるとき、何を考えますか？ 性能改善だけでなく、不整合・無効化・運用を理解しているかを見る。 キャッシュを入れる目的は、レイテンシ低下、db負荷低減、外部api呼び出し削減です。考えるべき点は、何をキーにするか、ttl、有効期限、無効化タイミング、更新方式、キャッシュミス時の挙動、スタンピード対策、古い値を許容できるかです。 cache aside：アプリがキャッシュを見て、なければdbから読み、キャッシュへ保存する。 write through：書き込み時にdbとキャッシュを同時更新する。 write behind：キャッシュに書き、db反映を遅延させる。 ttlを短くすれば鮮度は上がるが、キャッシュ効果は下がる。 キャッシュは一番簡単に見えて、実務では難しいです。特に権限情報、価格、在庫、ユーザー状態など、古い値が問題になるデータでは慎重に扱う必要があります。 認可結果のキャッシュは危険です。権限剥奪後も古い許可が残る可能性があるため、ttlや失効方法を慎重に設計します。">
+<div class="qa-head">
+<div><span class="cat">System Design Primer系</span> <span class="badge badge-B">B</span></div>
+<div class="num">OQ035</div>
+</div>
+<h3>キャッシュを入れるとき、何を考えますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>性能改善だけでなく、不整合・無効化・運用を理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">キャッシュを入れる目的は、レイテンシ低下、DB負荷低減、外部API呼び出し削減です。考えるべき点は、何をキーにするか、TTL、有効期限、無効化タイミング、更新方式、キャッシュミス時の挙動、スタンピード対策、古い値を許容できるかです。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>Cache Aside：アプリがキャッシュを見て、なければDBから読み、キャッシュへ保存する。</li><li>Write Through：書き込み時にDBとキャッシュを同時更新する。</li><li>Write Behind：キャッシュに書き、DB反映を遅延させる。</li><li>TTLを短くすれば鮮度は上がるが、キャッシュ効果は下がる。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>キャッシュは一番簡単に見えて、実務では難しいです。特に権限情報、価格、在庫、ユーザー状態など、古い値が問題になるデータでは慎重に扱う必要があります。</div>
+<div class="caution"><strong>注意点：</strong>認可結果のキャッシュは危険です。権限剥奪後も古い許可が残る可能性があるため、TTLや失効方法を慎重に設計します。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="distributed systems a oq036 強い整合性と結果整合性の違いは？ 面接官の意図： 分散システムで可用性・性能・整合性のトレードオフを理解しているかを見る。 回答例・補足を見る 30秒回答 強い整合性は、書き込みが完了した後の読み取りで常に最新状態が見える性質です。結果整合性は、一時的には古い値や未反映の値が見える可能性があるものの、時間が経てば最終的に整合する性質です。残高、注文確定、認可判定のような誤りが重大な領域は強い整合性を重視し、通知数、検索インデックス、分析集計のように多少遅れても許容できる領域は結果整合性を検討します。 メリット・デメリット 強い整合性のメリット： 利用者や開発者にとって分かりやすい。二重在庫引当、残高不整合、権限ミスを防ぎやすい。 強い整合性のデメリット： ロック、同期通信、合意形成が必要になり、レイテンシや可用性、スケールにコストがかかる。 結果整合性のメリット： 非同期処理や複製を使いやすく、可用性・スループット・スケールを上げやすい。 結果整合性のデメリット： 一時的に古い情報が見える。ユーザー体験、補正処理、再試行、監視が必要になる。 例 強い整合性が欲しい - 決済残高 - 注文確定 - 在庫引当 - 認可判定 結果整合性を許容しやすい - 検索インデックス反映 - 通知未読件数 - アクセス分析 - ランキング集計 理解補足： 結果整合性は「不整合でよい」という意味ではありません。「短時間の遅れやズレは許容し、最終的に正しい状態へ収束させる」という意味です。例えば、db更新後に検索インデックスへ非同期反映する場合、数秒間は検索結果に出ないことがありますが、業務上許容できるなら結果整合性でよい判断になります。 注意点： 認証認可、決済、在庫、契約状態のような領域で安易に結果整合性を採用すると、セキュリティ事故や金銭事故につながります。どの不整合を何秒まで許すのか、具体的に言える必要があります。">
+<div class="qa-head">
+<div><span class="cat">Distributed Systems</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ036</div>
+</div>
+<h3>強い整合性と結果整合性の違いは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>分散システムで可用性・性能・整合性のトレードオフを理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">強い整合性は、書き込みが完了した後の読み取りで常に最新状態が見える性質です。結果整合性は、一時的には古い値や未反映の値が見える可能性があるものの、時間が経てば最終的に整合する性質です。残高、注文確定、認可判定のような誤りが重大な領域は強い整合性を重視し、通知数、検索インデックス、分析集計のように多少遅れても許容できる領域は結果整合性を検討します。</div>
+<h4>メリット・デメリット</h4>
+<ul>
+<li><strong>強い整合性のメリット：</strong>利用者や開発者にとって分かりやすい。二重在庫引当、残高不整合、権限ミスを防ぎやすい。</li>
+<li><strong>強い整合性のデメリット：</strong>ロック、同期通信、合意形成が必要になり、レイテンシや可用性、スケールにコストがかかる。</li>
+<li><strong>結果整合性のメリット：</strong>非同期処理や複製を使いやすく、可用性・スループット・スケールを上げやすい。</li>
+<li><strong>結果整合性のデメリット：</strong>一時的に古い情報が見える。ユーザー体験、補正処理、再試行、監視が必要になる。</li>
+</ul>
+<div class="code">例
+
+強い整合性が欲しい
+- 決済残高
+- 注文確定
+- 在庫引当
+- 認可判定
+
+結果整合性を許容しやすい
+- 検索インデックス反映
+- 通知未読件数
+- アクセス分析
+- ランキング集計</div>
+<div class="supplement"><strong>理解補足：</strong>結果整合性は「不整合でよい」という意味ではありません。「短時間の遅れやズレは許容し、最終的に正しい状態へ収束させる」という意味です。例えば、DB更新後に検索インデックスへ非同期反映する場合、数秒間は検索結果に出ないことがありますが、業務上許容できるなら結果整合性でよい判断になります。</div>
+<div class="caution"><strong>注意点：</strong>認証認可、決済、在庫、契約状態のような領域で安易に結果整合性を採用すると、セキュリティ事故や金銭事故につながります。どの不整合を何秒まで許すのか、具体的に言える必要があります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="distributed systems a oq037 メッセージキューで、at-least-once と exactly-once の違いは？ 面接官の意図： 非同期処理の重複・欠落・冪等性を理解しているかを見る。 回答例・補足を見る 30秒回答 at-least-onceは、メッセージが少なくとも1回は処理される保証です。失敗時に再配信されるため欠落しにくい一方、同じメッセージが複数回処理される可能性があります。exactly-onceは、論理的に1回だけ処理されたように見せる性質ですが、実現は難しく、ブローカーだけでなくdb更新や外部api呼び出しまで含めて考える必要があります。実務ではat-least-once前提でコンシューマを冪等にすることが多いです。 深掘りされたときに足す観点 at-most-once： 最大1回。重複はしにくいが、失敗時に欠落する可能性がある。 at-least-once： 少なくとも1回。欠落しにくいが、重複処理が起きる可能性がある。 exactly-once： 論理的に1回だけ処理された状態を目指す。ただし、外部副作用を含むと難しい。 冪等性： 同じメッセージを2回処理しても結果が壊れないようにする。 重複対策： message_id、idempotency_key、処理済みテーブル、一意制約を使う。 at-least-onceで重複が起きる例 queue → worker が message m を取得 worker → db更新成功 worker → ack送信前にクラッシュ queue → ack未受信なので message m を再配信 worker → message m をもう一度処理 対策：message_id を処理済みテーブルに記録し、2回目はスキップする 理解補足： exactly-onceという言葉は誤解しやすいです。kafkaなど一部の基盤は特定条件下でexactly-onceに近い処理をサポートしますが、メール送信、決済api、外部システム登録のような外部副作用まで完全に1回にするのは別問題です。そのため、アプリケーション側で冪等キーや状態遷移を設計する必要があります。 注意点： 「exactly-onceを使えば重複しません」と言い切るのは危険です。面接では、「基盤の保証範囲」と「アプリケーション全体での副作用」を分けて説明する方が正確です。">
+<div class="qa-head">
+<div><span class="cat">Distributed Systems</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ037</div>
+</div>
+<h3>メッセージキューで、at-least-once と exactly-once の違いは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>非同期処理の重複・欠落・冪等性を理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">at-least-onceは、メッセージが少なくとも1回は処理される保証です。失敗時に再配信されるため欠落しにくい一方、同じメッセージが複数回処理される可能性があります。exactly-onceは、論理的に1回だけ処理されたように見せる性質ですが、実現は難しく、ブローカーだけでなくDB更新や外部API呼び出しまで含めて考える必要があります。実務ではat-least-once前提でコンシューマを冪等にすることが多いです。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>at-most-once：</strong>最大1回。重複はしにくいが、失敗時に欠落する可能性がある。</li>
+<li><strong>at-least-once：</strong>少なくとも1回。欠落しにくいが、重複処理が起きる可能性がある。</li>
+<li><strong>exactly-once：</strong>論理的に1回だけ処理された状態を目指す。ただし、外部副作用を含むと難しい。</li>
+<li><strong>冪等性：</strong>同じメッセージを2回処理しても結果が壊れないようにする。</li>
+<li><strong>重複対策：</strong>message_id、idempotency_key、処理済みテーブル、一意制約を使う。</li>
+</ul>
+<div class="code">at-least-onceで重複が起きる例
+
+Queue → Worker が message M を取得
+Worker → DB更新成功
+Worker → ack送信前にクラッシュ
+Queue → ack未受信なので message M を再配信
+Worker → message M をもう一度処理
+
+対策：message_id を処理済みテーブルに記録し、2回目はスキップする</div>
+<div class="supplement"><strong>理解補足：</strong>exactly-onceという言葉は誤解しやすいです。Kafkaなど一部の基盤は特定条件下でexactly-onceに近い処理をサポートしますが、メール送信、決済API、外部システム登録のような外部副作用まで完全に1回にするのは別問題です。そのため、アプリケーション側で冪等キーや状態遷移を設計する必要があります。</div>
+<div class="caution"><strong>注意点：</strong>「exactly-onceを使えば重複しません」と言い切るのは危険です。面接では、「基盤の保証範囲」と「アプリケーション全体での副作用」を分けて説明する方が正確です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="distributed systems サーキットブレーカーは何のために使いますか？ 依存先障害の連鎖を防ぐ設計を理解しているかを見る。 サーキットブレーカーは、依存先サービスで失敗やタイムアウトが増えたときに、一時的に呼び出しを止めて即時失敗させる仕組みです。これにより、呼び出し元のスレッドやリソースが詰まることを防ぎ、障害の連鎖を抑えます。一定時間後に少量のリクエストで回復確認し、成功すれば再開します。 closed：通常通り呼び出す。 open：失敗が多いので呼び出しを止める。 half-open：回復確認のため一部だけ試す。 フォールバックや縮退レスポンスと組み合わせることがある。 マイクロサービスでは、依存先1つの遅延が全体障害に波及します。タイムアウト、リトライ、サーキットブレーカーはセットで考える必要があります。 サーキットブレーカーを入れても、代替レスポンスやユーザーへの見せ方を考えないと、ただエラーが早く返るだけになります。">
+<div class="qa-head">
+<div><span class="cat">Distributed Systems</span> <span class="badge badge-B">B</span></div>
+<div class="num">OQ038</div>
+</div>
+<h3>サーキットブレーカーは何のために使いますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>依存先障害の連鎖を防ぐ設計を理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">サーキットブレーカーは、依存先サービスで失敗やタイムアウトが増えたときに、一時的に呼び出しを止めて即時失敗させる仕組みです。これにより、呼び出し元のスレッドやリソースが詰まることを防ぎ、障害の連鎖を抑えます。一定時間後に少量のリクエストで回復確認し、成功すれば再開します。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>Closed：通常通り呼び出す。</li><li>Open：失敗が多いので呼び出しを止める。</li><li>Half-open：回復確認のため一部だけ試す。</li><li>フォールバックや縮退レスポンスと組み合わせることがある。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>マイクロサービスでは、依存先1つの遅延が全体障害に波及します。タイムアウト、リトライ、サーキットブレーカーはセットで考える必要があります。</div>
+<div class="caution"><strong>注意点：</strong>サーキットブレーカーを入れても、代替レスポンスやユーザーへの見せ方を考えないと、ただエラーが早く返るだけになります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="backend design a oq039 テスト戦略をどう考えますか？ 面接官の意図： 単体テスト、結合テスト、e2e、契約テストを使い分けられるかを見る。 回答例・補足を見る 30秒回答 テスト戦略は、リスクに応じて単体テスト、結合テスト、e2eテスト、契約テストを使い分けます。単体テストは業務ロジックを高速に検証し、結合テストはdb、http、springコンテナ、設定、トランザクションなどの接続を確認します。e2eはユーザー操作に近い主要導線だけを確認します。マイクロサービスでは、サービス間apiの契約が壊れていないかを見る契約テストも重要です。 深掘りされたときに足す観点 単体テスト： serviceやドメインロジックの分岐、境界値、例外を高速に確認する。 結合テスト： 単一アプリ内のdb接続、di、http、repository、トランザクションを確認する。また、複数マイクロサービスや外部apiとの連携確認も広い意味で結合試験に含まれる。 e2eテスト： ブラウザやapi経由で、ユーザー視点の重要シナリオを確認する。数は絞る。 契約テスト： 提供側apiと利用側の期待がズレていないかを確認する。マイクロサービス間で有効。 負荷・性能テスト： 高トラフィックapi、バッチ、外部連携で必要になる。 テストピラミッドの考え方 多い・速い 単体テスト → ロジック、分岐、境界値 結合テスト → db、http、di、設定、サービス間連携 契約テスト → apiの入出力契約 e2eテスト → 主要なユーザー導線 少ない・遅い 理解補足： 「結合テスト」は文脈で範囲が変わります。spring bootアプリ単体でdbやhttpレイヤを含めて動かす結合テストもあれば、マイクロサービス間、api gateway、外部api、認証基盤まで含めた結合試験もあります。面接では、「どのリスクをどのテストで検知するか」を話すと実務的です。 注意点： すべてをe2eで確認しようとすると、遅く壊れやすいテストになります。逆に単体テストだけだと、db接続、設定ミス、api契約違反、認証認可の設定漏れを見逃します。テスト種別ごとに役割を分けるべきです。">
+<div class="qa-head">
+<div><span class="cat">Backend Design</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ039</div>
+</div>
+<h3>テスト戦略をどう考えますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>単体テスト、結合テスト、E2E、契約テストを使い分けられるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">テスト戦略は、リスクに応じて単体テスト、結合テスト、E2Eテスト、契約テストを使い分けます。単体テストは業務ロジックを高速に検証し、結合テストはDB、HTTP、Springコンテナ、設定、トランザクションなどの接続を確認します。E2Eはユーザー操作に近い主要導線だけを確認します。マイクロサービスでは、サービス間APIの契約が壊れていないかを見る契約テストも重要です。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul>
+<li><strong>単体テスト：</strong>Serviceやドメインロジックの分岐、境界値、例外を高速に確認する。</li>
+<li><strong>結合テスト：</strong>単一アプリ内のDB接続、DI、HTTP、Repository、トランザクションを確認する。また、複数マイクロサービスや外部APIとの連携確認も広い意味で結合試験に含まれる。</li>
+<li><strong>E2Eテスト：</strong>ブラウザやAPI経由で、ユーザー視点の重要シナリオを確認する。数は絞る。</li>
+<li><strong>契約テスト：</strong>提供側APIと利用側の期待がズレていないかを確認する。マイクロサービス間で有効。</li>
+<li><strong>負荷・性能テスト：</strong>高トラフィックAPI、バッチ、外部連携で必要になる。</li>
+</ul>
+<div class="code">テストピラミッドの考え方
+
+多い・速い
+  単体テスト        → ロジック、分岐、境界値
+  結合テスト        → DB、HTTP、DI、設定、サービス間連携
+  契約テスト        → APIの入出力契約
+  E2Eテスト         → 主要なユーザー導線
+少ない・遅い</div>
+<div class="supplement"><strong>理解補足：</strong>「結合テスト」は文脈で範囲が変わります。Spring Bootアプリ単体でDBやHTTPレイヤを含めて動かす結合テストもあれば、マイクロサービス間、API Gateway、外部API、認証基盤まで含めた結合試験もあります。面接では、「どのリスクをどのテストで検知するか」を話すと実務的です。</div>
+<div class="caution"><strong>注意点：</strong>すべてをE2Eで確認しようとすると、遅く壊れやすいテストになります。逆に単体テストだけだと、DB接続、設定ミス、API契約違反、認証認可の設定漏れを見逃します。テスト種別ごとに役割を分けるべきです。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="backend design コードレビューで何を見ますか？ 品質を属人的な好みではなく、観点で見られるかを確認する。 コードレビューでは、仕様を満たしているか、責務分担が適切か、可読性、例外処理、境界値、セキュリティ、性能、テスト、既存設計との整合性を見ます。単なる好みの指摘ではなく、バグ・保守性・運用リスクに関わる点を優先して指摘します。 重大度を分ける。must修正、提案、質問を区別する。 設計の意図が分かりにくい場合は、命名やコメント、テストで補う。 セキュリティやデータ破壊リスクは強く指摘する。 レビューは相手を否定する場ではなく、コードのリスクを下げる場。 web系企業では、レビュー文化は重要です。あなたが技術志向を示すなら、レビュー観点を持っていることは強みになります。特に認証認可やapi設計では、認可漏れ、エラーレスポンス、ログに秘密情報を出していないかが重要です。 細かいスタイル指摘ばかりだと、本質を見ていない印象になります。自動整形で済むものはツールに任せ、レビューでは設計・安全性・保守性を見るべきです。">
+<div class="qa-head">
+<div><span class="cat">Backend Design</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ040</div>
+</div>
+<h3>コードレビューで何を見ますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>品質を属人的な好みではなく、観点で見られるかを確認する。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">コードレビューでは、仕様を満たしているか、責務分担が適切か、可読性、例外処理、境界値、セキュリティ、性能、テスト、既存設計との整合性を見ます。単なる好みの指摘ではなく、バグ・保守性・運用リスクに関わる点を優先して指摘します。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>重大度を分ける。Must修正、提案、質問を区別する。</li><li>設計の意図が分かりにくい場合は、命名やコメント、テストで補う。</li><li>セキュリティやデータ破壊リスクは強く指摘する。</li><li>レビューは相手を否定する場ではなく、コードのリスクを下げる場。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>Web系企業では、レビュー文化は重要です。あなたが技術志向を示すなら、レビュー観点を持っていることは強みになります。特に認証認可やAPI設計では、認可漏れ、エラーレスポンス、ログに秘密情報を出していないかが重要です。</div>
+<div class="caution"><strong>注意点：</strong>細かいスタイル指摘ばかりだと、本質を見ていない印象になります。自動整形で済むものはツールに任せ、レビューでは設計・安全性・保守性を見るべきです。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="backend design 既存のレガシーコードを改善するなら、どう進めますか？ 大きく壊さず、段階的に改善できるかを見る。 まず現状の振る舞いを把握し、テストやログで安全網を作ります。次に、変更したい範囲を小さく切り出し、責務分離、命名改善、重複削減、依存方向の整理を段階的に行います。大規模な全面書き換えではなく、リスクの低い単位で改善し、リリース可能な状態を保ちます。 まずテストを追加して、既存動作を固定する。 変更範囲を小さくする。 外部仕様を変えずに内部構造を改善する。 段階的リリースやfeature flagを使う。 レガシー改善で危険なのは、理想設計を目指して一気に壊すことです。面接では「安全網→小さい改善→検証→継続」という順番を示すと実務的です。 「全部作り直したい」は、現場では危険な回答です。なぜなら、仕様が暗黙化しており、再実装で既存動作を壊す可能性が高いからです。">
+<div class="qa-head">
+<div><span class="cat">Backend Design</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ041</div>
+</div>
+<h3>既存のレガシーコードを改善するなら、どう進めますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>大きく壊さず、段階的に改善できるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">まず現状の振る舞いを把握し、テストやログで安全網を作ります。次に、変更したい範囲を小さく切り出し、責務分離、命名改善、重複削減、依存方向の整理を段階的に行います。大規模な全面書き換えではなく、リスクの低い単位で改善し、リリース可能な状態を保ちます。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>まずテストを追加して、既存動作を固定する。</li><li>変更範囲を小さくする。</li><li>外部仕様を変えずに内部構造を改善する。</li><li>段階的リリースやFeature Flagを使う。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>レガシー改善で危険なのは、理想設計を目指して一気に壊すことです。面接では「安全網→小さい改善→検証→継続」という順番を示すと実務的です。</div>
+<div class="caution"><strong>注意点：</strong>「全部作り直したい」は、現場では危険な回答です。なぜなら、仕様が暗黙化しており、再実装で既存動作を壊す可能性が高いからです。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="backend design 高凝集・低結合とは何ですか？ 責務分担の基本を理解しているかを見る。 高凝集は、1つのモジュールやクラスが関連する責務に集中している状態です。低結合は、モジュール同士の依存が少なく、片方の変更がもう片方に波及しにくい状態です。バックエンドでは、controller、service、repositoryの責務を分け、外部apiやdbへの依存をインターフェース越しに扱うことで、変更やテストをしやすくします。 凝集度が低いクラスは、何でもやる巨大クラスになりやすい。 結合度が高いと、変更時の影響範囲が広がる。 di、インターフェース、レイヤードアーキテクチャは低結合を助ける。 あなたが得意な「責務境界の整理」と接続しやすい概念です。ユーザ管理機能で、keycloakが持つ責務とアプリdbが持つ責務を分けた話も、高凝集・低結合の文脈で説明できます。 低結合を目指しすぎて抽象化を増やしすぎると、逆に読みにくくなります。変更可能性がある場所に絞って抽象化するのが現実的です。">
+<div class="qa-head">
+<div><span class="cat">Backend Design</span> <span class="badge badge-B">B</span></div>
+<div class="num">OQ042</div>
+</div>
+<h3>高凝集・低結合とは何ですか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>責務分担の基本を理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">高凝集は、1つのモジュールやクラスが関連する責務に集中している状態です。低結合は、モジュール同士の依存が少なく、片方の変更がもう片方に波及しにくい状態です。バックエンドでは、Controller、Service、Repositoryの責務を分け、外部APIやDBへの依存をインターフェース越しに扱うことで、変更やテストをしやすくします。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>凝集度が低いクラスは、何でもやる巨大クラスになりやすい。</li><li>結合度が高いと、変更時の影響範囲が広がる。</li><li>DI、インターフェース、レイヤードアーキテクチャは低結合を助ける。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>あなたが得意な「責務境界の整理」と接続しやすい概念です。ユーザ管理機能で、Keycloakが持つ責務とアプリDBが持つ責務を分けた話も、高凝集・低結合の文脈で説明できます。</div>
+<div class="caution"><strong>注意点：</strong>低結合を目指しすぎて抽象化を増やしすぎると、逆に読みにくくなります。変更可能性がある場所に絞って抽象化するのが現実的です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="backend design ドメインロジックはどこに置くべきですか？ controllerやrepositoryにロジックが散らばる危険を理解しているかを見る。 ドメインロジックは、基本的にはservice層やドメインモデルに置きます。controllerはhttpリクエスト/レスポンスの変換、repositoryは永続化の責務に寄せます。業務ルールがcontrollerやsqlに散らばると、再利用性・テスト容易性・保守性が下がります。 controller：入力受付、validation、レスポンス変換。 service：ユースケース、トランザクション境界、業務判断。 repository：dbアクセス。 entity/domain model：不変条件やドメイン固有の振る舞い。 面接では「serviceに書きます」だけでなく、なぜcontrollerやrepositoryに置かないのかを説明できるとよいです。業務ロジックをserviceやdomainに寄せると、http以外の入口、例えばbatchやmessage consumerからも再利用しやすくなります。 全てのロジックをserviceに集めると、巨大serviceになります。複雑なドメインでは、値オブジェクトやドメインサービスに分ける選択もあります。">
+<div class="qa-head">
+<div><span class="cat">Backend Design</span> <span class="badge badge-B">B</span></div>
+<div class="num">OQ043</div>
+</div>
+<h3>ドメインロジックはどこに置くべきですか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>ControllerやRepositoryにロジックが散らばる危険を理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">ドメインロジックは、基本的にはService層やドメインモデルに置きます。ControllerはHTTPリクエスト/レスポンスの変換、Repositoryは永続化の責務に寄せます。業務ルールがControllerやSQLに散らばると、再利用性・テスト容易性・保守性が下がります。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>Controller：入力受付、Validation、レスポンス変換。</li><li>Service：ユースケース、トランザクション境界、業務判断。</li><li>Repository：DBアクセス。</li><li>Entity/Domain Model：不変条件やドメイン固有の振る舞い。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>面接では「Serviceに書きます」だけでなく、なぜControllerやRepositoryに置かないのかを説明できるとよいです。業務ロジックをServiceやDomainに寄せると、HTTP以外の入口、例えばBatchやMessage Consumerからも再利用しやすくなります。</div>
+<div class="caution"><strong>注意点：</strong>全てのロジックをServiceに集めると、巨大Serviceになります。複雑なドメインでは、値オブジェクトやドメインサービスに分ける選択もあります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="backend design apiエラーレスポンスを設計するとき、何を意識しますか？ ユーザー体験、クライアント実装、運用調査の観点を持てるかを見る。 apiエラーレスポンスでは、httpステータスコード、アプリケーションエラーコード、ユーザー向けメッセージ、開発者向け詳細、リクエストidを設計します。クライアントが機械的に分岐できること、ユーザーに過剰な内部情報を出さないこと、運用時にログと突合できることが重要です。 400：リクエスト不正。 401：認証が必要、または認証失敗。 403：認証済みだが権限がない。 404：リソースが存在しない。権限隠蔽で使うこともある。 409：競合状態、重複、状態遷移違反。 500：サーバー内部エラー。 認証認可が絡むapiでは、401と403の使い分けが重要です。また、存在しないのか権限がないのかを詳細に返すと情報漏洩になる場合があるため、セキュリティ要件に応じて404に寄せる設計もあります。 例外メッセージやスタックトレースをそのままレスポンスに出してはいけません。内部情報漏洩につながります。">
+<div class="qa-head">
+<div><span class="cat">Backend Design</span> <span class="badge badge-B">B</span></div>
+<div class="num">OQ044</div>
+</div>
+<h3>APIエラーレスポンスを設計するとき、何を意識しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>ユーザー体験、クライアント実装、運用調査の観点を持てるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">APIエラーレスポンスでは、HTTPステータスコード、アプリケーションエラーコード、ユーザー向けメッセージ、開発者向け詳細、リクエストIDを設計します。クライアントが機械的に分岐できること、ユーザーに過剰な内部情報を出さないこと、運用時にログと突合できることが重要です。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>400：リクエスト不正。</li><li>401：認証が必要、または認証失敗。</li><li>403：認証済みだが権限がない。</li><li>404：リソースが存在しない。権限隠蔽で使うこともある。</li><li>409：競合状態、重複、状態遷移違反。</li><li>500：サーバー内部エラー。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>認証認可が絡むAPIでは、401と403の使い分けが重要です。また、存在しないのか権限がないのかを詳細に返すと情報漏洩になる場合があるため、セキュリティ要件に応じて404に寄せる設計もあります。</div>
+<div class="caution"><strong>注意点：</strong>例外メッセージやスタックトレースをそのままレスポンスに出してはいけません。内部情報漏洩につながります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="backend design 冪等性とは何ですか？api設計でなぜ重要ですか？ リトライや二重送信に耐える設計を理解しているかを見る。 冪等性とは、同じ操作を1回実行しても複数回実行しても、最終的な結果が同じになる性質です。apiでは、ネットワークエラーやクライアントのリトライにより同じリクエストが複数回届くことがあります。注文作成や決済のような処理では、idempotency keyを使い、同じキーのリクエストは同じ結果を返すようにします。 get、put、deleteは一般に冪等として設計される。postは通常冪等ではないが、idempotency keyで冪等にできる。 外部api連携やキュー処理では重複実行が現実に起きる。 dbに処理済みキーを保存し、二重作成を防ぐ。 冪等性は、stripe系のintegration面接でかなり重要な概念です。あなたの外部api連携経験にも直結します。dips apiラップやトークン更新処理でも、同じ処理が再実行された場合に壊れないかを考える必要があります。 「リトライします」と言うなら、必ず冪等性をセットで説明してください。冪等性がないリトライは、二重注文・二重請求・二重通知を引き起こします。">
+<div class="qa-head">
+<div><span class="cat">Backend Design</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ045</div>
+</div>
+<h3>冪等性とは何ですか？API設計でなぜ重要ですか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>リトライや二重送信に耐える設計を理解しているかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">冪等性とは、同じ操作を1回実行しても複数回実行しても、最終的な結果が同じになる性質です。APIでは、ネットワークエラーやクライアントのリトライにより同じリクエストが複数回届くことがあります。注文作成や決済のような処理では、Idempotency Keyを使い、同じキーのリクエストは同じ結果を返すようにします。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>GET、PUT、DELETEは一般に冪等として設計される。POSTは通常冪等ではないが、Idempotency Keyで冪等にできる。</li><li>外部API連携やキュー処理では重複実行が現実に起きる。</li><li>DBに処理済みキーを保存し、二重作成を防ぐ。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>冪等性は、Stripe系のIntegration面接でかなり重要な概念です。あなたの外部API連携経験にも直結します。DIPS APIラップやトークン更新処理でも、同じ処理が再実行された場合に壊れないかを考える必要があります。</div>
+<div class="caution"><strong>注意点：</strong>「リトライします」と言うなら、必ず冪等性をセットで説明してください。冪等性がないリトライは、二重注文・二重請求・二重通知を引き起こします。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="backend design dbスキーマ変更を安全にリリースするにはどうしますか？ アプリとdbの互換性、段階リリース、ロールバックを考えられるかを見る。 dbスキーマ変更は、アプリとdbの互換性を保ちながら段階的に行います。基本は、まず後方互換な変更を入れます。例えば、nullableな新規カラム追加、アプリ側で新旧両方に対応、データ移行、読み取り切替、旧カラム削除の順に進めます。破壊的変更を一度に入れないことが重要です。 expand and contract：追加→併用→移行→削除の段階で進める。 大きなテーブルのalterはロックや性能影響に注意。 データ移行はバッチ化し、途中失敗に備える。 ロールバック時に旧アプリが新dbでも動くか確認する。 web系企業では、ゼロダウンタイムデプロイが求められることがあります。アプリとdbを同時に完全同期して切り替える前提ではなく、どちらが先にリリースされても壊れにくい変更順序を考える必要があります。 カラム削除、not null追加、型変更、意味変更は破壊的になりやすいです。いきなり実施せず、移行期間を設けます。">
+<div class="qa-head">
+<div><span class="cat">Backend Design</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ046</div>
+</div>
+<h3>DBスキーマ変更を安全にリリースするにはどうしますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>アプリとDBの互換性、段階リリース、ロールバックを考えられるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">DBスキーマ変更は、アプリとDBの互換性を保ちながら段階的に行います。基本は、まず後方互換な変更を入れます。例えば、nullableな新規カラム追加、アプリ側で新旧両方に対応、データ移行、読み取り切替、旧カラム削除の順に進めます。破壊的変更を一度に入れないことが重要です。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>Expand and Contract：追加→併用→移行→削除の段階で進める。</li><li>大きなテーブルのALTERはロックや性能影響に注意。</li><li>データ移行はバッチ化し、途中失敗に備える。</li><li>ロールバック時に旧アプリが新DBでも動くか確認する。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>Web系企業では、ゼロダウンタイムデプロイが求められることがあります。アプリとDBを同時に完全同期して切り替える前提ではなく、どちらが先にリリースされても壊れにくい変更順序を考える必要があります。</div>
+<div class="caution"><strong>注意点：</strong>カラム削除、NOT NULL追加、型変更、意味変更は破壊的になりやすいです。いきなり実施せず、移行期間を設けます。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="behavioral / ownership 自分が直接実装担当ではない技術課題に、どう関与しましたか？ 所有感、技術理解、チーム貢献を見ている。 あなたの場合は、認証認可方式やユーザ管理責務整理、aws/ci/cd環境構築を話せます。直接すべてを実装したわけではなくても、技術仕様を理解し、設計前提を整理し、実装担当が迷わない状態を作ったことを説明します。単なる進捗管理ではなく、技術的な前提整理とリスク低減に貢献した、と位置づけます。 何を理解したか：oidc、openfga、keycloak、aws構成。 何を整理したか：責務境界、認可タイミング、ユーザー情報の持ち方。 何が良くなったか：実装前提のズレや結合時の手戻りを減らした。 反省点：もっと早くpocやサンプル実装を作ればよかった、など。 web系面接では、実装経験を重視されます。ただし、あなたの経験は「技術的な横断整理」として価値があります。弱く見せないためには、実装していない部分を曖昧にせず、自分が判断した技術論点を明確にすることです。 「担当者に依頼しました」「調整しました」で止めると、技術職として弱いです。必ず、技術的に何を理解し、何を決め、何を改善したかまで言い切ります。">
+<div class="qa-head">
+<div><span class="cat">Behavioral / Ownership</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ047</div>
+</div>
+<h3>自分が直接実装担当ではない技術課題に、どう関与しましたか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>所有感、技術理解、チーム貢献を見ている。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">あなたの場合は、認証認可方式やユーザ管理責務整理、AWS/CI/CD環境構築を話せます。直接すべてを実装したわけではなくても、技術仕様を理解し、設計前提を整理し、実装担当が迷わない状態を作ったことを説明します。単なる進捗管理ではなく、技術的な前提整理とリスク低減に貢献した、と位置づけます。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>何を理解したか：OIDC、OpenFGA、Keycloak、AWS構成。</li><li>何を整理したか：責務境界、認可タイミング、ユーザー情報の持ち方。</li><li>何が良くなったか：実装前提のズレや結合時の手戻りを減らした。</li><li>反省点：もっと早くPoCやサンプル実装を作ればよかった、など。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>Web系面接では、実装経験を重視されます。ただし、あなたの経験は「技術的な横断整理」として価値があります。弱く見せないためには、実装していない部分を曖昧にせず、自分が判断した技術論点を明確にすることです。</div>
+<div class="caution"><strong>注意点：</strong>「担当者に依頼しました」「調整しました」で止めると、技術職として弱いです。必ず、技術的に何を理解し、何を決め、何を改善したかまで言い切ります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="behavioral / learning 未経験の技術をどうキャッチアップしますか？ 知らない領域に対する学習手順と実務接続力を見る。 まず、公式ドキュメントや信頼できる資料で、その技術が何を解決するものかを把握します。次に、実務上必要なユースケースに絞り、小さな検証環境で動かします。その後、既存システムへの適用時の制約、運用、セキュリティ、障害時の挙動を確認します。最後に、チームで共有できる資料やサンプルに落とします。 目的を先に決める。技術そのものを全部学ぼうとしない。 小さく動かして、概念と実装を接続する。 公式ドキュメント、サンプル、既存実装、エラーを確認する。 学んだ内容をチームが使える形に変換する。 あなたは深く理解してから強くなるタイプなので、面接では「理解に時間がかかる」ではなく「必要な前提を構造化し、実務に接続する」と表現する方がよいです。 「調べながらやります」だけでは弱いです。調べる順序、検証方法、実務に接続する方法まで話す必要があります。">
+<div class="qa-head">
+<div><span class="cat">Behavioral / Learning</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ048</div>
+</div>
+<h3>未経験の技術をどうキャッチアップしますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>知らない領域に対する学習手順と実務接続力を見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">まず、公式ドキュメントや信頼できる資料で、その技術が何を解決するものかを把握します。次に、実務上必要なユースケースに絞り、小さな検証環境で動かします。その後、既存システムへの適用時の制約、運用、セキュリティ、障害時の挙動を確認します。最後に、チームで共有できる資料やサンプルに落とします。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>目的を先に決める。技術そのものを全部学ぼうとしない。</li><li>小さく動かして、概念と実装を接続する。</li><li>公式ドキュメント、サンプル、既存実装、エラーを確認する。</li><li>学んだ内容をチームが使える形に変換する。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>あなたは深く理解してから強くなるタイプなので、面接では「理解に時間がかかる」ではなく「必要な前提を構造化し、実務に接続する」と表現する方がよいです。</div>
+<div class="caution"><strong>注意点：</strong>「調べながらやります」だけでは弱いです。調べる順序、検証方法、実務に接続する方法まで話す必要があります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="behavioral / retrospective 失敗した技術判断と、そこから学んだことを説明してください。 失敗を他責にせず、判断基準を改善できるかを見る。 あなたの場合は、共通機能をkubernetes前提で深追いした後、ecsへ方針転換した話が使いやすいです。当初は手順書の前提に沿ってkubernetes理解から進めたが、自分たちの既存環境や対象アプリの特性を踏まえると、ecsで動かす方が現実的だった。学びとして、技術調査に入る前に、目的、既存環境との整合、代替案、検証コストを比較すべきだった、と話します。 失敗の内容：初期方針の深追いに時間を使った。 原因：手順書前提を疑う前に技術理解へ入りすぎた。 改善：目的・制約・代替案を早めに整理するようにした。 結果：ecsベースに切り替え、環境構築を前に進めた。 この回答は、あなたの弱みを安全に出せます。「理解してから進めたい」特性を認めつつ、改善行動として初期比較・小さい検証・代替案整理を言えるからです。 失敗談で「大変でした」だけを話すと弱いです。何を誤判断し、次にどう判断基準を変えたかまで話してください。">
+<div class="qa-head">
+<div><span class="cat">Behavioral / Retrospective</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ049</div>
+</div>
+<h3>失敗した技術判断と、そこから学んだことを説明してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>失敗を他責にせず、判断基準を改善できるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">あなたの場合は、共通機能をKubernetes前提で深追いした後、ECSへ方針転換した話が使いやすいです。当初は手順書の前提に沿ってKubernetes理解から進めたが、自分たちの既存環境や対象アプリの特性を踏まえると、ECSで動かす方が現実的だった。学びとして、技術調査に入る前に、目的、既存環境との整合、代替案、検証コストを比較すべきだった、と話します。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>失敗の内容：初期方針の深追いに時間を使った。</li><li>原因：手順書前提を疑う前に技術理解へ入りすぎた。</li><li>改善：目的・制約・代替案を早めに整理するようにした。</li><li>結果：ECSベースに切り替え、環境構築を前に進めた。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>この回答は、あなたの弱みを安全に出せます。「理解してから進めたい」特性を認めつつ、改善行動として初期比較・小さい検証・代替案整理を言えるからです。</div>
+<div class="caution"><strong>注意点：</strong>失敗談で「大変でした」だけを話すと弱いです。何を誤判断し、次にどう判断基準を変えたかまで話してください。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="behavioral / product thinking 技術的負債にどう向き合いますか？ 理想論ではなく、事業・開発速度・品質のバランスを取れるかを見る。 技術的負債は、すべてを一気に解消するのではなく、リスクと変更頻度で優先順位をつけます。障害につながる、開発速度を大きく落としている、セキュリティリスクがある、今後触る予定がある箇所を優先します。改善は通常開発に組み込み、小さく継続的に進めます。 負債を分類する：品質、設計、テスト不足、依存ライブラリ、運用、セキュリティ。 ビジネス影響と技術リスクを結びつけて説明する。 リファクタリングは、機能開発や障害対応のタイミングに合わせると通しやすい。 改善の効果を、障害削減、変更容易性、リードタイム短縮で示す。 プロダクト企業では、機能開発だけでなく、継続的に改善できるかが重要です。あなたの志向である保守性・信頼性・仕組み化と相性が良い質問です。 「技術的負債は全部返すべき」と言うと現実感がありません。事業上の優先度と技術リスクの両方で判断します。">
+<div class="qa-head">
+<div><span class="cat">Behavioral / Product Thinking</span> <span class="badge badge-B">B</span></div>
+<div class="num">OQ050</div>
+</div>
+<h3>技術的負債にどう向き合いますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>理想論ではなく、事業・開発速度・品質のバランスを取れるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">技術的負債は、すべてを一気に解消するのではなく、リスクと変更頻度で優先順位をつけます。障害につながる、開発速度を大きく落としている、セキュリティリスクがある、今後触る予定がある箇所を優先します。改善は通常開発に組み込み、小さく継続的に進めます。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>負債を分類する：品質、設計、テスト不足、依存ライブラリ、運用、セキュリティ。</li><li>ビジネス影響と技術リスクを結びつけて説明する。</li><li>リファクタリングは、機能開発や障害対応のタイミングに合わせると通しやすい。</li><li>改善の効果を、障害削減、変更容易性、リードタイム短縮で示す。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>プロダクト企業では、機能開発だけでなく、継続的に改善できるかが重要です。あなたの志向である保守性・信頼性・仕組み化と相性が良い質問です。</div>
+<div class="caution"><strong>注意点：</strong>「技術的負債は全部返すべき」と言うと現実感がありません。事業上の優先度と技術リスクの両方で判断します。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="behavioral / communication 知らない技術について質問されたら、どう答えますか？ 知ったかぶりせず、関連経験から推論できるかを見る。 まず、実務で直接扱った経験があるかないかを正直に言います。そのうえで、関連する経験、現時点の理解、設計時に確認すべき観点、キャッチアップ方法を話します。例えばkafkaなら、直接運用経験はないが、非同期処理・マイクロサービス間連携の文脈で、順序性、重複、リトライ、コンシューマスケール、dlqを確認すると答えます。 経験有無を曖昧にしない。 完全に知らない場合も、近い概念から推論する。 公式ドキュメント、小さい検証、既存実装確認という学習手順を示す。 面接官が深掘りしてきたら、分かる範囲と分からない範囲を分ける。 これはあなたにとって重要です。未経験技術で詰まるのは、知識不足そのものより、答え方の型がないことが原因です。「経験はありません。ただ、関連する経験としては……」の型を暗記してください。 知ったかぶりは最悪です。深掘りで崩れます。知らないことは認めた上で、構造化して考えられることを示す方が評価されます。">
+<div class="qa-head">
+<div><span class="cat">Behavioral / Communication</span> <span class="badge badge-A">A</span></div>
+<div class="num">OQ051</div>
+</div>
+<h3>知らない技術について質問されたら、どう答えますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>知ったかぶりせず、関連経験から推論できるかを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">まず、実務で直接扱った経験があるかないかを正直に言います。そのうえで、関連する経験、現時点の理解、設計時に確認すべき観点、キャッチアップ方法を話します。例えばKafkaなら、直接運用経験はないが、非同期処理・マイクロサービス間連携の文脈で、順序性、重複、リトライ、コンシューマスケール、DLQを確認すると答えます。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>経験有無を曖昧にしない。</li><li>完全に知らない場合も、近い概念から推論する。</li><li>公式ドキュメント、小さい検証、既存実装確認という学習手順を示す。</li><li>面接官が深掘りしてきたら、分かる範囲と分からない範囲を分ける。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>これはあなたにとって重要です。未経験技術で詰まるのは、知識不足そのものより、答え方の型がないことが原因です。「経験はありません。ただ、関連する経験としては……」の型を暗記してください。</div>
+<div class="caution"><strong>注意点：</strong>知ったかぶりは最悪です。深掘りで崩れます。知らないことは認めた上で、構造化して考えられることを示す方が評価されます。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="behavioral / two-way interview 面接の最後に、技術面で何を逆質問しますか？ 候補者側も環境を見極められるか、技術志向が本物かを見る。 バックエンドエンジニアがどの範囲まで設計・実装・運用に関わるか、新機能開発と品質改善の優先順位をどう決めるか、認証認可や共通基盤の責務はどのチームが持つか、障害対応やポストモーテムの文化があるか、入社後半年で期待される技術的アウトプットは何かを聞きます。 実装比率、設計比率、運用責任を確認する。 技術的負債や改善が許容される文化か確認する。 レビュー、テスト、ci/cd、監視の実態を確認する。 自分が避けたい「調整中心ポジション」かどうかを見極める。 逆質問は評価されるためだけでなく、ミスマッチ防止のために重要です。あなたは調整中心の仕事に戻ると消耗しやすいので、実装・設計・改善にどれだけ関われるかを必ず確認すべきです。 給与・残業だけ聞くのではなく、技術的な業務実態を確認してください。職種名がバックエンドでも、実態が調整・管理中心のケースはあります。">
+<div class="qa-head">
+<div><span class="cat">Behavioral / Two-way Interview</span> <span class="badge badge-B">B</span></div>
+<div class="num">OQ052</div>
+</div>
+<h3>面接の最後に、技術面で何を逆質問しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>候補者側も環境を見極められるか、技術志向が本物かを見る。</p>
+<details>
+<summary>回答例・補足を見る</summary>
+<div class="answer structured">
+<h4>30秒回答</h4>
+<div class="short-answer">バックエンドエンジニアがどの範囲まで設計・実装・運用に関わるか、新機能開発と品質改善の優先順位をどう決めるか、認証認可や共通基盤の責務はどのチームが持つか、障害対応やポストモーテムの文化があるか、入社後半年で期待される技術的アウトプットは何かを聞きます。</div>
+<h4>深掘りされたときに足す観点</h4>
+<ul><li>実装比率、設計比率、運用責任を確認する。</li><li>技術的負債や改善が許容される文化か確認する。</li><li>レビュー、テスト、CI/CD、監視の実態を確認する。</li><li>自分が避けたい「調整中心ポジション」かどうかを見極める。</li></ul>
+<div class="supplement"><strong>理解補足：</strong>逆質問は評価されるためだけでなく、ミスマッチ防止のために重要です。あなたは調整中心の仕事に戻ると消耗しやすいので、実装・設計・改善にどれだけ関われるかを必ず確認すべきです。</div>
+<div class="caution"><strong>注意点：</strong>給与・残業だけ聞くのではなく、技術的な業務実態を確認してください。職種名がバックエンドでも、実態が調整・管理中心のケースはあります。</div>
+</div>
+</details>
+</article>
+</section></main>
+</body>
+</html>

@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>あなた向け優先 Q&amp;A</title>
+<style>
+:root {
+  --bg: #f7f7fb;
+  --paper: #ffffff;
+  --ink: #1f2937;
+  --muted: #64748b;
+  --line: #e5e7eb;
+  --accent: #2563eb;
+  --accent2: #0f766e;
+  --warn: #b45309;
+  --danger: #b91c1c;
+  --soft: #eef2ff;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+  line-height: 1.75;
+}
+header {
+  background: linear-gradient(135deg, #111827 0%, #1e3a8a 55%, #0f766e 100%);
+  color: white;
+  padding: 44px 24px 36px;
+}
+.header-inner { max-width: 1160px; margin: 0 auto; }
+h1 { font-size: clamp(26px, 4vw, 44px); line-height: 1.25; margin: 0 0 16px; }
+.lead { font-size: 17px; max-width: 920px; color: #e5e7eb; }
+.meta { margin-top: 16px; color: #bfdbfe; font-size: 14px; }
+nav {
+  position: sticky; top: 0; z-index: 10;
+  background: rgba(255,255,255,.96);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(8px);
+}
+.nav-inner {
+  max-width: 1160px; margin: 0 auto; padding: 10px 20px;
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+}
+nav a {
+  color: #1e40af; text-decoration: none; font-weight: 700; font-size: 13px;
+  padding: 6px 10px; border-radius: 999px; background: #eff6ff;
+}
+main { max-width: 1160px; margin: 0 auto; padding: 26px 20px 80px; }
+section { margin: 28px 0; }
+.panel {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 4px 20px rgba(15,23,42,.05);
+}
+h2 { margin: 0 0 16px; font-size: 26px; line-height: 1.35; }
+h3 { margin: 8px 0 8px; line-height: 1.45; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 16px; }
+.source-card, .qa-card, .note-card {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px;
+}
+.source-card { border-top: 5px solid var(--accent); }
+.source-top { display: flex; justify-content: space-between; }
+.source-priority, .cat, .badge {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 800;
+}
+.source-priority { background: #ecfeff; color: #155e75; }
+.cat { background: #f1f5f9; color: #334155; }
+.badge-S { background: #fee2e2; color: #991b1b; }
+.badge-A { background: #ffedd5; color: #9a3412; }
+.badge-B { background: #dbeafe; color: #1e40af; }
+.qa-card { margin: 14px 0; }
+.qa-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.num { color: var(--muted); font-weight: 800; font-size: 13px; }
+.intent {
+  margin: 8px 0 10px;
+  color: #475569;
+  background: #f8fafc;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border-left: 4px solid #cbd5e1;
+}
+details {
+  margin-top: 8px;
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+summary { cursor: pointer; font-weight: 800; color: #1d4ed8; }
+.answer { margin-top: 10px; white-space: pre-line; }
+.warn {
+  border-left: 6px solid var(--warn);
+  background: #fffbeb;
+}
+.danger {
+  border-left: 6px solid var(--danger);
+  background: #fef2f2;
+}
+.ok {
+  border-left: 6px solid var(--accent2);
+  background: #ecfdf5;
+}
+ul.tight li { margin: 4px 0; }
+.kpi {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;
+}
+.kpi div {
+  background: #f8fafc; padding: 14px; border-radius: 14px; border: 1px solid var(--line);
+}
+.kpi strong { display:block; font-size: 22px; color:#1d4ed8; }
+.searchbox {
+  width: 100%; padding: 14px 16px; border: 1px solid #cbd5e1;
+  border-radius: 14px; font-size: 16px; margin: 12px 0 16px;
+}
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; background: white; }
+th, td { border: 1px solid var(--line); padding: 10px; vertical-align: top; }
+th { background: #f1f5f9; text-align: left; }
+.code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: #0f172a; color: #e2e8f0; padding: 14px; border-radius: 14px;
+  overflow-x:auto; white-space: pre-wrap;
+}
+.footer {
+  color: var(--muted); font-size: 13px; margin-top: 40px;
+}
+
+.answer.structured { white-space: normal; }
+.answer.structured h4 { margin: 14px 0 6px; font-size: 15px; color: #0f172a; }
+.answer.structured ul, .answer.structured ol { margin: 6px 0 10px 1.3em; padding: 0; }
+.answer.structured li { margin: 5px 0; }
+.answer.structured .short-answer {
+  background: #eff6ff; border-left: 4px solid #2563eb; padding: 10px 12px;
+  border-radius: 10px; margin: 8px 0 12px;
+}
+.answer.structured .supplement {
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
+  padding: 10px 12px; margin: 10px 0;
+}
+.answer.structured .caution {
+  background: #fffbeb; border-left: 4px solid #b45309; padding: 10px 12px;
+  border-radius: 10px; margin: 10px 0;
+}
+.answer.structured code { background:#e2e8f0; color:#0f172a; padding:1px 5px; border-radius:5px; }
+
+
+.answer.structured .diagram {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: #0f172a; color: #e2e8f0; padding: 12px 14px;
+  border-radius: 12px; overflow-x: auto; white-space: pre; margin: 10px 0;
+}
+.answer.structured .mini-table { overflow-x:auto; margin:10px 0; }
+.answer.structured .mini-table table { font-size: 14px; }
+
+@media print {
+  nav, .searchbox { display:none; }
+  body { background:white; }
+  .panel, .qa-card, .source-card { box-shadow:none; break-inside: avoid; }
+  details[open] { break-inside: avoid; }
+}
+
+.index-back-button {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border: 1px solid rgba(35, 88, 197, 0.22);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1e40af;
+  padding: 8px 12px;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.16);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  text-decoration: none;
+}
+.index-back-button:hover {
+  border-color: #2358c5;
+  background: #eef4ff;
+}
+@media print {
+  .index-back-button { display: none; }
+}
+
+</style>
+<script>
+function filterCards() {
+  const q = document.getElementById('filter').value.toLowerCase().trim();
+  const cards = document.querySelectorAll('.qa-card');
+  cards.forEach(card => {
+    const hit = card.getAttribute('data-text').includes(q);
+    card.style.display = hit ? '' : 'none';
+  });
+}
+function openAll() {
+  document.querySelectorAll('details').forEach(d => d.open = true);
+}
+function closeAll() {
+  document.querySelectorAll('details').forEach(d => d.open = false);
+}
+</script>
+</head>
+<body>
+<a class="index-back-button" href="../index.html">Indexへ戻る</a>
+<header>
+<div class="header-inner">
+<h1>あなた向け優先 Q&amp;A</h1>
+<p class="lead">あなたの経験領域に接続して答えやすい質問を優先してまとめた、直前確認向けのQ&amp;Aページです。</p>
+<div class="meta">作成日: 2026-06-09 / 更新: 2026-06-27 / 分割ページ構成</div>
+</div>
+</header>
+<nav>
+<div class="nav-inner">
+<a href="web_backend_interview_qa_2026.html">入口</a>
+<a href="web_backend_interview_qa_overseas.html">海外面接型</a>
+<a href="web_backend_interview_qa_xderived.html">X由来・海外アカウント型</a>
+<a href="web_backend_interview_qa_priority.html">あなた向け優先</a>
+</div>
+</nav>
+<main>
+<section class="panel" id="priority">
+<h2>あなた向け優先 Q&amp;A</h2>
+<p>あなたの職務経験と志向を踏まえると、面接で一番守るべき領域は <strong>認証認可・API・Java/Spring・DB・AWS/ECS/CI/CD・システム設計</strong> です。特に認証認可とAWSは経験として話せる分、深掘りに耐えられないと逆に弱点に見えます。</p>
+<article class="qa-card" data-text="s: 経験深掘り・認証認可 s q001 認証と認可の違いを説明してください。 面接官の意図： あなたの主戦場。定義を曖昧にすると、認証認可経験全体が浅く見える。 回答例を見る 回答例： 認証は、操作しているユーザーが誰であるかを確認することです。認可は、その認証済みユーザーが、対象リソースに対してどの操作を実行できるかを判断することです。例えば、ログインによってユーザーidを確認するのが認証で、そのユーザーが特定の事業者情報を参照できるか、特定apiを実行できるかを判断するのが認可です。 補足知識 認証 authentication： 「あなたは誰か」を確認する。id/パスワード、多要素認証、idpログイン、oidcのid tokenなどが関係する。 認可 authorization： 「その主体は、このリソースに、この操作をしてよいか」を判断する。subject / resource / action の組み合わせで考えると整理しやすい。 面接では： 「誰か」だけでなく、「どのリソースに」「何ができるか」まで言うと精度が上がる。 注意： 「認可＝その人が何をしてよいか」でも大枠は正しいですが、web系面接では「リソースに対して」という表現を入れた方が正確です。">
+<div class="qa-head">
+<div><span class="cat">S: 経験深掘り・認証認可</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q001</div>
+</div>
+<h3>認証と認可の違いを説明してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>あなたの主戦場。定義を曖昧にすると、認証認可経験全体が浅く見える。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+認証は、操作しているユーザーが誰であるかを確認することです。認可は、その認証済みユーザーが、対象リソースに対してどの操作を実行できるかを判断することです。例えば、ログインによってユーザーIDを確認するのが認証で、そのユーザーが特定の事業者情報を参照できるか、特定APIを実行できるかを判断するのが認可です。</div>
+<div class="supplement"><h4>補足知識</h4>
+<ul>
+<li><strong>認証 authentication：</strong>「あなたは誰か」を確認する。ID/パスワード、多要素認証、IdPログイン、OIDCのID Tokenなどが関係する。</li>
+<li><strong>認可 authorization：</strong>「その主体は、このリソースに、この操作をしてよいか」を判断する。subject / resource / action の組み合わせで考えると整理しやすい。</li>
+<li><strong>面接では：</strong>「誰か」だけでなく、「どのリソースに」「何ができるか」まで言うと精度が上がる。</li>
+</ul></div>
+<div class="caution"><strong>注意：</strong>「認可＝その人が何をしてよいか」でも大枠は正しいですが、Web系面接では「リソースに対して」という表現を入れた方が正確です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: 経験深掘り・認証認可 s q002 oauth 2.0 と oidc の違いは何ですか？ 面接官の意図： oidc経験の本質理解を見る。 回答例を見る 回答例： oauth 2.0は、クライアントが保護されたリソースへアクセスするためのアクセストークンを取得する認可のフレームワークです。oidcはoauth 2.0の上に認証レイヤーを追加した仕様で、id tokenによって「ユーザーが認証されたこと」やユーザー識別子をクライアントが確認できます。つまり、oauth 2.0は主にapiアクセス権限、oidcはログイン・本人確認まで扱う、という整理です。 補足知識 oauth 2.0だけで「ログイン」を実装しようとすると、ユーザー認証結果の標準的な表現が不足しやすい。 oidcでは id token 、 userinfo endpoint 、 scope=openid などが登場する。 面接では「oauthでログイン」は雑な表現で、厳密には「oidcを使ったログイン」と言えるとよい。">
+<div class="qa-head">
+<div><span class="cat">S: 経験深掘り・認証認可</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q002</div>
+</div>
+<h3>OAuth 2.0 と OIDC の違いは何ですか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>OIDC経験の本質理解を見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+OAuth 2.0は、クライアントが保護されたリソースへアクセスするためのアクセストークンを取得する認可のフレームワークです。OIDCはOAuth 2.0の上に認証レイヤーを追加した仕様で、ID Tokenによって「ユーザーが認証されたこと」やユーザー識別子をクライアントが確認できます。つまり、OAuth 2.0は主にAPIアクセス権限、OIDCはログイン・本人確認まで扱う、という整理です。</div>
+<div class="supplement"><h4>補足知識</h4>
+<ul>
+<li>OAuth 2.0だけで「ログイン」を実装しようとすると、ユーザー認証結果の標準的な表現が不足しやすい。</li>
+<li>OIDCでは <code>ID Token</code>、<code>UserInfo Endpoint</code>、<code>scope=openid</code> などが登場する。</li>
+<li>面接では「OAuthでログイン」は雑な表現で、厳密には「OIDCを使ったログイン」と言えるとよい。</li>
+</ul></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: 経験深掘り・認証認可 s q003 authorization code flowを使う理由は？ 面接官の意図： ブラウザ/バックエンド構成の安全性と、フローの役割を理解しているか。 回答例を見る 回答例： authorization code flowは、認可サーバーがブラウザ経由で直接トークンを返すのではなく、まず短命の認可コードをクライアントへ返し、その後クライアントがトークンエンドポイントで認可コードをaccess tokenやid tokenに交換する方式です。メリットは、トークンをurlフラグメントなどのフロントチャネルに直接露出させずに済むこと、サーバー側クライアントであればクライアント認証を組み合わせられること、pkceによって認可コード横取りへの耐性を上げられることです。bff構成では、この流れを使ってトークンをbff側に保持し、ブラウザにはhttponly cookieのセッションだけを持たせる設計にできます。 端的な役割 ユーザーを認可サーバーへリダイレクトする。 認可サーバーでユーザー認証・同意・認可判断を行う。 認可サーバーがブラウザ経由で 認可コード をクライアントに返す。 クライアントがバックチャネルでトークンエンドポイントに認可コードを提示し、access tokenなどを取得する。 なぜ安全性が上がるのか access tokenそのものを認可エンドポイントからブラウザ経由で返さないため、url、履歴、referer、フロント側ログなどに露出するリスクを下げられる。 認可コードは短命・一回限りで、盗まれてもpkceやクライアント認証があれば悪用しにくい。 トークン発行をトークンエンドポイントに集約でき、クライアント認証、リダイレクトuri検証、pkce検証などを組み合わせられる。 重要な補正： authorization code flow自体が常に「ブラウザにaccess tokenを保持させない」わけではありません。spaでauthorization code flow + pkceを使う場合、最終的にブラウザ側がtokenを扱う構成もあります。ブラウザにaccess tokenを持たせないのは、bffやサーバーサイドwebアプリとして設計した場合のメリットです。">
+<div class="qa-head">
+<div><span class="cat">S: 経験深掘り・認証認可</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q003</div>
+</div>
+<h3>Authorization Code Flowを使う理由は？</h3>
+<p class="intent"><strong>面接官の意図：</strong>ブラウザ/バックエンド構成の安全性と、フローの役割を理解しているか。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+Authorization Code Flowは、認可サーバーがブラウザ経由で直接トークンを返すのではなく、まず短命の認可コードをクライアントへ返し、その後クライアントがトークンエンドポイントで認可コードをAccess TokenやID Tokenに交換する方式です。メリットは、トークンをURLフラグメントなどのフロントチャネルに直接露出させずに済むこと、サーバー側クライアントであればクライアント認証を組み合わせられること、PKCEによって認可コード横取りへの耐性を上げられることです。BFF構成では、この流れを使ってトークンをBFF側に保持し、ブラウザにはHttpOnly Cookieのセッションだけを持たせる設計にできます。</div>
+<div class="supplement"><h4>端的な役割</h4>
+<ol>
+<li>ユーザーを認可サーバーへリダイレクトする。</li>
+<li>認可サーバーでユーザー認証・同意・認可判断を行う。</li>
+<li>認可サーバーがブラウザ経由で <strong>認可コード</strong> をクライアントに返す。</li>
+<li>クライアントがバックチャネルでトークンエンドポイントに認可コードを提示し、Access Tokenなどを取得する。</li>
+</ol></div>
+<div class="supplement"><h4>なぜ安全性が上がるのか</h4>
+<ul>
+<li>Access Tokenそのものを認可エンドポイントからブラウザ経由で返さないため、URL、履歴、Referer、フロント側ログなどに露出するリスクを下げられる。</li>
+<li>認可コードは短命・一回限りで、盗まれてもPKCEやクライアント認証があれば悪用しにくい。</li>
+<li>トークン発行をトークンエンドポイントに集約でき、クライアント認証、リダイレクトURI検証、PKCE検証などを組み合わせられる。</li>
+</ul></div>
+<div class="caution"><strong>重要な補正：</strong>Authorization Code Flow自体が常に「ブラウザにAccess Tokenを保持させない」わけではありません。SPAでAuthorization Code Flow + PKCEを使う場合、最終的にブラウザ側がTokenを扱う構成もあります。ブラウザにAccess Tokenを持たせないのは、BFFやサーバーサイドWebアプリとして設計した場合のメリットです。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: 経験深掘り・認証認可 s q004 jwtのメリットとデメリットは？ 面接官の意図： トークンベース認証の仕組みとトレードオフを説明できるか。 回答例を見る 回答例： jwtは、ヘッダー・ペイロード・署名からなるトークン形式で、ペイロードにユーザー識別子、発行者、有効期限、スコープなどのclaimを入れられます。メリットは、resource server側で署名、有効期限、発行者、audienceなどを検証すれば、毎回認可サーバーやセッションストアへ問い合わせずにトークンの正当性を確認できる点です。デメリットは、発行後の即時失効や権限変更の即時反映が難しいこと、漏洩時に有効期限まで悪用されること、claimを詰め込みすぎると肥大化すること、署名付きjwtは暗号化ではないため中身を読めることです。 署名検証では何を検証しているのか jwtは一般に base64url(header).base64url(payload).signature という形です。 署名検証では、受け取った header.payload に対して、発行者の公開鍵、または共有秘密鍵を使って署名を検証します。 これにより「信頼している発行者が発行したこと」と「途中でペイロードが改ざんされていないこと」を確認します。 ただし署名検証だけでは不十分で、 iss 、 aud 、 exp 、 nbf 、必要な scope や role も確認します。 覚えるべきポイント 署名付きjwt = 改ざん検知できる。 中身を隠すものではない。暗号化したいならjweなど別の仕組みが必要。 jwtはステートレスに検証しやすい。 一方で、ステートレスだからこそ失効や権限変更の即時反映が難しい。 access tokenとしてのjwt は、resource serverがapiアクセス可否を判断する材料になる。ただし詳細な認可判断を全部jwtだけで完結させる必要はない。">
+<div class="qa-head">
+<div><span class="cat">S: 経験深掘り・認証認可</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q004</div>
+</div>
+<h3>JWTのメリットとデメリットは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>トークンベース認証の仕組みとトレードオフを説明できるか。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+JWTは、ヘッダー・ペイロード・署名からなるトークン形式で、ペイロードにユーザー識別子、発行者、有効期限、スコープなどのClaimを入れられます。メリットは、Resource Server側で署名、有効期限、発行者、Audienceなどを検証すれば、毎回認可サーバーやセッションストアへ問い合わせずにトークンの正当性を確認できる点です。デメリットは、発行後の即時失効や権限変更の即時反映が難しいこと、漏洩時に有効期限まで悪用されること、Claimを詰め込みすぎると肥大化すること、署名付きJWTは暗号化ではないため中身を読めることです。</div>
+<div class="supplement"><h4>署名検証では何を検証しているのか</h4>
+<ul>
+<li>JWTは一般に <code>Base64Url(header).Base64Url(payload).signature</code> という形です。</li>
+<li>署名検証では、受け取った <code>header.payload</code> に対して、発行者の公開鍵、または共有秘密鍵を使って署名を検証します。</li>
+<li>これにより「信頼している発行者が発行したこと」と「途中でペイロードが改ざんされていないこと」を確認します。</li>
+<li>ただし署名検証だけでは不十分で、<code>iss</code>、<code>aud</code>、<code>exp</code>、<code>nbf</code>、必要な <code>scope</code> や <code>role</code> も確認します。</li>
+</ul></div>
+<div class="supplement"><h4>覚えるべきポイント</h4>
+<ul>
+<li><strong>署名付きJWT = 改ざん検知できる。</strong>中身を隠すものではない。暗号化したいならJWEなど別の仕組みが必要。</li>
+<li><strong>JWTはステートレスに検証しやすい。</strong>一方で、ステートレスだからこそ失効や権限変更の即時反映が難しい。</li>
+<li><strong>Access TokenとしてのJWT</strong>は、Resource ServerがAPIアクセス可否を判断する材料になる。ただし詳細な認可判断を全部JWTだけで完結させる必要はない。</li>
+</ul></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: 経験深掘り・認証認可 s q005 認可情報をjwtに全部入れない理由は？ 面接官の意図： openfga利用理由とjwtの限界を語れるか。 回答例を見る 回答例： jwtに認可情報を全部入れると、トークンが肥大化しやすく、権限変更や所属変更を即時反映しづらくなります。access tokenは発行された時点のclaimを持つため、有効期限が残っている間は古い権限情報がresource serverで有効に見えてしまう可能性があります。特に、組織、リソース所有関係、業務状態に応じた細かい認可はjwtに固定的に詰め込むより、外部認可基盤やアプリ側で subject / resource / action を使って判断した方が柔軟です。 権限変更の即時反映が難しい理由 ユーザーが「管理者」ロールを持つaccess tokenを受け取る。 その後、管理者ロールを剥奪する。 しかし、既に発行済みのaccess tokenのclaimは自動では変わらない。 resource serverがjwtをステートレスに検証しているだけなら、 exp まで古いclaimを信じてしまう。 対策 access tokenを短命にする。 重要な認可は外部認可基盤、db、pdpに問い合わせる。 token introspectionや失効リストを使う。ただし性能・可用性コストが増える。 refresh tokenをローテーション・失効管理する。 面接での言い方： 「jwtに権限を入れるのが悪い」ではありません。粗いscopeやroleを入れるのは普通にあります。問題は、変更頻度が高い・リソース単位で細かい・即時反映が必要な認可までjwtに閉じ込めることです。">
+<div class="qa-head">
+<div><span class="cat">S: 経験深掘り・認証認可</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q005</div>
+</div>
+<h3>認可情報をJWTに全部入れない理由は？</h3>
+<p class="intent"><strong>面接官の意図：</strong>OpenFGA利用理由とJWTの限界を語れるか。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+JWTに認可情報を全部入れると、トークンが肥大化しやすく、権限変更や所属変更を即時反映しづらくなります。Access Tokenは発行された時点のClaimを持つため、有効期限が残っている間は古い権限情報がResource Serverで有効に見えてしまう可能性があります。特に、組織、リソース所有関係、業務状態に応じた細かい認可はJWTに固定的に詰め込むより、外部認可基盤やアプリ側で subject / resource / action を使って判断した方が柔軟です。</div>
+<div class="supplement"><h4>権限変更の即時反映が難しい理由</h4>
+<ul>
+<li>ユーザーが「管理者」ロールを持つAccess Tokenを受け取る。</li>
+<li>その後、管理者ロールを剥奪する。</li>
+<li>しかし、既に発行済みのAccess TokenのClaimは自動では変わらない。</li>
+<li>Resource ServerがJWTをステートレスに検証しているだけなら、<code>exp</code> まで古いClaimを信じてしまう。</li>
+</ul></div>
+<div class="supplement"><h4>対策</h4>
+<ul>
+<li>Access Tokenを短命にする。</li>
+<li>重要な認可は外部認可基盤、DB、PDPに問い合わせる。</li>
+<li>Token Introspectionや失効リストを使う。ただし性能・可用性コストが増える。</li>
+<li>Refresh Tokenをローテーション・失効管理する。</li>
+</ul></div>
+<div class="caution"><strong>面接での言い方：</strong>「JWTに権限を入れるのが悪い」ではありません。粗いscopeやroleを入れるのは普通にあります。問題は、変更頻度が高い・リソース単位で細かい・即時反映が必要な認可までJWTに閉じ込めることです。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: 経験深掘り・認証認可 s q006 rbacとrebacの違いは？ 面接官の意図： openfgaを使った意味を理解しているか。 回答例を見る 回答例： rbacはユーザーにロールを付与し、ロールごとに操作権限を管理する方式です。rebacはユーザー、組織、グループ、リソースなどの関係性をもとに権限を判断する方式です。例えば「この組織の管理者は、この組織に属するリソースを更新できる」「このドキュメントの所有者は編集できる」といった関係を表現しやすいのがrebacです。単純なapiロール制御ならrbacで十分ですが、組織階層や所有関係、共有関係が絡むとrebacが有効です。 補足知識 rbacは「役割」を中心に考える。例：admin、manager、operator。 rebacは「関係」を中心に考える。例：user a is manager of org x、document y belongs to org x。 openfgaはrebac的なモデルを表現しやすい認可エンジン。">
+<div class="qa-head">
+<div><span class="cat">S: 経験深掘り・認証認可</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q006</div>
+</div>
+<h3>RBACとReBACの違いは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>OpenFGAを使った意味を理解しているか。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+RBACはユーザーにロールを付与し、ロールごとに操作権限を管理する方式です。ReBACはユーザー、組織、グループ、リソースなどの関係性をもとに権限を判断する方式です。例えば「この組織の管理者は、この組織に属するリソースを更新できる」「このドキュメントの所有者は編集できる」といった関係を表現しやすいのがReBACです。単純なAPIロール制御ならRBACで十分ですが、組織階層や所有関係、共有関係が絡むとReBACが有効です。</div>
+<div class="supplement"><h4>補足知識</h4>
+<ul>
+<li>RBACは「役割」を中心に考える。例：admin、manager、operator。</li>
+<li>ReBACは「関係」を中心に考える。例：user A is manager of org X、document Y belongs to org X。</li>
+<li>OpenFGAはReBAC的なモデルを表現しやすい認可エンジン。</li>
+</ul></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: 経験深掘り・認証認可 s q007 api gatewayで認可する場合と各サービスで認可する場合の違いは？ 面接官の意図： 認可の責務境界と、gatewayでできること・できないことを理解しているか。 回答例を見る 回答例： api gatewayで認可すると、入口で一元的に制御でき、認証済みか、tokenが有効か、api単位のscopeやroleを満たしているか、といった粗い制御を集約できます。一方、各サービスで認可すると、db上のリソース所有者、業務状態、テナント所属、詳細なドメインルールを見た判断がしやすくなります。実務では、gatewayで共通的な入口制御を行い、リソース状態に依存する細かい認可はサービス側、または外部認可基盤へ問い合わせる形で分担するのが現実的です。 gateway認可が向いているもの 未認証リクエストの遮断。 tokenの署名、有効期限、issuer、audience確認。 api単位・endpoint単位のscope/roleチェック。 レート制限、ip制限、共通ヘッダ付与などの横断制御。 サービス側認可が向いているもの 「このユーザーはこの注文の所有者か」。 「このリソースは承認済み状態なので編集不可か」。 「同じ組織に所属しているが、部署単位で参照範囲が違うか」。 「画面上は見えてよいが、この業務状態では更新できないか」。 精査結果： 「リソースの詳細状態や業務ロジックに依存する認可はgatewayだけでは判断しづらい」という説明は概ね正しいです。ただし、gatewayが外部認可基盤へ subject / action / resource / attributes を問い合わせる設計なら、gateway側でも細かい認可は可能です。その場合は、gatewayが必要なリソース属性をどう取得するか、レイテンシ、可用性、責務肥大化が設計課題になります。">
+<div class="qa-head">
+<div><span class="cat">S: 経験深掘り・認証認可</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q007</div>
+</div>
+<h3>API Gatewayで認可する場合と各サービスで認可する場合の違いは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>認可の責務境界と、Gatewayでできること・できないことを理解しているか。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+API Gatewayで認可すると、入口で一元的に制御でき、認証済みか、Tokenが有効か、API単位のscopeやroleを満たしているか、といった粗い制御を集約できます。一方、各サービスで認可すると、DB上のリソース所有者、業務状態、テナント所属、詳細なドメインルールを見た判断がしやすくなります。実務では、Gatewayで共通的な入口制御を行い、リソース状態に依存する細かい認可はサービス側、または外部認可基盤へ問い合わせる形で分担するのが現実的です。</div>
+<div class="supplement"><h4>Gateway認可が向いているもの</h4>
+<ul>
+<li>未認証リクエストの遮断。</li>
+<li>Tokenの署名、有効期限、issuer、audience確認。</li>
+<li>API単位・endpoint単位のscope/roleチェック。</li>
+<li>レート制限、IP制限、共通ヘッダ付与などの横断制御。</li>
+</ul></div>
+<div class="supplement"><h4>サービス側認可が向いているもの</h4>
+<ul>
+<li>「このユーザーはこの注文の所有者か」。</li>
+<li>「このリソースは承認済み状態なので編集不可か」。</li>
+<li>「同じ組織に所属しているが、部署単位で参照範囲が違うか」。</li>
+<li>「画面上は見えてよいが、この業務状態では更新できないか」。</li>
+</ul></div>
+<div class="caution"><strong>精査結果：</strong>「リソースの詳細状態や業務ロジックに依存する認可はGatewayだけでは判断しづらい」という説明は概ね正しいです。ただし、Gatewayが外部認可基盤へ subject / action / resource / attributes を問い合わせる設計なら、Gateway側でも細かい認可は可能です。その場合は、Gatewayが必要なリソース属性をどう取得するか、レイテンシ、可用性、責務肥大化が設計課題になります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: 経験深掘り・認証認可 a q008 access tokenとrefresh tokenの役割は？ 面接官の意図： access tokenを「ユーザー情報そのもの」と誤解していないかを見る。 回答例を見る 回答例： access tokenは、クライアントがresource serverのapiへアクセスするときに提示する資格情報です。resource serverはaccess tokenを検証し、「誰の権限に基づくアクセスか」「どのクライアント向けか」「どのscopeや権限を持つか」「期限切れでないか」を確認した上で、リソースへの操作可否を判断します。refresh tokenは、access tokenの有効期限が切れたときに、認可サーバーへ提示して新しいaccess tokenを取得するためのトークンです。refresh tokenはresource serverには送らず、認可サーバーにだけ提示します。 access tokenを提示することで何をしているのか api呼び出し元が、認可サーバーから発行された有効なトークンを持っていることを示す。 resource serverに対して、ユーザー、クライアント、scope、audience、有効期限などの判断材料を渡す。 resource serverは、その情報と自分側の認可ロジックを組み合わせてアクセス可否を決める。 理解の補正： access tokenは「操作ユーザーがリソースに対して何をしてよいかが全部書かれているトークン」とは限りません。jwt形式ならscopeやroleなどが入ることがありますが、tokenが不透明文字列のこともあります。また、詳細なリソース単位の認可は、token内の情報だけでなく、dbや外部認可基盤を見て判断することも多いです。">
+<div class="qa-head">
+<div><span class="cat">S: 経験深掘り・認証認可</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q008</div>
+</div>
+<h3>Access TokenとRefresh Tokenの役割は？</h3>
+<p class="intent"><strong>面接官の意図：</strong>Access Tokenを「ユーザー情報そのもの」と誤解していないかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+Access Tokenは、クライアントがResource ServerのAPIへアクセスするときに提示する資格情報です。Resource ServerはAccess Tokenを検証し、「誰の権限に基づくアクセスか」「どのクライアント向けか」「どのscopeや権限を持つか」「期限切れでないか」を確認した上で、リソースへの操作可否を判断します。Refresh Tokenは、Access Tokenの有効期限が切れたときに、認可サーバーへ提示して新しいAccess Tokenを取得するためのトークンです。Refresh TokenはResource Serverには送らず、認可サーバーにだけ提示します。</div>
+<div class="supplement"><h4>Access Tokenを提示することで何をしているのか</h4>
+<ul>
+<li>API呼び出し元が、認可サーバーから発行された有効なトークンを持っていることを示す。</li>
+<li>Resource Serverに対して、ユーザー、クライアント、scope、audience、有効期限などの判断材料を渡す。</li>
+<li>Resource Serverは、その情報と自分側の認可ロジックを組み合わせてアクセス可否を決める。</li>
+</ul></div>
+<div class="caution"><strong>理解の補正：</strong>Access Tokenは「操作ユーザーがリソースに対して何をしてよいかが全部書かれているトークン」とは限りません。JWT形式ならscopeやroleなどが入ることがありますが、Tokenが不透明文字列のこともあります。また、詳細なリソース単位の認可は、Token内の情報だけでなく、DBや外部認可基盤を見て判断することも多いです。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: 経験深掘り・認証認可 a q009 bff構成でcookie sessionを使うメリットは？ 面接官の意図： spa/ブラウザセキュリティ理解を見る。 回答例を見る 回答例： bff構成では、ブラウザにaccess tokenを直接持たせず、bff側でtokenを管理し、ブラウザにはhttponly / secure cookieのセッションだけを持たせる設計にできます。これにより、xssでjavascriptからaccess tokenを直接盗まれるリスクを下げられます。一方、cookieはブラウザが自動送信するため、csrf対策が必要です。bffはフロントエンドに近いバックエンドとして、認証情報管理、api集約、画面向けレスポンス整形などを担います。 補足知識 httponly cookieはjavascriptから読み取れない。 secure cookieはhttps通信でのみ送信される。 samesite 設定はcsrfリスク低減に関係する。">
+<div class="qa-head">
+<div><span class="cat">S: 経験深掘り・認証認可</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q009</div>
+</div>
+<h3>BFF構成でCookie Sessionを使うメリットは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>SPA/ブラウザセキュリティ理解を見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+BFF構成では、ブラウザにAccess Tokenを直接持たせず、BFF側でTokenを管理し、ブラウザにはHttpOnly / Secure Cookieのセッションだけを持たせる設計にできます。これにより、XSSでJavaScriptからAccess Tokenを直接盗まれるリスクを下げられます。一方、Cookieはブラウザが自動送信するため、CSRF対策が必要です。BFFはフロントエンドに近いバックエンドとして、認証情報管理、API集約、画面向けレスポンス整形などを担います。</div>
+<div class="supplement"><h4>補足知識</h4>
+<ul>
+<li><code>HttpOnly</code> CookieはJavaScriptから読み取れない。</li>
+<li><code>Secure</code> CookieはHTTPS通信でのみ送信される。</li>
+<li><code>SameSite</code> 設定はCSRFリスク低減に関係する。</li>
+</ul></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: 経験深掘り・認証認可 a q010 権限変更を即時反映したい場合、どんな設計が考えられますか？ 面接官の意図： jwtの限界と外部認可の価値を理解しているか。 回答例を見る 回答例： jwtに権限を固定的に入れている場合、発行済みtokenの有効期限が切れるまで古い権限が残る可能性があります。即時反映したい場合は、access tokenを短命にする、認可判断を都度外部認可基盤やdbに問い合わせる、token introspectionや失効リストを使う、セッション管理で強制ログアウトする、といった設計が考えられます。ただし、即時性を高めるほど、レイテンシ、可用性、実装複雑性のコストが上がります。 面接での整理 低リスクな権限：短命access tokenで十分なことが多い。 高リスクな権限：毎回外部認可やdb確認を入れる方が安全。 退職・管理者剥奪・不正検知：強制失効やセッション無効化まで必要になる。">
+<div class="qa-head">
+<div><span class="cat">S: 経験深掘り・認証認可</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q010</div>
+</div>
+<h3>権限変更を即時反映したい場合、どんな設計が考えられますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>JWTの限界と外部認可の価値を理解しているか。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+JWTに権限を固定的に入れている場合、発行済みTokenの有効期限が切れるまで古い権限が残る可能性があります。即時反映したい場合は、Access Tokenを短命にする、認可判断を都度外部認可基盤やDBに問い合わせる、Token Introspectionや失効リストを使う、セッション管理で強制ログアウトする、といった設計が考えられます。ただし、即時性を高めるほど、レイテンシ、可用性、実装複雑性のコストが上がります。</div>
+<div class="supplement"><h4>面接での整理</h4>
+<ul>
+<li>低リスクな権限：短命Access Tokenで十分なことが多い。</li>
+<li>高リスクな権限：毎回外部認可やDB確認を入れる方が安全。</li>
+<li>退職・管理者剥奪・不正検知：強制失効やセッション無効化まで必要になる。</li>
+</ul></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: 経験深掘り・認証認可 a q011 ユーザ管理情報をkeycloak側とアプリdb側でどう分けますか？ 面接官の意図： あなたの実務経験に直結。 回答例を見る 回答例： 認証に必要なユーザーid、認証情報、ログイン関連属性はkeycloak側に寄せます。一方、アプリ固有の業務属性、組織内での意味付け、ドメイン上必要な状態はアプリdbに持たせます。全部をkeycloakに寄せるとドメインモデルがidpに依存しすぎますし、全部をアプリ側に持つと認証基盤の意味が薄れます。責務境界を明確にすることが重要です。 例 keycloak側：ログインid、認証方式、パスワード、mfa、ユーザー識別子。 アプリdb側：事業者id、部署、業務上の状態、アプリ固有プロフィール、利用設定。 認可基盤側：ユーザーと組織・ロール・リソースの関係。">
+<div class="qa-head">
+<div><span class="cat">S: 経験深掘り・認証認可</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q011</div>
+</div>
+<h3>ユーザ管理情報をKeycloak側とアプリDB側でどう分けますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>あなたの実務経験に直結。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+認証に必要なユーザーID、認証情報、ログイン関連属性はKeycloak側に寄せます。一方、アプリ固有の業務属性、組織内での意味付け、ドメイン上必要な状態はアプリDBに持たせます。全部をKeycloakに寄せるとドメインモデルがIdPに依存しすぎますし、全部をアプリ側に持つと認証基盤の意味が薄れます。責務境界を明確にすることが重要です。</div>
+<div class="supplement"><h4>例</h4>
+<ul>
+<li>Keycloak側：ログインID、認証方式、パスワード、MFA、ユーザー識別子。</li>
+<li>アプリDB側：事業者ID、部署、業務上の状態、アプリ固有プロフィール、利用設定。</li>
+<li>認可基盤側：ユーザーと組織・ロール・リソースの関係。</li>
+</ul></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: 経験深掘り・認証認可 a q012 マイクロサービス間通信でユーザー文脈をどう扱いますか？ 面接官の意図： access tokenを「ユーザー情報伝搬手段」と雑に扱っていないかを見る。 回答例を見る 回答例： まず、その処理を「ユーザーの代理として実行するのか」「サービス自身の権限で実行するのか」を分けて考えます。ユーザーの代理として下流サービスでもユーザー単位の認可判断が必要なら、ユーザー文脈を伝える必要があります。ただし、access tokenを単にユーザー情報の入れ物として伝搬するのではなく、audience、scope、有効期限、下流サービスでの検証方法を設計する必要があります。サービス自身の定期処理や機械的な連携であれば、client credentialsなどのサービス間認証を使い、必要なユーザーidは監査・業務データとして別に渡す方が適切な場合があります。 代表的な方式 token relay： 元のaccess tokenを下流サービスへ渡す。ユーザー文脈を維持しやすいが、token漏洩範囲、audience不一致、権限過多に注意が必要。 token exchange / on-behalf-of： 上流サービスが、下流サービス向けのtokenに交換する。audienceやscopeを下流用に絞りやすい。 client credentials： サービス自身の資格情報で呼び出す。ユーザー代理ではなくシステム間処理に向く。 内部ヘッダでユーザーidを渡す： gatewayやbffで認証済みユーザーを解決し、内部向けにヘッダ付与する方式。境界内の信頼、改ざん防止、署名、mtlsなどを考える必要がある。 重要： access tokenは本来、apiアクセスのための資格情報です。「ユーザー情報を伝えるための便利な箱」として扱うと設計が崩れます。下流サービスに必要なのが認可判断なのか、監査用のユーザーidなのか、画面表示用プロフィールなのかを分けるべきです。">
+<div class="qa-head">
+<div><span class="cat">S: 経験深掘り・認証認可</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q012</div>
+</div>
+<h3>マイクロサービス間通信でユーザー文脈をどう扱いますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>Access Tokenを「ユーザー情報伝搬手段」と雑に扱っていないかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+まず、その処理を「ユーザーの代理として実行するのか」「サービス自身の権限で実行するのか」を分けて考えます。ユーザーの代理として下流サービスでもユーザー単位の認可判断が必要なら、ユーザー文脈を伝える必要があります。ただし、Access Tokenを単にユーザー情報の入れ物として伝搬するのではなく、audience、scope、有効期限、下流サービスでの検証方法を設計する必要があります。サービス自身の定期処理や機械的な連携であれば、Client Credentialsなどのサービス間認証を使い、必要なユーザーIDは監査・業務データとして別に渡す方が適切な場合があります。</div>
+<div class="supplement"><h4>代表的な方式</h4>
+<ul>
+<li><strong>Token Relay：</strong>元のAccess Tokenを下流サービスへ渡す。ユーザー文脈を維持しやすいが、Token漏洩範囲、audience不一致、権限過多に注意が必要。</li>
+<li><strong>Token Exchange / On-Behalf-Of：</strong>上流サービスが、下流サービス向けのTokenに交換する。audienceやscopeを下流用に絞りやすい。</li>
+<li><strong>Client Credentials：</strong>サービス自身の資格情報で呼び出す。ユーザー代理ではなくシステム間処理に向く。</li>
+<li><strong>内部ヘッダでユーザーIDを渡す：</strong>GatewayやBFFで認証済みユーザーを解決し、内部向けにヘッダ付与する方式。境界内の信頼、改ざん防止、署名、mTLSなどを考える必要がある。</li>
+</ul></div>
+<div class="caution"><strong>重要：</strong>Access Tokenは本来、APIアクセスのための資格情報です。「ユーザー情報を伝えるための便利な箱」として扱うと設計が崩れます。下流サービスに必要なのが認可判断なのか、監査用のユーザーIDなのか、画面表示用プロフィールなのかを分けるべきです。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: java / spring boot s q013 diとは何ですか？なぜ必要ですか？ 面接官の意図： springの入口。 回答例を見る 回答例： diはdependency injection、つまりオブジェクトが必要な依存オブジェクトを自分で生成せず、外部から注入してもらう設計です。これにより、具象クラスへの依存を弱め、テスト時にモックへ差し替えやすくなり、責務分離もしやすくなります。springではbeanをコンテナが管理し、コンストラクタインジェクションなどで依存を渡します。 補足知識 自分で new すると依存先が固定されやすい。 diにより、実装差し替え、単体テスト、設定による構成変更がしやすくなる。">
+<div class="qa-head">
+<div><span class="cat">A: Java / Spring Boot</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q013</div>
+</div>
+<h3>DIとは何ですか？なぜ必要ですか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>Springの入口。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+DIはDependency Injection、つまりオブジェクトが必要な依存オブジェクトを自分で生成せず、外部から注入してもらう設計です。これにより、具象クラスへの依存を弱め、テスト時にモックへ差し替えやすくなり、責務分離もしやすくなります。SpringではBeanをコンテナが管理し、コンストラクタインジェクションなどで依存を渡します。</div>
+<div class="supplement"><h4>補足知識</h4><ul><li>自分で <code>new</code> すると依存先が固定されやすい。</li><li>DIにより、実装差し替え、単体テスト、設定による構成変更がしやすくなる。</li></ul></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: java / spring boot s q014 controller / service / repository の責務は？ 面接官の意図： アプリケーション層の基本設計。 回答例を見る 回答例： controllerはhttpリクエスト/レスポンスの入口で、入力受付、validation、dto変換、ステータスコード返却を担当します。serviceはユースケースや業務処理、トランザクション境界を担当します。repositoryはdbアクセスを隠蔽し、永続化の詳細を扱います。controllerに業務ロジックを書くとテストしづらく、repositoryに業務判断を書くとdbアクセスとドメイン判断が混ざるため、層ごとの責務を分けます。 面接での一言 「controllerは薄く、serviceにユースケース、repositoryに永続化」を基本線として話すと崩れにくいです。">
+<div class="qa-head">
+<div><span class="cat">A: Java / Spring Boot</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q014</div>
+</div>
+<h3>Controller / Service / Repository の責務は？</h3>
+<p class="intent"><strong>面接官の意図：</strong>アプリケーション層の基本設計。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+ControllerはHTTPリクエスト/レスポンスの入口で、入力受付、Validation、DTO変換、ステータスコード返却を担当します。Serviceはユースケースや業務処理、トランザクション境界を担当します。RepositoryはDBアクセスを隠蔽し、永続化の詳細を扱います。Controllerに業務ロジックを書くとテストしづらく、Repositoryに業務判断を書くとDBアクセスとドメイン判断が混ざるため、層ごとの責務を分けます。</div>
+<div class="supplement"><h4>面接での一言</h4><p>「Controllerは薄く、Serviceにユースケース、Repositoryに永続化」を基本線として話すと崩れにくいです。</p></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: java / spring boot s q015 @transactional はどこに付けるべきですか？ 面接官の意図： トランザクション境界を理解しているか。 回答例を見る 回答例： 基本的にはservice層のユースケース単位に付けます。controllerに付けるとhttp処理全体を巻き込みすぎ、repository単位だけだと複数db操作を一貫した単位で扱えない場合があります。例えば注文作成と明細登録を一つの業務処理として成功/失敗させたいなら、そのserviceメソッドをトランザクション境界にします。 補足知識 トランザクション境界は「業務的に一緒に成功・失敗すべき単位」で考える。 外部api呼び出しをトランザクション内に入れすぎるとロック保持時間が伸びるので注意。">
+<div class="qa-head">
+<div><span class="cat">A: Java / Spring Boot</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q015</div>
+</div>
+<h3>@Transactional はどこに付けるべきですか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>トランザクション境界を理解しているか。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+基本的にはService層のユースケース単位に付けます。Controllerに付けるとHTTP処理全体を巻き込みすぎ、Repository単位だけだと複数DB操作を一貫した単位で扱えない場合があります。例えば注文作成と明細登録を一つの業務処理として成功/失敗させたいなら、そのServiceメソッドをトランザクション境界にします。</div>
+<div class="supplement"><h4>補足知識</h4><ul><li>トランザクション境界は「業務的に一緒に成功・失敗すべき単位」で考える。</li><li>外部API呼び出しをトランザクション内に入れすぎるとロック保持時間が伸びるので注意。</li></ul></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: java / spring boot s q016 jpaとmybatisの違いは？ 面接官の意図： javaバックエンド企業でよく聞かれる。 回答例を見る 回答例： jpaはormとしてentity中心にdb操作を抽象化します。単純なcrudやドメインモデル中心の開発では生産性が高い一方、発行sqlを意識しないとn+1や意図しないクエリが出ます。mybatisはsqlを明示的に書くため、複雑なsqlや性能チューニングでは制御しやすいです。一方、マッピングやsql管理の手間は増えます。選定はチームのsql運用力、ドメイン複雑性、性能要件で決めます。 あなた向けの言い方 「sqlを見られるバックエンドエンジニアになりたいのでmybatisにも関心がある。ただ、jpaでも発行sqlやn+1を理解する必要があり、どちらでもdb理解は避けられない」と言えるとよいです。">
+<div class="qa-head">
+<div><span class="cat">A: Java / Spring Boot</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q016</div>
+</div>
+<h3>JPAとMyBatisの違いは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>Javaバックエンド企業でよく聞かれる。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+JPAはORMとしてEntity中心にDB操作を抽象化します。単純なCRUDやドメインモデル中心の開発では生産性が高い一方、発行SQLを意識しないとN+1や意図しないクエリが出ます。MyBatisはSQLを明示的に書くため、複雑なSQLや性能チューニングでは制御しやすいです。一方、マッピングやSQL管理の手間は増えます。選定はチームのSQL運用力、ドメイン複雑性、性能要件で決めます。</div>
+<div class="supplement"><h4>あなた向けの言い方</h4><p>「SQLを見られるバックエンドエンジニアになりたいのでMyBatisにも関心がある。ただ、JPAでも発行SQLやN+1を理解する必要があり、どちらでもDB理解は避けられない」と言えるとよいです。</p></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: java / spring boot a q017 checked exception と unchecked exception の違いは？ 面接官の意図： javaの例外処理の基本。 回答例を見る 回答例： checked exceptionはコンパイル時に捕捉またはthrows宣言が必要な例外です。unchecked exceptionはruntimeexception配下で、コンパイル時強制はありません。回復可能で呼び出し側に処理を強制したいものはchecked、プログラムの前提違反や業務バリデーション失敗などはuncheckedにすることが多いです。ただしspringではトランザクションロールバックとの関係も意識します。 補足知識 springの宣言的トランザクションは、デフォルトではruntimeexception/errorでロールバックされ、checked exceptionではロールバックされない扱いが基本です。必要ならrollbackforを指定します。">
+<div class="qa-head">
+<div><span class="cat">A: Java / Spring Boot</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q017</div>
+</div>
+<h3>checked exception と unchecked exception の違いは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>Javaの例外処理の基本。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+checked exceptionはコンパイル時に捕捉またはthrows宣言が必要な例外です。unchecked exceptionはRuntimeException配下で、コンパイル時強制はありません。回復可能で呼び出し側に処理を強制したいものはchecked、プログラムの前提違反や業務バリデーション失敗などはuncheckedにすることが多いです。ただしSpringではトランザクションロールバックとの関係も意識します。</div>
+<div class="supplement"><h4>補足知識</h4><p>Springの宣言的トランザクションは、デフォルトではRuntimeException/Errorでロールバックされ、checked exceptionではロールバックされない扱いが基本です。必要ならrollbackForを指定します。</p></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: java / spring boot a q018 springで例外ハンドリングはどう設計しますか？ 面接官の意図： api品質・設計の実務力。 回答例を見る 回答例： service層では、業務的な失敗を意味のある独自例外として表現し、controller層では @controlleradvice と @exceptionhandler を使って、例外をhttpステータスとエラーレスポンスに変換します。repositoryや外部apiの低レベル例外をそのまま利用者へ出さず、api利用者に必要なエラーコード、メッセージ、詳細項目に整理します。ログには原因調査に必要な情報を残しつつ、レスポンスにはスタックトレースや内部情報を出さないようにします。 設計の観点 入力不正： 400 bad request。bean validationのfield errorを返す。 未認証： 401 unauthorized。 権限不足： 403 forbidden。 存在しないリソース： 404 not found。 状態競合・重複： 409 conflict。 想定外エラー： 500 internal server error。利用者には汎用メッセージ、ログには詳細。 実装イメージ controller内でtry-catchを乱立させず、横断的な例外変換は @controlleradvice に寄せる。 エラーレスポンスは code 、 message 、 details 、 traceid のように形式を揃える。 業務例外とシステム例外を分け、利用者に見せるメッセージと内部ログを分離する。 トランザクションロールバック条件も例外設計と合わせて考える。">
+<div class="qa-head">
+<div><span class="cat">A: Java / Spring Boot</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q018</div>
+</div>
+<h3>Springで例外ハンドリングはどう設計しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>API品質・設計の実務力。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+Service層では、業務的な失敗を意味のある独自例外として表現し、Controller層では <code>@ControllerAdvice</code> と <code>@ExceptionHandler</code> を使って、例外をHTTPステータスとエラーレスポンスに変換します。Repositoryや外部APIの低レベル例外をそのまま利用者へ出さず、API利用者に必要なエラーコード、メッセージ、詳細項目に整理します。ログには原因調査に必要な情報を残しつつ、レスポンスにはスタックトレースや内部情報を出さないようにします。</div>
+<div class="supplement"><h4>設計の観点</h4>
+<ul>
+<li><strong>入力不正：</strong>400 Bad Request。Bean Validationのfield errorを返す。</li>
+<li><strong>未認証：</strong>401 Unauthorized。</li>
+<li><strong>権限不足：</strong>403 Forbidden。</li>
+<li><strong>存在しないリソース：</strong>404 Not Found。</li>
+<li><strong>状態競合・重複：</strong>409 Conflict。</li>
+<li><strong>想定外エラー：</strong>500 Internal Server Error。利用者には汎用メッセージ、ログには詳細。</li>
+</ul></div>
+<div class="supplement"><h4>実装イメージ</h4>
+<ul>
+<li>Controller内でtry-catchを乱立させず、横断的な例外変換は <code>@ControllerAdvice</code> に寄せる。</li>
+<li>エラーレスポンスは <code>code</code>、<code>message</code>、<code>details</code>、<code>traceId</code> のように形式を揃える。</li>
+<li>業務例外とシステム例外を分け、利用者に見せるメッセージと内部ログを分離する。</li>
+<li>トランザクションロールバック条件も例外設計と合わせて考える。</li>
+</ul></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: java / spring boot a q019 dtoとentityを分ける理由は？ 面接官の意図： api設計・db設計の分離。 回答例を見る 回答例： entityはdb永続化やドメイン状態を表し、dtoは外部入出力の形式を表します。分けることで、db構造をapiに直接晒さずに済み、api変更とdb変更を分離しやすくなります。また、パスワードハッシュなど外部に出してはいけない項目を誤って返すリスクも下げられます。小規模なら同一でも動きますが、保守性を考えると分離が安全です。 補足知識 特にjpa entityをそのままレスポンスに返すと、遅延ロード、循環参照、不要項目露出、api契約とdb構造の密結合が起きやすいです。">
+<div class="qa-head">
+<div><span class="cat">A: Java / Spring Boot</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q019</div>
+</div>
+<h3>DTOとEntityを分ける理由は？</h3>
+<p class="intent"><strong>面接官の意図：</strong>API設計・DB設計の分離。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+EntityはDB永続化やドメイン状態を表し、DTOは外部入出力の形式を表します。分けることで、DB構造をAPIに直接晒さずに済み、API変更とDB変更を分離しやすくなります。また、パスワードハッシュなど外部に出してはいけない項目を誤って返すリスクも下げられます。小規模なら同一でも動きますが、保守性を考えると分離が安全です。</div>
+<div class="supplement"><h4>補足知識</h4><p>特にJPA Entityをそのままレスポンスに返すと、遅延ロード、循環参照、不要項目露出、API契約とDB構造の密結合が起きやすいです。</p></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: java / spring boot a q020 単体テストと結合テストの違いは？ 面接官の意図： 品質保証の基本。単一アプリ内だけでなく、マイクロサービス間の結合も含めて説明できるか。 回答例を見る 回答例： 単体テストは、serviceのメソッドやドメインロジックなど小さい単位を対象に、依存をモックやスタブに置き換えてロジックを検証するテストです。結合テストは、複数の要素を組み合わせて、要素間の接続・設定・データ受け渡しが期待通り動くかを確認するテストです。単一アプリ内であればspringコンテキスト、db、repository、http controllerなどの結合を見ますし、マイクロサービス構成であれば、サービス間api、認証認可、外部システム連携、メッセージング、環境設定まで含めて確認することがあります。 違いの整理 単体テスト： 速い。原因特定しやすい。ロジックの境界条件を細かく検証しやすい。 結合テスト： dbスキーマ不整合、di設定ミス、sqlミス、httpステータス、認証認可、サービス間ifのズレを検出しやすい。 e2eテスト： ユーザー操作や業務フロー全体が通るかを見る。重く、壊れやすいので必要な範囲に絞る。 面接での言い方： 「単体テストはロジック、結合テストは配線」だけだと浅いです。あなたの場合は、マイクロサービス間の認証認可・api連携・結合試験経験にも接続して話すべきです。">
+<div class="qa-head">
+<div><span class="cat">A: Java / Spring Boot</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q020</div>
+</div>
+<h3>単体テストと結合テストの違いは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>品質保証の基本。単一アプリ内だけでなく、マイクロサービス間の結合も含めて説明できるか。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+単体テストは、Serviceのメソッドやドメインロジックなど小さい単位を対象に、依存をモックやスタブに置き換えてロジックを検証するテストです。結合テストは、複数の要素を組み合わせて、要素間の接続・設定・データ受け渡しが期待通り動くかを確認するテストです。単一アプリ内であればSpringコンテキスト、DB、Repository、HTTP Controllerなどの結合を見ますし、マイクロサービス構成であれば、サービス間API、認証認可、外部システム連携、メッセージング、環境設定まで含めて確認することがあります。</div>
+<div class="supplement"><h4>違いの整理</h4>
+<ul>
+<li><strong>単体テスト：</strong>速い。原因特定しやすい。ロジックの境界条件を細かく検証しやすい。</li>
+<li><strong>結合テスト：</strong>DBスキーマ不整合、DI設定ミス、SQLミス、HTTPステータス、認証認可、サービス間IFのズレを検出しやすい。</li>
+<li><strong>E2Eテスト：</strong>ユーザー操作や業務フロー全体が通るかを見る。重く、壊れやすいので必要な範囲に絞る。</li>
+</ul></div>
+<div class="caution"><strong>面接での言い方：</strong>「単体テストはロジック、結合テストは配線」だけだと浅いです。あなたの場合は、マイクロサービス間の認証認可・API連携・結合試験経験にも接続して話すべきです。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: db / sql s q021 インデックスとは何ですか？ 面接官の意図： db性能の基本。web系バックエンドでは弱いと実装経験不足に見えやすい。 回答例を見る 回答例： インデックスは、テーブル内の行を高速に探すための補助データ構造です。本の索引のように、条件に合う行を全件走査せずに見つけやすくします。一般的なb-treeインデックスではキーがソートされた構造で管理され、等価検索、範囲検索、order by、join条件などで効くことがあります。一方、insert / update / delete時にはインデックスも更新する必要があるため、書き込み性能と容量のコストが増えます。検索条件、カーディナリティ、複合インデックスの順序、実行計画を見て設計します。 何が速くなるのか where user_id = ? のような等価検索。 where created_at between ? and ? のような範囲検索。 join の結合キー。 order by created_at desc など、並び順と合う場合のソート。 複合インデックスの考え方 例えば where tenant_id = ? and status = ? order by created_at desc が頻出するなら、 (tenant_id, status, created_at) のような複合インデックスが候補になります。複合インデックスは左から順に効くため、列順が重要です。 注意点 カーディナリティが低すぎる列、例えばbooleanだけの列は単独インデックス効果が弱いことが多い。 小さいテーブルでは全件走査の方が速い場合もある。 関数をかけた条件、前方一致でないlikeなどはインデックスが効きにくいことがある。 最終的には explain や実行計画を見て確認する。">
+<div class="qa-head">
+<div><span class="cat">A: DB / SQL</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q021</div>
+</div>
+<h3>インデックスとは何ですか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>DB性能の基本。Web系バックエンドでは弱いと実装経験不足に見えやすい。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+インデックスは、テーブル内の行を高速に探すための補助データ構造です。本の索引のように、条件に合う行を全件走査せずに見つけやすくします。一般的なB-treeインデックスではキーがソートされた構造で管理され、等価検索、範囲検索、ORDER BY、JOIN条件などで効くことがあります。一方、INSERT / UPDATE / DELETE時にはインデックスも更新する必要があるため、書き込み性能と容量のコストが増えます。検索条件、カーディナリティ、複合インデックスの順序、実行計画を見て設計します。</div>
+<div class="supplement"><h4>何が速くなるのか</h4>
+<ul>
+<li><code>WHERE user_id = ?</code> のような等価検索。</li>
+<li><code>WHERE created_at BETWEEN ? AND ?</code> のような範囲検索。</li>
+<li><code>JOIN</code> の結合キー。</li>
+<li><code>ORDER BY created_at DESC</code> など、並び順と合う場合のソート。</li>
+</ul></div>
+<div class="supplement"><h4>複合インデックスの考え方</h4>
+<p>例えば <code>WHERE tenant_id = ? AND status = ? ORDER BY created_at DESC</code> が頻出するなら、<code>(tenant_id, status, created_at)</code> のような複合インデックスが候補になります。複合インデックスは左から順に効くため、列順が重要です。</p></div>
+<div class="supplement"><h4>注意点</h4>
+<ul>
+<li>カーディナリティが低すぎる列、例えばbooleanだけの列は単独インデックス効果が弱いことが多い。</li>
+<li>小さいテーブルでは全件走査の方が速い場合もある。</li>
+<li>関数をかけた条件、前方一致でないLIKEなどはインデックスが効きにくいことがある。</li>
+<li>最終的には <code>EXPLAIN</code> や実行計画を見て確認する。</li>
+</ul></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: db / sql s q022 n+1問題とは何ですか？ 面接官の意図： jpaを使うなら必須。発行sqlを意識できているかを見る。 回答例を見る 回答例： n+1問題は、親データを1回のsqlで取得した後、その親データn件それぞれに対して関連する子データを個別sqlで取得してしまい、合計で1+n回のsqlが発行される問題です。例えば注文一覧を1回取得した後、各注文の注文明細や顧客情報をループ内で遅延ロードすると、注文件数分だけ追加sqlが出ます。件数が増えるとdb往復が急増し、性能劣化します。対策は、join fetch、entitygraph、バッチフェッチ、必要なdtoを直接取得するクエリなどです。 具体例 select * from orders limit 100 で注文100件を取得する。 画面表示時に各注文の order.getitems() を呼ぶ。 遅延ロードにより select * from order_items where order_id = ? が100回発行される。 結果として、1回 + 100回 = 101回のsqlになる。 対策の使い分け join fetch： 必要な関連を一緒に取得する。便利だが、1対多で行数が膨らむことがある。 entitygraph： jpaで取得したい関連を指定する。 バッチフェッチ： 関連データを1件ずつではなくまとめて取得する。 dtoクエリ： 一覧画面に必要な項目だけをselectする。画面/api用途では現実的。 注意： 「joinすれば全部解決」ではありません。ページングとの相性、重複行、取得しすぎ、メモリ使用量も見る必要があります。">
+<div class="qa-head">
+<div><span class="cat">A: DB / SQL</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q022</div>
+</div>
+<h3>N+1問題とは何ですか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>JPAを使うなら必須。発行SQLを意識できているかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+N+1問題は、親データを1回のSQLで取得した後、その親データN件それぞれに対して関連する子データを個別SQLで取得してしまい、合計で1+N回のSQLが発行される問題です。例えば注文一覧を1回取得した後、各注文の注文明細や顧客情報をループ内で遅延ロードすると、注文件数分だけ追加SQLが出ます。件数が増えるとDB往復が急増し、性能劣化します。対策は、JOIN FETCH、EntityGraph、バッチフェッチ、必要なDTOを直接取得するクエリなどです。</div>
+<div class="supplement"><h4>具体例</h4>
+<ol>
+<li><code>SELECT * FROM orders LIMIT 100</code> で注文100件を取得する。</li>
+<li>画面表示時に各注文の <code>order.getItems()</code> を呼ぶ。</li>
+<li>遅延ロードにより <code>SELECT * FROM order_items WHERE order_id = ?</code> が100回発行される。</li>
+<li>結果として、1回 + 100回 = 101回のSQLになる。</li>
+</ol></div>
+<div class="supplement"><h4>対策の使い分け</h4>
+<ul>
+<li><strong>JOIN FETCH：</strong>必要な関連を一緒に取得する。便利だが、1対多で行数が膨らむことがある。</li>
+<li><strong>EntityGraph：</strong>JPAで取得したい関連を指定する。</li>
+<li><strong>バッチフェッチ：</strong>関連データを1件ずつではなくまとめて取得する。</li>
+<li><strong>DTOクエリ：</strong>一覧画面に必要な項目だけをSELECTする。画面/API用途では現実的。</li>
+</ul></div>
+<div class="caution"><strong>注意：</strong>「JOINすれば全部解決」ではありません。ページングとの相性、重複行、取得しすぎ、メモリ使用量も見る必要があります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: db / sql a q023 正規化とは何ですか？どこまで正規化しますか？ 面接官の意図： テーブル設計の基本。更新不整合を理解しているかを見る。 回答例を見る 回答例： 正規化は、データの重複や更新不整合を減らすために、データの依存関係に基づいてテーブルを適切に分割する考え方です。基本的には、1つの事実を1か所に持つことで、更新漏れ、削除異常、挿入異常を防ぎます。実務では、まず第3正規形程度までを基本に整合性のあるモデルを作り、そのうえで検索性能、履歴要件、集計要件、実装単純性に応じて、必要な範囲で非正規化を検討します。 ざっくりした正規形 第1正規形： 1つのカラムに複数値を詰め込まない。値を原子的にする。 第2正規形： 複合主キーの一部だけに依存する項目を分離する。 第3正規形： 主キー以外の項目に依存する項目を分離する。推移的依存を避ける。 非正規化があり得る場面 注文時点の商品名・価格のように、後からマスタが変わっても当時の値を保持したい。 大量アクセスされる一覧画面で、joinが重すぎる。 検索・集計用に別テーブルやマテリアライズドビューを持つ。 面接での安全な答え： 「最初から非正規化で楽をする」のではなく、「まず整合性のある正規化モデルを作り、性能・履歴・集計要件に応じて意図的に冗長化する」と答えるとよいです。">
+<div class="qa-head">
+<div><span class="cat">A: DB / SQL</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q023</div>
+</div>
+<h3>正規化とは何ですか？どこまで正規化しますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>テーブル設計の基本。更新不整合を理解しているかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+正規化は、データの重複や更新不整合を減らすために、データの依存関係に基づいてテーブルを適切に分割する考え方です。基本的には、1つの事実を1か所に持つことで、更新漏れ、削除異常、挿入異常を防ぎます。実務では、まず第3正規形程度までを基本に整合性のあるモデルを作り、そのうえで検索性能、履歴要件、集計要件、実装単純性に応じて、必要な範囲で非正規化を検討します。</div>
+<div class="supplement"><h4>ざっくりした正規形</h4>
+<ul>
+<li><strong>第1正規形：</strong>1つのカラムに複数値を詰め込まない。値を原子的にする。</li>
+<li><strong>第2正規形：</strong>複合主キーの一部だけに依存する項目を分離する。</li>
+<li><strong>第3正規形：</strong>主キー以外の項目に依存する項目を分離する。推移的依存を避ける。</li>
+</ul></div>
+<div class="supplement"><h4>非正規化があり得る場面</h4>
+<ul>
+<li>注文時点の商品名・価格のように、後からマスタが変わっても当時の値を保持したい。</li>
+<li>大量アクセスされる一覧画面で、JOINが重すぎる。</li>
+<li>検索・集計用に別テーブルやマテリアライズドビューを持つ。</li>
+</ul></div>
+<div class="caution"><strong>面接での安全な答え：</strong>「最初から非正規化で楽をする」のではなく、「まず整合性のある正規化モデルを作り、性能・履歴・集計要件に応じて意図的に冗長化する」と答えるとよいです。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: db / sql a q024 楽観ロックと悲観ロックの違いは？ 面接官の意図： 並行更新の理解。違いを具体例で説明できるか。 回答例を見る 回答例： 悲観ロックは、競合が起きる前提で、更新対象の行を先にロックし、他トランザクションの更新を待たせる方式です。例えば select ... for update のように、在庫や残高など同時更新されると困るデータで使われます。楽観ロックは、競合は少ない前提で、読み取り時にはロックせず、更新時にversion列などを条件に含め、他者が先に更新していたら更新失敗として検知する方式です。ユーザー編集画面のように競合頻度が低い場合に向きます。 悲観ロック 更新前にロックを取る。 競合を未然に防げる。 高競合・強い整合性が必要な処理に向く。 待ち時間、デッドロック、スループット低下に注意。 楽観ロック 読み取り時にはロックしない。 更新時に where id = ? and version = ? のように確認する。 更新件数が0件なら、他者更新があったと判断してエラーや再読み込みにする。 低競合でスループットを上げたい処理に向く。 違いの一言： 悲観ロックは「先に止める」、楽観ロックは「後で衝突を検知する」です。">
+<div class="qa-head">
+<div><span class="cat">A: DB / SQL</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q024</div>
+</div>
+<h3>楽観ロックと悲観ロックの違いは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>並行更新の理解。違いを具体例で説明できるか。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+悲観ロックは、競合が起きる前提で、更新対象の行を先にロックし、他トランザクションの更新を待たせる方式です。例えば <code>SELECT ... FOR UPDATE</code> のように、在庫や残高など同時更新されると困るデータで使われます。楽観ロックは、競合は少ない前提で、読み取り時にはロックせず、更新時にversion列などを条件に含め、他者が先に更新していたら更新失敗として検知する方式です。ユーザー編集画面のように競合頻度が低い場合に向きます。</div>
+<div class="supplement"><h4>悲観ロック</h4>
+<ul>
+<li>更新前にロックを取る。</li>
+<li>競合を未然に防げる。</li>
+<li>高競合・強い整合性が必要な処理に向く。</li>
+<li>待ち時間、デッドロック、スループット低下に注意。</li>
+</ul></div>
+<div class="supplement"><h4>楽観ロック</h4>
+<ul>
+<li>読み取り時にはロックしない。</li>
+<li>更新時に <code>WHERE id = ? AND version = ?</code> のように確認する。</li>
+<li>更新件数が0件なら、他者更新があったと判断してエラーや再読み込みにする。</li>
+<li>低競合でスループットを上げたい処理に向く。</li>
+</ul></div>
+<div class="caution"><strong>違いの一言：</strong>悲観ロックは「先に止める」、楽観ロックは「後で衝突を検知する」です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: db / sql a q025 論理削除と物理削除の違いは？ 面接官の意図： 業務システム設計で頻出。 回答例を見る 回答例： 物理削除はレコードを実際に消します。論理削除は削除フラグや削除日時を立て、通常検索から除外します。監査や復旧が必要なら論理削除が有効ですが、検索条件に削除フラグが常に必要になり、ユニーク制約やデータ肥大化が課題になります。要件がないのに論理削除を乱用すると複雑になります。 補足知識 個人情報削除、監査ログ、法的保存期間などの要件によって、論理削除・物理削除・匿名化・アーカイブを使い分けます。">
+<div class="qa-head">
+<div><span class="cat">A: DB / SQL</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q025</div>
+</div>
+<h3>論理削除と物理削除の違いは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>業務システム設計で頻出。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+物理削除はレコードを実際に消します。論理削除は削除フラグや削除日時を立て、通常検索から除外します。監査や復旧が必要なら論理削除が有効ですが、検索条件に削除フラグが常に必要になり、ユニーク制約やデータ肥大化が課題になります。要件がないのに論理削除を乱用すると複雑になります。</div>
+<div class="supplement"><h4>補足知識</h4><p>個人情報削除、監査ログ、法的保存期間などの要件によって、論理削除・物理削除・匿名化・アーカイブを使い分けます。</p></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: api / web / security s q026 rest api設計で意識することは？ 面接官の意図： web系企業で頻出。単にurlとhttpメソッドを知っているだけでは弱い。 回答例を見る 回答例： rest api設計では、リソース中心にuriを設計し、httpメソッド、ステータスコード、冪等性、入力validation、エラーレスポンス、認証認可、ページング、ソート、フィルタ、バージョニング、後方互換性を整理します。例えば、取得はget、作成はpost、全置換はput、部分更新はpatch、削除はdeleteを基本にします。単に動くapiではなく、利用者が予測しやすく、変更に強いapi契約にすることが重要です。 具体的な観点 uri： /users/{id} のように名詞・リソース中心にする。動詞を乱用しない。 httpメソッド： getは取得、postは作成や非冪等処理、putは全置換、patchは部分更新、deleteは削除。 ステータスコード： 201 created、400 validation error、401未認証、403権限不足、404存在なし、409競合などを使い分ける。 エラーレスポンス： 機械的に扱えるerror codeと、人間が読めるmessageを分ける。 ページング： limit/offsetまたはcursor方式を選ぶ。大量データではcursor方式も検討する。 互換性： 既存クライアントを壊さない。削除・型変更・意味変更は慎重に行う。 面接での深掘り対策： api設計は「restです」で終わらず、認証認可、エラー設計、冪等性、ページング、後方互換性まで話せるとweb系バックエンドらしくなります。">
+<div class="qa-head">
+<div><span class="cat">A: API / Web / Security</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q026</div>
+</div>
+<h3>REST API設計で意識することは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>Web系企業で頻出。単にURLとHTTPメソッドを知っているだけでは弱い。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+REST API設計では、リソース中心にURIを設計し、HTTPメソッド、ステータスコード、冪等性、入力Validation、エラーレスポンス、認証認可、ページング、ソート、フィルタ、バージョニング、後方互換性を整理します。例えば、取得はGET、作成はPOST、全置換はPUT、部分更新はPATCH、削除はDELETEを基本にします。単に動くAPIではなく、利用者が予測しやすく、変更に強いAPI契約にすることが重要です。</div>
+<div class="supplement"><h4>具体的な観点</h4>
+<ul>
+<li><strong>URI：</strong><code>/users/{id}</code> のように名詞・リソース中心にする。動詞を乱用しない。</li>
+<li><strong>HTTPメソッド：</strong>GETは取得、POSTは作成や非冪等処理、PUTは全置換、PATCHは部分更新、DELETEは削除。</li>
+<li><strong>ステータスコード：</strong>201 Created、400 Validation Error、401未認証、403権限不足、404存在なし、409競合などを使い分ける。</li>
+<li><strong>エラーレスポンス：</strong>機械的に扱えるerror codeと、人間が読めるmessageを分ける。</li>
+<li><strong>ページング：</strong>limit/offsetまたはcursor方式を選ぶ。大量データではcursor方式も検討する。</li>
+<li><strong>互換性：</strong>既存クライアントを壊さない。削除・型変更・意味変更は慎重に行う。</li>
+</ul></div>
+<div class="caution"><strong>面接での深掘り対策：</strong>API設計は「RESTです」で終わらず、認証認可、エラー設計、冪等性、ページング、後方互換性まで話せるとWeb系バックエンドらしくなります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: api / web / security s q027 401と403の違いは？ 面接官の意図： 認証認可とhttpの接続。 回答例を見る 回答例： 401 unauthorizedは、認証されていない、または認証情報が無効な状態です。403 forbiddenは、認証済みだが、その操作権限がない状態です。例えば、tokenがない・期限切れ・署名不正なら401、ログイン済みユーザーが管理者apiを実行しようとして権限不足なら403です。認証と認可の違いと対応させて説明します。 補足知識 401は「まず認証してください」、403は「誰かは分かるが許可できません」に近いです。">
+<div class="qa-head">
+<div><span class="cat">A: API / Web / Security</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q027</div>
+</div>
+<h3>401と403の違いは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>認証認可とHTTPの接続。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+401 Unauthorizedは、認証されていない、または認証情報が無効な状態です。403 Forbiddenは、認証済みだが、その操作権限がない状態です。例えば、Tokenがない・期限切れ・署名不正なら401、ログイン済みユーザーが管理者APIを実行しようとして権限不足なら403です。認証と認可の違いと対応させて説明します。</div>
+<div class="supplement"><h4>補足知識</h4><p>401は「まず認証してください」、403は「誰かは分かるが許可できません」に近いです。</p></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: api / web / security a q028 冪等性とは何ですか？ 面接官の意図： api設計・外部連携で重要。 回答例を見る 回答例： 冪等性とは、同じ操作を複数回実行しても、結果が変わらない性質です。get、put、deleteは通常冪等に設計し、postは非冪等になりやすいです。決済や注文作成では通信失敗後にリトライすると二重作成の危険があるため、idempotency keyを使って同一リクエストを一度だけ処理する設計が重要です。 補足知識 putで同じ内容に全置換する操作は何度やっても同じ状態になる。 postで注文作成を何度も実行すると注文が複数作られる可能性がある。 外部api連携では、タイムアウト後のリトライと冪等性をセットで考える。">
+<div class="qa-head">
+<div><span class="cat">A: API / Web / Security</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q028</div>
+</div>
+<h3>冪等性とは何ですか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>API設計・外部連携で重要。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+冪等性とは、同じ操作を複数回実行しても、結果が変わらない性質です。GET、PUT、DELETEは通常冪等に設計し、POSTは非冪等になりやすいです。決済や注文作成では通信失敗後にリトライすると二重作成の危険があるため、Idempotency Keyを使って同一リクエストを一度だけ処理する設計が重要です。</div>
+<div class="supplement"><h4>補足知識</h4><ul><li>PUTで同じ内容に全置換する操作は何度やっても同じ状態になる。</li><li>POSTで注文作成を何度も実行すると注文が複数作られる可能性がある。</li><li>外部API連携では、タイムアウト後のリトライと冪等性をセットで考える。</li></ul></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: api / web / security a q029 corsとは何ですか？ 面接官の意図： ブラウザ/バックエンド連携理解。サーバー間通信との違いも見る。 回答例を見る 回答例： corsは、ブラウザのsame-origin policyを前提に、異なるオリジンへのリクエストをサーバー側が明示的に許可するための仕組みです。オリジンはスキーム、ホスト、ポートの組み合わせで決まります。サーバーが access-control-allow-origin などのレスポンスヘッダで許可した場合だけ、ブラウザはレスポンスをjavascriptへ渡します。これはブラウザの制約であり、サーバー間通信には基本的に関係しません。 preflightとは ブラウザが本リクエストの前に options リクエストを送り、サーバーが許可するメソッド・ヘッダか確認する仕組み。 authorization ヘッダを使う、 content-type: application/json を使う、put/deleteを使うなどの場合に発生しやすい。 サーバーは access-control-allow-methods 、 access-control-allow-headers などを返す。 cookie認証との関係 cookieなどのcredentialsをクロスオリジンで送るには、クライアント側のcredentials設定と、サーバー側の access-control-allow-credentials: true が必要。 credentialsありの場合、 access-control-allow-origin: * は使えず、具体的なoriginを返す必要がある。 クロスサイトcookieでは samesite=none; secure が関係する。 注意： corsは認証認可の仕組みではありません。corsで許可しても、api側で認証認可を必ず行います。">
+<div class="qa-head">
+<div><span class="cat">A: API / Web / Security</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q029</div>
+</div>
+<h3>CORSとは何ですか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>ブラウザ/バックエンド連携理解。サーバー間通信との違いも見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+CORSは、ブラウザのSame-Origin Policyを前提に、異なるオリジンへのリクエストをサーバー側が明示的に許可するための仕組みです。オリジンはスキーム、ホスト、ポートの組み合わせで決まります。サーバーが <code>Access-Control-Allow-Origin</code> などのレスポンスヘッダで許可した場合だけ、ブラウザはレスポンスをJavaScriptへ渡します。これはブラウザの制約であり、サーバー間通信には基本的に関係しません。</div>
+<div class="supplement"><h4>Preflightとは</h4>
+<ul>
+<li>ブラウザが本リクエストの前に <code>OPTIONS</code> リクエストを送り、サーバーが許可するメソッド・ヘッダか確認する仕組み。</li>
+<li><code>Authorization</code> ヘッダを使う、<code>Content-Type: application/json</code> を使う、PUT/DELETEを使うなどの場合に発生しやすい。</li>
+<li>サーバーは <code>Access-Control-Allow-Methods</code>、<code>Access-Control-Allow-Headers</code> などを返す。</li>
+</ul></div>
+<div class="supplement"><h4>Cookie認証との関係</h4>
+<ul>
+<li>Cookieなどのcredentialsをクロスオリジンで送るには、クライアント側のcredentials設定と、サーバー側の <code>Access-Control-Allow-Credentials: true</code> が必要。</li>
+<li>credentialsありの場合、<code>Access-Control-Allow-Origin: *</code> は使えず、具体的なOriginを返す必要がある。</li>
+<li>クロスサイトCookieでは <code>SameSite=None; Secure</code> が関係する。</li>
+</ul></div>
+<div class="caution"><strong>注意：</strong>CORSは認証認可の仕組みではありません。CORSで許可しても、API側で認証認可を必ず行います。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: api / web / security a q030 csrfとxssの違いは？ 面接官の意図： cookie sessionを語るなら必須。攻撃の成立条件を説明できるか。 回答例を見る 回答例： csrfは、ログイン済みユーザーのブラウザに、別サイトから意図しないリクエストを送らせる攻撃です。cookieは対象サイトへのリクエスト時にブラウザが自動送信するため、対策がないと攻撃者がユーザー本人の操作に見せかけて状態変更リクエストを送れる場合があります。xssは、攻撃者のスクリプトを正規サイト上で実行させる攻撃です。xssが成立すると、画面改ざん、任意リクエスト送信、localstorage上のtoken窃取などが可能になります。 csrfの具体例 ユーザーが銀行サイトにログイン済みで、セッションcookieを持っている。 攻撃者サイトを開く。 攻撃者サイトが銀行サイトの送金apiへフォーム送信や画像読み込み等でリクエストを誘導する。 ブラウザが銀行サイトのcookieを自動送信する。 銀行サイトがcsrf対策をしていないと、本人操作と区別できず処理してしまう。 主な対策 csrf対策： csrf token、samesite cookie、origin/refererチェック、getで状態変更しない。 xss対策： 出力エスケープ、入力値の適切な検証、csp、危険なhtml挿入の回避、cookieのhttponly化。 整理： csrfは「ブラウザがcookieを自動で送る」性質を悪用します。xssは「正規サイト上で悪意あるjavascriptが動く」ことが本質です。cookie sessionではcsrf対策が重要で、tokenをlocalstorage等に置く構成ではxssによるtoken窃取が特に危険です。">
+<div class="qa-head">
+<div><span class="cat">A: API / Web / Security</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q030</div>
+</div>
+<h3>CSRFとXSSの違いは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>Cookie Sessionを語るなら必須。攻撃の成立条件を説明できるか。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+CSRFは、ログイン済みユーザーのブラウザに、別サイトから意図しないリクエストを送らせる攻撃です。Cookieは対象サイトへのリクエスト時にブラウザが自動送信するため、対策がないと攻撃者がユーザー本人の操作に見せかけて状態変更リクエストを送れる場合があります。XSSは、攻撃者のスクリプトを正規サイト上で実行させる攻撃です。XSSが成立すると、画面改ざん、任意リクエスト送信、LocalStorage上のToken窃取などが可能になります。</div>
+<div class="supplement"><h4>CSRFの具体例</h4>
+<ol>
+<li>ユーザーが銀行サイトにログイン済みで、セッションCookieを持っている。</li>
+<li>攻撃者サイトを開く。</li>
+<li>攻撃者サイトが銀行サイトの送金APIへフォーム送信や画像読み込み等でリクエストを誘導する。</li>
+<li>ブラウザが銀行サイトのCookieを自動送信する。</li>
+<li>銀行サイトがCSRF対策をしていないと、本人操作と区別できず処理してしまう。</li>
+</ol></div>
+<div class="supplement"><h4>主な対策</h4>
+<ul>
+<li><strong>CSRF対策：</strong>CSRF Token、SameSite Cookie、Origin/Refererチェック、GETで状態変更しない。</li>
+<li><strong>XSS対策：</strong>出力エスケープ、入力値の適切な検証、CSP、危険なHTML挿入の回避、CookieのHttpOnly化。</li>
+</ul></div>
+<div class="caution"><strong>整理：</strong>CSRFは「ブラウザがCookieを自動で送る」性質を悪用します。XSSは「正規サイト上で悪意あるJavaScriptが動く」ことが本質です。Cookie SessionではCSRF対策が重要で、TokenをLocalStorage等に置く構成ではXSSによるToken窃取が特に危険です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: aws / docker / ci/cd q031 ecs fargateを使うメリットは？ あなたのaws経験を、単なる作業経験ではなく設計判断として説明できるかを見る。 ecs fargateは、コンテナを実行するためのサーバー管理をaws側に任せられる点が大きなメリットです。ec2インスタンスのプロビジョニング、osパッチ適用、クラスタ容量管理を自分たちで持たずに、タスク単位でcpu・メモリを指定してアプリケーションを動かせます。ecr、alb、cloudwatch logs、iam、vpcなどのaws標準サービスとも連携しやすく、kubernetesの運用機能が必須でない場合は、eksよりも構成と運用をシンプルにしやすいです。私の経験でも、kubernetes前提の手順を深追いするより、既存のecs環境と整合する形に切り替えた方が、短期間で結合試験環境を成立させやすいと判断しました。 ecs はawsのコンテナオーケストレーションサービスです。タスク定義、サービス、クラスター、タスクという概念でアプリケーションを管理します。 fargate はecs/eksで使えるサーバーレスなコンテナ実行基盤です。ec2起動タイプと違い、コンテナを載せるec2インスタンスを自分で管理しません。 ecs on ec2 は、ec2インスタンスの管理が必要な代わりに、より細かいホスト制御やコスト最適化をしやすい場合があります。 eks/kubernetes は柔軟性が高く、kubernetesエコシステムを使えますが、pod、deployment、service、ingress、クラスタ運用などの理解が必要で、学習・運用コストが上がります。 なぜeksではなくecsで足りたのか。 fargateでどの単位にcpu・メモリを割り当てるのか。 alb、ターゲットグループ、ecsサービス、タスク定義の関係を説明できるか。 ログ、環境変数、シークレット、ヘルスチェックをどう設計するか。">
+<div class="qa-head">
+<div><span class="cat">A: AWS / Docker / CI/CD</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q031</div>
+</div>
+<h3>ECS Fargateを使うメリットは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>あなたのAWS経験を、単なる作業経験ではなく設計判断として説明できるかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+ECS Fargateは、コンテナを実行するためのサーバー管理をAWS側に任せられる点が大きなメリットです。EC2インスタンスのプロビジョニング、OSパッチ適用、クラスタ容量管理を自分たちで持たずに、タスク単位でCPU・メモリを指定してアプリケーションを動かせます。ECR、ALB、CloudWatch Logs、IAM、VPCなどのAWS標準サービスとも連携しやすく、Kubernetesの運用機能が必須でない場合は、EKSよりも構成と運用をシンプルにしやすいです。私の経験でも、Kubernetes前提の手順を深追いするより、既存のECS環境と整合する形に切り替えた方が、短期間で結合試験環境を成立させやすいと判断しました。</div><div class="supplement"><h4>補足知識</h4>
+<ul>
+<li><strong>ECS</strong>はAWSのコンテナオーケストレーションサービスです。タスク定義、サービス、クラスター、タスクという概念でアプリケーションを管理します。</li>
+<li><strong>Fargate</strong>はECS/EKSで使えるサーバーレスなコンテナ実行基盤です。EC2起動タイプと違い、コンテナを載せるEC2インスタンスを自分で管理しません。</li>
+<li><strong>ECS on EC2</strong>は、EC2インスタンスの管理が必要な代わりに、より細かいホスト制御やコスト最適化をしやすい場合があります。</li>
+<li><strong>EKS/Kubernetes</strong>は柔軟性が高く、Kubernetesエコシステムを使えますが、Pod、Deployment、Service、Ingress、クラスタ運用などの理解が必要で、学習・運用コストが上がります。</li>
+</ul></div><div class="supplement"><h4>面接での深掘りポイント</h4>
+<ul>
+<li>なぜEKSではなくECSで足りたのか。</li>
+<li>Fargateでどの単位にCPU・メモリを割り当てるのか。</li>
+<li>ALB、ターゲットグループ、ECSサービス、タスク定義の関係を説明できるか。</li>
+<li>ログ、環境変数、シークレット、ヘルスチェックをどう設計するか。</li>
+</ul></div><div class="caution"><strong>注意：</strong>「Fargateは常に最善」と言うのは雑です。Kubernetes標準の運用、Service Mesh、複雑なスケジューリング、マルチクラウド移植性が重要ならEKS/Kubernetesが候補になります。逆に、AWS上でWeb APIを安定運用したいだけなら、ECS Fargateの単純さはかなり強いです。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: aws / docker / ci/cd q032 albからecsまでの通信経路を説明してください。 実際にecs環境を構築した人か、図として理解しているだけかを見分ける質問。 クライアントからのhttp/httpsリクエストは、まずalbのリスナーで受けます。リスナーはポート443や80で待ち受け、ホスト名やパスなどのリスナールールに従ってターゲットグループへ転送します。ecsサービスは、そのターゲットグループにfargateタスクを登録します。fargateのawsvpcネットワークモードでは各タスクがeniとプライベートipを持つため、ターゲットグループのターゲットタイプは通常ipになります。albはヘルスチェックに成功しているタスクだけへ通信を流します。セキュリティグループとしては、alb側は外部から443/80を許可し、ecsタスク側はalbのセキュリティグループからアプリケーションポートへの通信だけを許可する構成が基本です。 ユーザーがドメインへアクセスする。 dnsによりalbへ解決される。 albのlistenerがhttp/httpsを受ける。 listener ruleがtarget groupを選ぶ。 target groupがhealthyなecs taskへ転送する。 ecs task上のコンテナがアプリケーションポートで受ける。 アプリケーションは必要に応じてrds、外部api、他サービスへ通信する。 alb sg: internetまたは社内ネットワークから80/443を許可。 ecs task sg: alb sgからアプリケーションポートへのinboundのみ許可。 rds sg: ecs task sgからdbポートへのinboundのみ許可。 タスクのポートとターゲットグループのポートが噛み合っていない。 ヘルスチェックパスがアプリの実際のエンドポイントと一致していない。 セキュリティグループでalbからecsへの通信を許可していない。 private subnet上のタスクがecrや外部apiへ出る経路、nat gatewayやvpc endpointを考慮していない。">
+<div class="qa-head">
+<div><span class="cat">A: AWS / Docker / CI/CD</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q032</div>
+</div>
+<h3>ALBからECSまでの通信経路を説明してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>実際にECS環境を構築した人か、図として理解しているだけかを見分ける質問。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+クライアントからのHTTP/HTTPSリクエストは、まずALBのリスナーで受けます。リスナーはポート443や80で待ち受け、ホスト名やパスなどのリスナールールに従ってターゲットグループへ転送します。ECSサービスは、そのターゲットグループにFargateタスクを登録します。Fargateのawsvpcネットワークモードでは各タスクがENIとプライベートIPを持つため、ターゲットグループのターゲットタイプは通常ipになります。ALBはヘルスチェックに成功しているタスクだけへ通信を流します。セキュリティグループとしては、ALB側は外部から443/80を許可し、ECSタスク側はALBのセキュリティグループからアプリケーションポートへの通信だけを許可する構成が基本です。</div><div class="supplement"><h4>通信経路の分解</h4>
+<ol>
+<li>ユーザーがドメインへアクセスする。</li>
+<li>DNSによりALBへ解決される。</li>
+<li>ALBのListenerがHTTP/HTTPSを受ける。</li>
+<li>Listener RuleがTarget Groupを選ぶ。</li>
+<li>Target GroupがHealthyなECS Taskへ転送する。</li>
+<li>ECS Task上のコンテナがアプリケーションポートで受ける。</li>
+<li>アプリケーションは必要に応じてRDS、外部API、他サービスへ通信する。</li>
+</ol></div><div class="supplement"><h4>セキュリティグループの典型</h4>
+<ul>
+<li><strong>ALB SG:</strong> Internetまたは社内ネットワークから80/443を許可。</li>
+<li><strong>ECS Task SG:</strong> ALB SGからアプリケーションポートへのInboundのみ許可。</li>
+<li><strong>RDS SG:</strong> ECS Task SGからDBポートへのInboundのみ許可。</li>
+</ul></div><div class="supplement"><h4>よくある落とし穴</h4>
+<ul>
+<li>タスクのポートとターゲットグループのポートが噛み合っていない。</li>
+<li>ヘルスチェックパスがアプリの実際のエンドポイントと一致していない。</li>
+<li>セキュリティグループでALBからECSへの通信を許可していない。</li>
+<li>Private Subnet上のタスクがECRや外部APIへ出る経路、NAT GatewayやVPC Endpointを考慮していない。</li>
+</ul></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: aws / docker / ci/cd q033 ci/cdで何を自動化しましたか？ ci/cdを「使ったことがある」ではなく、どの工程を、何のために自動化したかを説明できるかを見る。 私の経験では、prマージを起点に、ソース取得、ビルド、テスト、dockerイメージ作成、ecrへのpush、ecsサービスへのデプロイまでをパイプライン化しました。目的は、手作業デプロイのミスを減らすこと、環境差異を小さくすること、結合試験環境への反映を速くすることです。codebuildではアプリケーションのビルドとdockerイメージ作成を行い、作成したイメージをecrへ登録し、codepipelineからecsデプロイへつなげる構成です。面接では、単に自動化した内容だけでなく、失敗時の検知、ログ確認、手戻し、環境変数やシークレットの扱い、どこまでを自動化対象にするかも説明できるようにします。 ci: コード変更後に、ビルド、静的解析、テスト、dockerイメージ作成などを自動実行する。 cd: 作成した成果物を検証環境・本番環境へ反映する。ecsなら新しいタスク定義やイメージを使ってサービスを更新する。 どのタイミングでpipelineを起動するか。 dockerイメージのタグをどう決めるか。例：gitコミットid、ビルド番号。 失敗時にどこを見て原因調査するか。例：codebuildログ、ecsイベント、cloudwatch logs。 standard deployなのか、blue/green deployなのか。 自動テストをどこまで組み込んでいたか。 「codepipelineを使いました」だけだと弱いです。「どの工程の手作業をなくし、どのリスクを減らしたのか」まで言うと、ci/cdを設計・運用の観点で理解しているように見えます。">
+<div class="qa-head">
+<div><span class="cat">A: AWS / Docker / CI/CD</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q033</div>
+</div>
+<h3>CI/CDで何を自動化しましたか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>CI/CDを「使ったことがある」ではなく、どの工程を、何のために自動化したかを説明できるかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+私の経験では、PRマージを起点に、ソース取得、ビルド、テスト、Dockerイメージ作成、ECRへのPush、ECSサービスへのデプロイまでをパイプライン化しました。目的は、手作業デプロイのミスを減らすこと、環境差異を小さくすること、結合試験環境への反映を速くすることです。CodeBuildではアプリケーションのビルドとDockerイメージ作成を行い、作成したイメージをECRへ登録し、CodePipelineからECSデプロイへつなげる構成です。面接では、単に自動化した内容だけでなく、失敗時の検知、ログ確認、手戻し、環境変数やシークレットの扱い、どこまでを自動化対象にするかも説明できるようにします。</div><div class="supplement"><h4>CI/CDの工程</h4>
+<ul>
+<li><strong>CI:</strong> コード変更後に、ビルド、静的解析、テスト、Dockerイメージ作成などを自動実行する。</li>
+<li><strong>CD:</strong> 作成した成果物を検証環境・本番環境へ反映する。ECSなら新しいタスク定義やイメージを使ってサービスを更新する。</li>
+</ul></div><div class="supplement"><h4>ECSデプロイで話せると強い観点</h4>
+<ul>
+<li>どのタイミングでPipelineを起動するか。</li>
+<li>Dockerイメージのタグをどう決めるか。例：GitコミットID、ビルド番号。</li>
+<li>失敗時にどこを見て原因調査するか。例：CodeBuildログ、ECSイベント、CloudWatch Logs。</li>
+<li>Standard Deployなのか、Blue/Green Deployなのか。</li>
+<li>自動テストをどこまで組み込んでいたか。</li>
+</ul></div><div class="supplement"><h4>面接での言い方</h4>
+<p>「CodePipelineを使いました」だけだと弱いです。「どの工程の手作業をなくし、どのリスクを減らしたのか」まで言うと、CI/CDを設計・運用の観点で理解しているように見えます。</p></div><div class="caution"><strong>注意：</strong>標準のECSデプロイとCodeDeploy Blue/Greenデプロイは別物です。Blue/Greenや自動ロールバックを使っていない場合は、使ったように話さない方がよいです。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: aws / docker / ci/cd q034 dockerfileで意識することは？ コンテナをただ動かすだけでなく、再現性・セキュリティ・運用性を考えているかを見る。 dockerfileでは、再現性、イメージサイズ、ビルドキャッシュ、セキュリティ、設定の外出しを意識します。javaアプリケーションであれば、ビルド用ステージと実行用ステージを分けるマルチステージビルドが有効です。例えばmavenでjarを作るステージと、jreだけを含む軽量な実行ステージを分けることで、最終イメージにビルドツールや不要ファイルを含めずに済みます。また、.dockerignoreで不要ファイルを除外し、固定しすぎない範囲でベースイメージを管理し、秘密情報をイメージに焼き込まないことが重要です。実行時に変わる設定は環境変数やsecrets managerなどへ逃がし、コンテナイメージ自体は環境非依存に近づけます。 イメージサイズ: 不要なビルドツールやキャッシュを最終イメージに入れない。 ビルドキャッシュ: 依存関係の解決とアプリコードのコピー順を工夫する。 セキュリティ: 可能なら非rootユーザーで実行する。秘密情報をdockerfileやイメージに含めない。 .dockerignore: .git、target、node_modules、ローカル設定ファイルなどを除外する。 起動方法: entrypoint/cmdを明確にし、アプリの終了シグナルを適切に扱えるようにする。 設定: db接続先、外部api url、ログレベルなどは実行時設定にする。 面接で話すなら、「mavenでビルドするステージ」と「生成されたjarをjreベースイメージで実行するステージ」を分ける、という説明が使いやすいです。さらに、spring bootではactuatorのヘルスチェックエンドポイントをecs/albのヘルスチェックに使う、という運用面まで接続できます。">
+<div class="qa-head">
+<div><span class="cat">A: AWS / Docker / CI/CD</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q034</div>
+</div>
+<h3>Dockerfileで意識することは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>コンテナをただ動かすだけでなく、再現性・セキュリティ・運用性を考えているかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+Dockerfileでは、再現性、イメージサイズ、ビルドキャッシュ、セキュリティ、設定の外出しを意識します。Javaアプリケーションであれば、ビルド用ステージと実行用ステージを分けるマルチステージビルドが有効です。例えばMavenでJARを作るステージと、JREだけを含む軽量な実行ステージを分けることで、最終イメージにビルドツールや不要ファイルを含めずに済みます。また、.dockerignoreで不要ファイルを除外し、固定しすぎない範囲でベースイメージを管理し、秘密情報をイメージに焼き込まないことが重要です。実行時に変わる設定は環境変数やSecrets Managerなどへ逃がし、コンテナイメージ自体は環境非依存に近づけます。</div><div class="supplement"><h4>具体的なチェック観点</h4>
+<ul>
+<li><strong>イメージサイズ:</strong> 不要なビルドツールやキャッシュを最終イメージに入れない。</li>
+<li><strong>ビルドキャッシュ:</strong> 依存関係の解決とアプリコードのコピー順を工夫する。</li>
+<li><strong>セキュリティ:</strong> 可能なら非rootユーザーで実行する。秘密情報をDockerfileやイメージに含めない。</li>
+<li><strong>.dockerignore:</strong> .git、target、node_modules、ローカル設定ファイルなどを除外する。</li>
+<li><strong>起動方法:</strong> ENTRYPOINT/CMDを明確にし、アプリの終了シグナルを適切に扱えるようにする。</li>
+<li><strong>設定:</strong> DB接続先、外部API URL、ログレベルなどは実行時設定にする。</li>
+</ul></div><div class="supplement"><h4>Java/Spring Bootの例</h4>
+<p>面接で話すなら、「Mavenでビルドするステージ」と「生成されたJARをJREベースイメージで実行するステージ」を分ける、という説明が使いやすいです。さらに、Spring BootではActuatorのヘルスチェックエンドポイントをECS/ALBのヘルスチェックに使う、という運用面まで接続できます。</p></div><div class="caution"><strong>注意：</strong>Dockerfileはアプリを動かす手順書ではなく、配布・実行される成果物を作る定義です。ローカルで動けばよいという発想だと、サイズ肥大化、秘密情報混入、環境差異、脆弱性の問題が残ります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: aws / docker / ci/cd q035 cloudformationを使うメリットとデメリットは？ iacを単なるテンプレート作成ではなく、再現性・レビュー・変更管理として説明できるかを見る。 cloudformationのメリットは、awsリソース構成をコードとして管理できることです。alb、ecsサービス、タスク定義、rds、security group、codebuild、codepipelineなどをテンプレート化することで、同じ構成を再現しやすくなり、差分レビューや環境追加もしやすくなります。手作業でコンソール設定すると、誰が何を変更したか分かりづらく、環境差異も起きやすいですが、iacにすると構成変更をpull requestやレビューの対象にできます。一方、デメリットは、yaml/jsonが複雑化しやすいこと、依存関係や更新失敗時の扱いが難しいこと、エラーメッセージから原因を追うのに慣れが必要なことです。 parameters: 環境ごとに変わる値を外から渡す。 outputs: 作成したリソースidやエンドポイントを他スタックや運用で参照する。 dependson: 暗黙の依存だけで順序が決まらない場合に明示する。 change set: 実行前にどのリソースが変更・置換されるか確認する。 drift detection: テンプレート外で手作業変更された差分を検出する。 テンプレートが肥大化し、見通しが悪くなる。 リソース置換が発生する変更を見落とすと、意図せず停止・再作成が起きる。 複数スタック間の依存関係が増えると管理が複雑になる。 本番適用時には、change setやバックアップ方針を確認しないと危険。 「環境構築の自動化を通じて、手作業の属人化と環境差異を減らした」と言うとよいです。さらに、「ただしcloudformation自体も複雑化するので、パラメータ分離やスタック分割、変更前確認が必要」と言えると設計視点が出ます。">
+<div class="qa-head">
+<div><span class="cat">A: AWS / Docker / CI/CD</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q035</div>
+</div>
+<h3>CloudFormationを使うメリットとデメリットは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>IaCを単なるテンプレート作成ではなく、再現性・レビュー・変更管理として説明できるかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+CloudFormationのメリットは、AWSリソース構成をコードとして管理できることです。ALB、ECSサービス、タスク定義、RDS、Security Group、CodeBuild、CodePipelineなどをテンプレート化することで、同じ構成を再現しやすくなり、差分レビューや環境追加もしやすくなります。手作業でコンソール設定すると、誰が何を変更したか分かりづらく、環境差異も起きやすいですが、IaCにすると構成変更をPull Requestやレビューの対象にできます。一方、デメリットは、YAML/JSONが複雑化しやすいこと、依存関係や更新失敗時の扱いが難しいこと、エラーメッセージから原因を追うのに慣れが必要なことです。</div><div class="supplement"><h4>面接で使える具体論</h4>
+<ul>
+<li><strong>Parameters:</strong> 環境ごとに変わる値を外から渡す。</li>
+<li><strong>Outputs:</strong> 作成したリソースIDやエンドポイントを他スタックや運用で参照する。</li>
+<li><strong>DependsOn:</strong> 暗黙の依存だけで順序が決まらない場合に明示する。</li>
+<li><strong>Change Set:</strong> 実行前にどのリソースが変更・置換されるか確認する。</li>
+<li><strong>Drift Detection:</strong> テンプレート外で手作業変更された差分を検出する。</li>
+</ul></div><div class="supplement"><h4>よくあるデメリット</h4>
+<ul>
+<li>テンプレートが肥大化し、見通しが悪くなる。</li>
+<li>リソース置換が発生する変更を見落とすと、意図せず停止・再作成が起きる。</li>
+<li>複数スタック間の依存関係が増えると管理が複雑になる。</li>
+<li>本番適用時には、Change Setやバックアップ方針を確認しないと危険。</li>
+</ul></div><div class="supplement"><h4>あなた向けの言い方</h4>
+<p>「環境構築の自動化を通じて、手作業の属人化と環境差異を減らした」と言うとよいです。さらに、「ただしCloudFormation自体も複雑化するので、パラメータ分離やスタック分割、変更前確認が必要」と言えると設計視点が出ます。</p></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: システム設計 q036 url短縮サービスを設計してください。 要件確認、api、db、キー生成、キャッシュ、障害・セキュリティを順序立てて話せるかを見る代表問題。 まず要件を確認します。基本機能は、長いurlを短いキーに変換し、短縮urlへアクセスされたら元urlへリダイレクトすることです。apiとしては、短縮url作成用にpost /urls、リダイレクト用にget /{key}を用意します。dbには、key、original_url、owner_user_id、created_at、expires_at、statusなどを保存します。キー生成は、ランダム文字列、連番idのbase62変換、urlハッシュなどが候補で、それぞれ衝突、推測可能性、実装容易性が違います。短縮urlは読み取りが非常に多くなりやすいため、keyからoriginal_urlを引く部分にredisなどのキャッシュを置く設計が有効です。さらに、不正url登録、期限切れ、アクセスログ、削除、カスタムエイリアス、レート制限も論点になります。 要件確認: 誰が作成するか、ログイン必須か、期限はあるか、独自キーを許すか。 api設計: 作成、取得、削除、統計取得などを分ける。 データ設計: keyを一意制約にし、元url・所有者・有効期限・状態を持つ。 キー生成: ランダムなら衝突時に再生成、連番base62なら短くしやすいが推測可能性に注意。 リダイレクト: 301/302/307の使い分け。恒久的なら301、一時的・計測したいなら302系が扱いやすい。 スケール: read heavyなのでキャッシュ、cdn、dbレプリカを検討する。 アクセスログを同期でdbへ書くとリダイレクトが遅くなるため、非同期キューへ流す。 悪性urlやフィッシングurl登録を防ぐため、レート制限・ブラックリスト・通報導線を用意する。 存在しないkeyは404、期限切れは410 goneなど、httpステータスも整理できる。 人気urlのキャッシュ失効時にはキャッシュスタンピードに注意する。">
+<div class="qa-head">
+<div><span class="cat">S: システム設計</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q036</div>
+</div>
+<h3>URL短縮サービスを設計してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>要件確認、API、DB、キー生成、キャッシュ、障害・セキュリティを順序立てて話せるかを見る代表問題。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+まず要件を確認します。基本機能は、長いURLを短いキーに変換し、短縮URLへアクセスされたら元URLへリダイレクトすることです。APIとしては、短縮URL作成用にPOST /urls、リダイレクト用にGET /{key}を用意します。DBには、key、original_url、owner_user_id、created_at、expires_at、statusなどを保存します。キー生成は、ランダム文字列、連番IDのBase62変換、URLハッシュなどが候補で、それぞれ衝突、推測可能性、実装容易性が違います。短縮URLは読み取りが非常に多くなりやすいため、keyからoriginal_urlを引く部分にRedisなどのキャッシュを置く設計が有効です。さらに、不正URL登録、期限切れ、アクセスログ、削除、カスタムエイリアス、レート制限も論点になります。</div><div class="supplement"><h4>設計の進め方</h4>
+<ol>
+<li><strong>要件確認:</strong> 誰が作成するか、ログイン必須か、期限はあるか、独自キーを許すか。</li>
+<li><strong>API設計:</strong> 作成、取得、削除、統計取得などを分ける。</li>
+<li><strong>データ設計:</strong> keyを一意制約にし、元URL・所有者・有効期限・状態を持つ。</li>
+<li><strong>キー生成:</strong> ランダムなら衝突時に再生成、連番Base62なら短くしやすいが推測可能性に注意。</li>
+<li><strong>リダイレクト:</strong> 301/302/307の使い分け。恒久的なら301、一時的・計測したいなら302系が扱いやすい。</li>
+<li><strong>スケール:</strong> Read Heavyなのでキャッシュ、CDN、DBレプリカを検討する。</li>
+</ol></div><div class="supplement"><h4>面接で追加できる論点</h4>
+<ul>
+<li>アクセスログを同期でDBへ書くとリダイレクトが遅くなるため、非同期キューへ流す。</li>
+<li>悪性URLやフィッシングURL登録を防ぐため、レート制限・ブラックリスト・通報導線を用意する。</li>
+<li>存在しないkeyは404、期限切れは410 Goneなど、HTTPステータスも整理できる。</li>
+<li>人気URLのキャッシュ失効時にはキャッシュスタンピードに注意する。</li>
+</ul></div><div class="caution"><strong>注意：</strong>いきなり大規模分散設計を語るより、まず単機能として正しく設計し、その後に読み取り増加・不正利用・ログ収集へ広げる方が面接では強いです。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: システム設計 q037 通知システムを設計してください。 非同期処理、キュー、外部サービス連携、重複・失敗処理を理解しているかを見る。 通知システムでは、apiが通知要求を受け、通知イベントをdbに保存し、キューへ投入し、workerがメール、push通知、slack、lineなどのチャネル別に送信する構成が基本です。送信処理をapiリクエスト内で同期実行すると、外部通知サービスの遅延や障害がapiレスポンスに直撃します。そのため、通知要求の受付と実際の送信を非同期に分けます。重要なのは、失敗時のリトライ、リトライ上限後のdlq、重複送信防止、ユーザーごとの通知設定、テンプレート管理、配信停止、監査ログです。通知は「送れたか」だけでなく、「送るべき相手に、送るべきタイミングで、重複なく、安全に送れたか」が重要です。 業務サービスが通知要求を発行する。 通知apiがイベントを受け、notification_eventsテーブルへ保存する。 queueへメッセージを投入する。 workerがqueueから取得し、チャネル別プロバイダへ送信する。 送信結果をdbへ記録する。 非同期化: 外部サービス障害をapi本体から切り離す。 冪等性: 同じ通知idを二重処理しても重複送信しない。 リトライ: 一時的な失敗は指数バックオフで再試行する。 dlq: 上限回数失敗したメッセージを隔離し、調査可能にする。 テンプレート: 通知本文をコードから分離し、差し替えや多言語対応をしやすくする。 ユーザー設定: メールは受け取るがpushは受け取らない、などの設定を反映する。 db保存とqueue投入の間で片方だけ成功すると通知漏れや二重送信が起きます。重要通知では、transactional outboxパターンを使い、業務dbにイベントを書いた後、別プロセスがqueueへ確実に流す設計も候補になります。">
+<div class="qa-head">
+<div><span class="cat">S: システム設計</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q037</div>
+</div>
+<h3>通知システムを設計してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>非同期処理、キュー、外部サービス連携、重複・失敗処理を理解しているかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+通知システムでは、APIが通知要求を受け、通知イベントをDBに保存し、キューへ投入し、Workerがメール、Push通知、Slack、LINEなどのチャネル別に送信する構成が基本です。送信処理をAPIリクエスト内で同期実行すると、外部通知サービスの遅延や障害がAPIレスポンスに直撃します。そのため、通知要求の受付と実際の送信を非同期に分けます。重要なのは、失敗時のリトライ、リトライ上限後のDLQ、重複送信防止、ユーザーごとの通知設定、テンプレート管理、配信停止、監査ログです。通知は「送れたか」だけでなく、「送るべき相手に、送るべきタイミングで、重複なく、安全に送れたか」が重要です。</div><div class="supplement"><h4>基本構成</h4>
+<ol>
+<li>業務サービスが通知要求を発行する。</li>
+<li>通知APIがイベントを受け、notification_eventsテーブルへ保存する。</li>
+<li>Queueへメッセージを投入する。</li>
+<li>WorkerがQueueから取得し、チャネル別プロバイダへ送信する。</li>
+<li>送信結果をDBへ記録する。</li>
+</ol></div><div class="supplement"><h4>設計で必ず見る観点</h4>
+<ul>
+<li><strong>非同期化:</strong> 外部サービス障害をAPI本体から切り離す。</li>
+<li><strong>冪等性:</strong> 同じ通知IDを二重処理しても重複送信しない。</li>
+<li><strong>リトライ:</strong> 一時的な失敗は指数バックオフで再試行する。</li>
+<li><strong>DLQ:</strong> 上限回数失敗したメッセージを隔離し、調査可能にする。</li>
+<li><strong>テンプレート:</strong> 通知本文をコードから分離し、差し替えや多言語対応をしやすくする。</li>
+<li><strong>ユーザー設定:</strong> メールは受け取るがPushは受け取らない、などの設定を反映する。</li>
+</ul></div><div class="supplement"><h4>さらに強い回答</h4>
+<p>DB保存とQueue投入の間で片方だけ成功すると通知漏れや二重送信が起きます。重要通知では、Transactional Outboxパターンを使い、業務DBにイベントを書いた後、別プロセスがQueueへ確実に流す設計も候補になります。</p></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: システム設計 q038 認証認可基盤を設計してください。 あなたの経験領域を、個別案件の説明ではなく汎用設計として語れるかを見る。 認証はidp/authorization serverが担い、oidcによりログイン、id token、access token発行を行います。api側はresource serverとしてaccess tokenを検証し、ユーザーやクライアント、scope、audience、有効期限を確認します。認可は、単純なapi単位のrole/scopeチェックで足りる場合はgatewayや各サービスで実装できます。一方、組織、リソース所有関係、業務状態に応じた細かい認可が必要な場合は、openfgaのような外部認可基盤、またはアプリ側の認可ロジックでsubject / resource / actionを使って判断します。設計論点は、トークン失効、権限変更の反映、管理画面、監査ログ、鍵ローテーション、jwks配布、可用性、レイテンシ、障害時のfail-close/fail-openです。 idp / authorization server: ユーザー認証、トークン発行、クライアント管理を担う。 client: ブラウザ、bff、spa、モバイルアプリなど。認証フローを開始する。 resource server: api本体。access tokenを検証して保護リソースを提供する。 pep: policy enforcement point。認可判断を強制する場所。gatewayやapiサービスなど。 pdp: policy decision point。認可可否を判断する場所。openfgaなど。 pap: policy administration point。権限設定やポリシーを管理する場所。 トークン設計: access tokenをjwtにするか不透明トークンにするか。 権限変更: 短命access token、外部認可問い合わせ、introspection、失効リストをどう使うか。 鍵管理: 署名鍵のローテーションとjwks公開。 監査: 誰が、いつ、どのリソースに、何をしたか。 障害時: 認可基盤が落ちた場合に拒否するのか、キャッシュ済み判断を使うのか。 あなたはkeycloak/oidc/openfga/ユーザ管理責務整理の経験があるので、「認証はkeycloak、細かい認可はopenfga、アプリdbはドメイン属性を管理する」という責務分担の話に接続できます。ここはかなり強い主戦場です。">
+<div class="qa-head">
+<div><span class="cat">S: システム設計</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q038</div>
+</div>
+<h3>認証認可基盤を設計してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>あなたの経験領域を、個別案件の説明ではなく汎用設計として語れるかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+認証はIdP/Authorization Serverが担い、OIDCによりログイン、ID Token、Access Token発行を行います。API側はResource ServerとしてAccess Tokenを検証し、ユーザーやクライアント、Scope、Audience、有効期限を確認します。認可は、単純なAPI単位のRole/Scopeチェックで足りる場合はGatewayや各サービスで実装できます。一方、組織、リソース所有関係、業務状態に応じた細かい認可が必要な場合は、OpenFGAのような外部認可基盤、またはアプリ側の認可ロジックでsubject / resource / actionを使って判断します。設計論点は、トークン失効、権限変更の反映、管理画面、監査ログ、鍵ローテーション、JWKS配布、可用性、レイテンシ、障害時のfail-close/fail-openです。</div><div class="supplement"><h4>役割分担</h4>
+<ul>
+<li><strong>IdP / Authorization Server:</strong> ユーザー認証、トークン発行、クライアント管理を担う。</li>
+<li><strong>Client:</strong> ブラウザ、BFF、SPA、モバイルアプリなど。認証フローを開始する。</li>
+<li><strong>Resource Server:</strong> API本体。Access Tokenを検証して保護リソースを提供する。</li>
+<li><strong>PEP:</strong> Policy Enforcement Point。認可判断を強制する場所。GatewayやAPIサービスなど。</li>
+<li><strong>PDP:</strong> Policy Decision Point。認可可否を判断する場所。OpenFGAなど。</li>
+<li><strong>PAP:</strong> Policy Administration Point。権限設定やポリシーを管理する場所。</li>
+</ul></div><div class="supplement"><h4>設計の論点</h4>
+<ul>
+<li><strong>トークン設計:</strong> Access TokenをJWTにするか不透明トークンにするか。</li>
+<li><strong>権限変更:</strong> 短命Access Token、外部認可問い合わせ、Introspection、失効リストをどう使うか。</li>
+<li><strong>鍵管理:</strong> 署名鍵のローテーションとJWKS公開。</li>
+<li><strong>監査:</strong> 誰が、いつ、どのリソースに、何をしたか。</li>
+<li><strong>障害時:</strong> 認可基盤が落ちた場合に拒否するのか、キャッシュ済み判断を使うのか。</li>
+</ul></div><div class="supplement"><h4>あなた向けの接続</h4>
+<p>あなたはKeycloak/OIDC/OpenFGA/ユーザ管理責務整理の経験があるので、「認証はKeycloak、細かい認可はOpenFGA、アプリDBはドメイン属性を管理する」という責務分担の話に接続できます。ここはかなり強い主戦場です。</p></div><div class="caution"><strong>注意：</strong>「認証認可基盤を作る」と言っても、ユーザーDB、ログイン画面、トークン発行、認可ポリシー、監査ログ、管理画面、SDK、運用監視まで範囲が広いです。面接では最初にスコープ確認するのが重要です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: システム設計 q039 ecの注文システムを設計してください。 dbトランザクション、状態遷移、在庫、決済、外部api連携を整理できるかを見る。 ecの注文システムでは、注文、注文明細、商品、在庫、決済、配送を分けて考えます。注文作成時には、ユーザー、配送先、注文商品、金額、注文状態を保存します。状態は、例えばpending_payment、paid、cancelled、shippedのように明確な状態遷移で管理します。在庫引当と決済は整合性が重要ですが、決済サービスや配送サービスは外部依存になりやすいため、すべてを1つの同期トランザクションで扱うのは現実的でない場合があります。その場合、注文作成後に在庫引当、決済、配送指示を非同期で進め、失敗時にはキャンセルや補償処理を行うsaga的な設計を検討します。決済apiには冪等性キーを使い、同じリクエストを再送しても二重決済にならないようにします。 orders: order_id, user_id, status, total_amount, shipping_address, created_at order_items: order_id, product_id, quantity, unit_price inventory: product_id, available_quantity, reserved_quantity, version payments: payment_id, order_id, status, provider, amount, idempotency_key 在庫: 同時注文で在庫を超えて売らないよう、楽観ロックや在庫引当を使う。 決済: 外部apiのタイムアウトや重複リクエストに備え、冪等性キーを使う。 状態遷移: 支払い前、支払い済み、キャンセル、発送済みなどを明確にし、不正遷移を防ぐ。 非同期処理: 決済完了通知や配送指示はイベント駆動にする候補がある。 整合性: どこを強整合にし、どこを結果整合にするかを要件で決める。 最初から「マイクロサービスにします」と言うより、まずモノリスでも成立するデータと状態遷移を整理し、スケールや組織境界が必要になったら注文・決済・在庫を分ける、という順序が安全です。">
+<div class="qa-head">
+<div><span class="cat">S: システム設計</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q039</div>
+</div>
+<h3>ECの注文システムを設計してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>DBトランザクション、状態遷移、在庫、決済、外部API連携を整理できるかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+ECの注文システムでは、注文、注文明細、商品、在庫、決済、配送を分けて考えます。注文作成時には、ユーザー、配送先、注文商品、金額、注文状態を保存します。状態は、例えばPENDING_PAYMENT、PAID、CANCELLED、SHIPPEDのように明確な状態遷移で管理します。在庫引当と決済は整合性が重要ですが、決済サービスや配送サービスは外部依存になりやすいため、すべてを1つの同期トランザクションで扱うのは現実的でない場合があります。その場合、注文作成後に在庫引当、決済、配送指示を非同期で進め、失敗時にはキャンセルや補償処理を行うSaga的な設計を検討します。決済APIには冪等性キーを使い、同じリクエストを再送しても二重決済にならないようにします。</div><div class="supplement"><h4>テーブル例</h4>
+<ul>
+<li><strong>orders:</strong> order_id, user_id, status, total_amount, shipping_address, created_at</li>
+<li><strong>order_items:</strong> order_id, product_id, quantity, unit_price</li>
+<li><strong>inventory:</strong> product_id, available_quantity, reserved_quantity, version</li>
+<li><strong>payments:</strong> payment_id, order_id, status, provider, amount, idempotency_key</li>
+</ul></div><div class="supplement"><h4>重要な設計論点</h4>
+<ul>
+<li><strong>在庫:</strong> 同時注文で在庫を超えて売らないよう、楽観ロックや在庫引当を使う。</li>
+<li><strong>決済:</strong> 外部APIのタイムアウトや重複リクエストに備え、冪等性キーを使う。</li>
+<li><strong>状態遷移:</strong> 支払い前、支払い済み、キャンセル、発送済みなどを明確にし、不正遷移を防ぐ。</li>
+<li><strong>非同期処理:</strong> 決済完了通知や配送指示はイベント駆動にする候補がある。</li>
+<li><strong>整合性:</strong> どこを強整合にし、どこを結果整合にするかを要件で決める。</li>
+</ul></div><div class="supplement"><h4>面接での答え方</h4>
+<p>最初から「マイクロサービスにします」と言うより、まずモノリスでも成立するデータと状態遷移を整理し、スケールや組織境界が必要になったら注文・決済・在庫を分ける、という順序が安全です。</p></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: システム設計 q040 ファイルアップロード機能を設計してください。 s3、署名付きurl、メタデータ、セキュリティ、非同期処理を理解しているかを見る。 小さいファイルならapiサーバー経由でアップロードできますが、大きなファイルや多数のアップロードを扱うなら、s3の署名付きurlを発行し、クライアントからs3へ直接アップロードする構成が有効です。流れとしては、まずapiが認可チェックを行い、アップロード予定のファイルメタデータをdbにpending状態で作成します。その後、s3の署名付きput urlを返し、クライアントがs3へ直接アップロードします。アップロード完了後、クライアントが完了通知をapiへ送り、必要に応じてウイルススキャンやmime検証を行い、問題なければactive状態にします。dbには、file_id、owner_id、object_key、size、content_type、status、created_atを保存します。 api経由: 実装は分かりやすいが、apiサーバーの帯域・メモリ・タイムアウトに影響する。 s3直接: apiサーバーを経由せず大容量ファイルを扱いやすい。ただし署名url発行、完了通知、検証、失敗時掃除の設計が必要。 認可されたユーザーにだけ署名urlを発行する。 署名urlの有効期限を短くする。 バケットは原則privateにし、公開はcloudfront署名urlなどを検討する。 ファイルサイズ、拡張子、mime typeを検証する。 アップロード後にウイルススキャンやマルウェアチェックを行う。 s3 object keyにユーザー入力値をそのまま使わない。 pendingのまま残ったメタデータやs3オブジェクトを定期削除する。 ダウンロードログや監査ログを残す。 画像ならサムネイル生成などを非同期処理にする。">
+<div class="qa-head">
+<div><span class="cat">S: システム設計</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q040</div>
+</div>
+<h3>ファイルアップロード機能を設計してください。</h3>
+<p class="intent"><strong>面接官の意図：</strong>S3、署名付きURL、メタデータ、セキュリティ、非同期処理を理解しているかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+小さいファイルならAPIサーバー経由でアップロードできますが、大きなファイルや多数のアップロードを扱うなら、S3の署名付きURLを発行し、クライアントからS3へ直接アップロードする構成が有効です。流れとしては、まずAPIが認可チェックを行い、アップロード予定のファイルメタデータをDBにPENDING状態で作成します。その後、S3の署名付きPUT URLを返し、クライアントがS3へ直接アップロードします。アップロード完了後、クライアントが完了通知をAPIへ送り、必要に応じてウイルススキャンやMIME検証を行い、問題なければACTIVE状態にします。DBには、file_id、owner_id、object_key、size、content_type、status、created_atを保存します。</div><div class="supplement"><h4>APIサーバー経由とS3直接アップロードの違い</h4>
+<ul>
+<li><strong>API経由:</strong> 実装は分かりやすいが、APIサーバーの帯域・メモリ・タイムアウトに影響する。</li>
+<li><strong>S3直接:</strong> APIサーバーを経由せず大容量ファイルを扱いやすい。ただし署名URL発行、完了通知、検証、失敗時掃除の設計が必要。</li>
+</ul></div><div class="supplement"><h4>セキュリティ観点</h4>
+<ul>
+<li>認可されたユーザーにだけ署名URLを発行する。</li>
+<li>署名URLの有効期限を短くする。</li>
+<li>バケットは原則Privateにし、公開はCloudFront署名URLなどを検討する。</li>
+<li>ファイルサイズ、拡張子、MIME typeを検証する。</li>
+<li>アップロード後にウイルススキャンやマルウェアチェックを行う。</li>
+<li>S3 object keyにユーザー入力値をそのまま使わない。</li>
+</ul></div><div class="supplement"><h4>運用観点</h4>
+<ul>
+<li>PENDINGのまま残ったメタデータやS3オブジェクトを定期削除する。</li>
+<li>ダウンロードログや監査ログを残す。</li>
+<li>画像ならサムネイル生成などを非同期処理にする。</li>
+</ul></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: 未経験技術への回答型 q041 kafkaを使った経験はありますか？ 未経験技術に対して、誤魔化さず、既存知識から構造化して答えられるかを見る。 kafkaを本番で設計・運用した経験はありません。ただ、マイクロサービス間連携やapi連携、認証認可を含むサービス間の責務整理は経験しています。私の理解では、kafkaはイベントをtopicに蓄積し、producerがイベントを書き込み、consumerが購読して処理する分散イベントストリーミング基盤です。サービス間を同期apiで密結合にするのではなく、イベントを介して非同期・疎結合にできます。設計時には、topic設計、partition、consumer group、offset、順序性、重複処理、再処理、dlq、スキーマ管理、最終的整合性を確認します。実務で扱うなら、まず小さなproducer/consumerを作り、重複配信・失敗・再処理時の挙動を検証します。 producer: イベントをtopicへ書き込むアプリケーション。 topic: イベントの論理的な保存先。 partition: topicを分割した単位。並列処理やスケール、順序性に関係する。 consumer: topicからイベントを読み取って処理するアプリケーション。 consumer group: 複数consumerでpartitionを分担して処理する単位。 offset: consumerがどこまで読んだかを示す位置情報。 順序性: kafkaはpartition内では順序を保てるが、topic全体で完全順序を保つわけではない。 重複: 再送やリトライで同じイベントを複数回処理する可能性があるため、consumer側の冪等性が重要。 再処理: offsetを戻して再処理できるが、外部副作用のある処理では注意が必要。 スキーマ進化: イベント形式を変更するとconsumerに影響するため、schema registryなどを検討する。 整合性: 同期apiより疎結合になる一方、結果整合になるため業務要件に合うか確認する。 「触ったことはありません」で終わらせないこと。関連経験、技術の目的、設計観点、検証手順まで言えば、未経験でも思考力は伝わります。">
+<div class="qa-head">
+<div><span class="cat">S: 未経験技術への回答型</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q041</div>
+</div>
+<h3>Kafkaを使った経験はありますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>未経験技術に対して、誤魔化さず、既存知識から構造化して答えられるかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+Kafkaを本番で設計・運用した経験はありません。ただ、マイクロサービス間連携やAPI連携、認証認可を含むサービス間の責務整理は経験しています。私の理解では、KafkaはイベントをTopicに蓄積し、Producerがイベントを書き込み、Consumerが購読して処理する分散イベントストリーミング基盤です。サービス間を同期APIで密結合にするのではなく、イベントを介して非同期・疎結合にできます。設計時には、Topic設計、Partition、Consumer Group、Offset、順序性、重複処理、再処理、DLQ、スキーマ管理、最終的整合性を確認します。実務で扱うなら、まず小さなProducer/Consumerを作り、重複配信・失敗・再処理時の挙動を検証します。</div><div class="supplement"><h4>Kafkaの基本語彙</h4>
+<ul>
+<li><strong>Producer:</strong> イベントをTopicへ書き込むアプリケーション。</li>
+<li><strong>Topic:</strong> イベントの論理的な保存先。</li>
+<li><strong>Partition:</strong> Topicを分割した単位。並列処理やスケール、順序性に関係する。</li>
+<li><strong>Consumer:</strong> Topicからイベントを読み取って処理するアプリケーション。</li>
+<li><strong>Consumer Group:</strong> 複数ConsumerでPartitionを分担して処理する単位。</li>
+<li><strong>Offset:</strong> Consumerがどこまで読んだかを示す位置情報。</li>
+</ul></div><div class="supplement"><h4>設計で見るべき論点</h4>
+<ul>
+<li><strong>順序性:</strong> KafkaはPartition内では順序を保てるが、Topic全体で完全順序を保つわけではない。</li>
+<li><strong>重複:</strong> 再送やリトライで同じイベントを複数回処理する可能性があるため、Consumer側の冪等性が重要。</li>
+<li><strong>再処理:</strong> Offsetを戻して再処理できるが、外部副作用のある処理では注意が必要。</li>
+<li><strong>スキーマ進化:</strong> イベント形式を変更するとConsumerに影響するため、Schema Registryなどを検討する。</li>
+<li><strong>整合性:</strong> 同期APIより疎結合になる一方、結果整合になるため業務要件に合うか確認する。</li>
+</ul></div><div class="supplement"><h4>面接での姿勢</h4>
+<p>「触ったことはありません」で終わらせないこと。関連経験、技術の目的、設計観点、検証手順まで言えば、未経験でも思考力は伝わります。</p></div><div class="caution"><strong>注意：</strong>Kafkaを「キュー」とだけ言うと浅く見えます。キュー的にも使えますが、イベントログとして保存し、複数Consumerが独立に読む点が重要です。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: 未経験技術への回答型 q042 goの経験はありますか？ java以外のバックエンドスタックへのキャッチアップ可能性を見る。 現時点ではjava/spring bootが中心で、goの実務経験は限定的です。ただ、私が深めたいのは特定言語そのものというより、api設計、認証認可、db、トランザクション、外部api連携、運用を見据えたバックエンド実装です。そのためgoを使う場合は、まず標準ライブラリ、net/http、context、goroutine/channel、明示的なエラーハンドリング、interface、testing、database/sql、go modulesを重点的にキャッチアップします。java/springとはフレームワークの思想やエラー処理が違うので、javaの書き方をそのまま持ち込まず、goらしい小さな構成と明示的な制御に慣れる必要があると考えています。 context: タイムアウト、キャンセル、リクエストスコープの制御。 goroutine/channel: 並行処理。ただし安易に使うとリークや競合が起きる。 error handling: 例外ではなく戻り値で明示的にエラーを扱う。 interface: 小さな抽象化。javaの大きな継承階層とは感覚が違う。 net/http: 標準ライブラリだけでもhttpサーバーを書ける。 testing: 標準テスト、テーブル駆動テスト、モックの扱い。 http api設計 認証認可の概念 db設計・sql トランザクション境界 例外・エラー応答設計の考え方 テスト・ci/cd・docker化 「go未経験ですが頑張ります」だと弱いです。「goで最初に押さえるべき差分」と「バックエンドとして転用できる基礎」を分けて話すと、キャッチアップ計画が具体的になります。">
+<div class="qa-head">
+<div><span class="cat">S: 未経験技術への回答型</span> <span class="badge badge-S">S</span></div>
+<div class="num">Q042</div>
+</div>
+<h3>Goの経験はありますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>Java以外のバックエンドスタックへのキャッチアップ可能性を見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+現時点ではJava/Spring Bootが中心で、Goの実務経験は限定的です。ただ、私が深めたいのは特定言語そのものというより、API設計、認証認可、DB、トランザクション、外部API連携、運用を見据えたバックエンド実装です。そのためGoを使う場合は、まず標準ライブラリ、net/http、context、goroutine/channel、明示的なエラーハンドリング、interface、testing、database/sql、Go modulesを重点的にキャッチアップします。Java/Springとはフレームワークの思想やエラー処理が違うので、Javaの書き方をそのまま持ち込まず、Goらしい小さな構成と明示的な制御に慣れる必要があると考えています。</div><div class="supplement"><h4>Goで重点的に見るべきもの</h4>
+<ul>
+<li><strong>context:</strong> タイムアウト、キャンセル、リクエストスコープの制御。</li>
+<li><strong>goroutine/channel:</strong> 並行処理。ただし安易に使うとリークや競合が起きる。</li>
+<li><strong>error handling:</strong> 例外ではなく戻り値で明示的にエラーを扱う。</li>
+<li><strong>interface:</strong> 小さな抽象化。Javaの大きな継承階層とは感覚が違う。</li>
+<li><strong>net/http:</strong> 標準ライブラリだけでもHTTPサーバーを書ける。</li>
+<li><strong>testing:</strong> 標準テスト、テーブル駆動テスト、モックの扱い。</li>
+</ul></div><div class="supplement"><h4>Java経験から転用できるもの</h4>
+<ul>
+<li>HTTP API設計</li>
+<li>認証認可の概念</li>
+<li>DB設計・SQL</li>
+<li>トランザクション境界</li>
+<li>例外・エラー応答設計の考え方</li>
+<li>テスト・CI/CD・Docker化</li>
+</ul></div><div class="supplement"><h4>面接での言い方</h4>
+<p>「Go未経験ですが頑張ります」だと弱いです。「Goで最初に押さえるべき差分」と「バックエンドとして転用できる基礎」を分けて話すと、キャッチアップ計画が具体的になります。</p></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: 未経験技術への回答型 q043 kubernetesの経験はありますか？ ecs経験をkubernetesとの比較に変換できるかを見る。 kubernetesを本格的に設計・運用した経験はありません。実務ではecs fargateを使ってコンテナ環境を構築しました。kubernetesは、pod、deployment、service、ingress、configmap、secretなどのリソースを使って、コンテナのデプロイ、スケーリング、サービス公開、設定管理を柔軟に扱える基盤だと理解しています。一方で、クラスタ運用、マニフェスト管理、ネットワーク、rbac、監視、アップグレードなど、アプリケーション以外の運用負荷も大きくなります。要件がaws上のweb api運用で、alb/ecs/rds/cloudwatchで十分に満たせるならecs fargateは合理的です。逆に、マルチクラウド、service mesh、高度なスケジューリング、kubernetes標準のエコシステムが必要ならkubernetes/eksが候補になります。 pod: kubernetesでデプロイされる最小単位。1つ以上のコンテナを含む。 deployment: podのレプリカ数やローリングアップデートを管理する。 service: podのipが変わっても安定したアクセス先を提供する。 ingress: http/httpsの外部公開、パス・ホストベースルーティングを扱う。 configmap/secret: 設定値や機密情報をアプリから分離して管理する。 ecs: awsとの統合が強く、構成が比較的シンプル。aws前提なら運用しやすい。 kubernetes: 柔軟でエコシステムが豊富。標準化された運用ができるが、学習・管理コストが高い。 判断基準: 要件、チームの運用力、既存基盤、マルチクラウド要求、拡張性。">
+<div class="qa-head">
+<div><span class="cat">S: 未経験技術への回答型</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q043</div>
+</div>
+<h3>Kubernetesの経験はありますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>ECS経験をKubernetesとの比較に変換できるかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+Kubernetesを本格的に設計・運用した経験はありません。実務ではECS Fargateを使ってコンテナ環境を構築しました。Kubernetesは、Pod、Deployment、Service、Ingress、ConfigMap、Secretなどのリソースを使って、コンテナのデプロイ、スケーリング、サービス公開、設定管理を柔軟に扱える基盤だと理解しています。一方で、クラスタ運用、マニフェスト管理、ネットワーク、RBAC、監視、アップグレードなど、アプリケーション以外の運用負荷も大きくなります。要件がAWS上のWeb API運用で、ALB/ECS/RDS/CloudWatchで十分に満たせるならECS Fargateは合理的です。逆に、マルチクラウド、Service Mesh、高度なスケジューリング、Kubernetes標準のエコシステムが必要ならKubernetes/EKSが候補になります。</div><div class="supplement"><h4>Kubernetes基本概念</h4>
+<ul>
+<li><strong>Pod:</strong> Kubernetesでデプロイされる最小単位。1つ以上のコンテナを含む。</li>
+<li><strong>Deployment:</strong> Podのレプリカ数やローリングアップデートを管理する。</li>
+<li><strong>Service:</strong> PodのIPが変わっても安定したアクセス先を提供する。</li>
+<li><strong>Ingress:</strong> HTTP/HTTPSの外部公開、パス・ホストベースルーティングを扱う。</li>
+<li><strong>ConfigMap/Secret:</strong> 設定値や機密情報をアプリから分離して管理する。</li>
+</ul></div><div class="supplement"><h4>ECSとの比較で話す観点</h4>
+<ul>
+<li><strong>ECS:</strong> AWSとの統合が強く、構成が比較的シンプル。AWS前提なら運用しやすい。</li>
+<li><strong>Kubernetes:</strong> 柔軟でエコシステムが豊富。標準化された運用ができるが、学習・管理コストが高い。</li>
+<li><strong>判断基準:</strong> 要件、チームの運用力、既存基盤、マルチクラウド要求、拡張性。</li>
+</ul></div><div class="caution"><strong>注意：</strong>「Kubernetesを知らない＝クラウドが弱い」とは限りません。ただしWeb系ではKubernetes語彙を知っている前提で話が進むことがあるため、Pod/Deployment/Service/Ingress程度は説明できるようにしておくべきです。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: 未経験技術への回答型 q044 graphqlの経験はありますか？ rest以外のapi方式について、目的・利点・落とし穴を説明できるかを見る。 graphqlの実務経験はありませんが、graphqlはapi向けのクエリ言語とサーバーサイドランタイムで、クライアントが必要なフィールドを指定してデータを取得できる方式だと理解しています。restでは、リソース単位のエンドポイントを設計しやすい一方、画面が必要とするデータに対して過不足が出ることがあります。graphqlでは、1つのqueryで複数の関連データを取得しやすく、クライアントごとの柔軟性が高いです。一方で、resolver設計を誤るとn+1が起きやすく、認可をフィールド単位・リソース単位でどう適用するか、キャッシュをどう効かせるか、複雑すぎるクエリをどう制限するかが重要になります。 schema: apiで扱える型と関係を定義する。 query: データ取得。 mutation: データ変更。 resolver: 各フィールドのデータ取得処理。 subscription: リアルタイム通知用途で使われることがある。 rest: httpメソッドとリソースuriでシンプルに設計しやすい。httpキャッシュとも相性がよい。 graphql: クライアントが必要データを指定しやすい。bff的な用途に向く場合がある。 注意: graphqlにしても、db設計、認可、性能、キャッシュ、エラー設計は消えない。 ネストしたqueryが大量のdbアクセスを生み、n+1になる。 httpステータスだけでエラー分類しづらく、エラーレスポンス設計が必要。 柔軟すぎるqueryでサーバー負荷が読みにくくなる。 認可チェックをresolverごとにどう適用するかが複雑になる。">
+<div class="qa-head">
+<div><span class="cat">S: 未経験技術への回答型</span> <span class="badge badge-A">A</span></div>
+<div class="num">Q044</div>
+</div>
+<h3>GraphQLの経験はありますか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>REST以外のAPI方式について、目的・利点・落とし穴を説明できるかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+GraphQLの実務経験はありませんが、GraphQLはAPI向けのクエリ言語とサーバーサイドランタイムで、クライアントが必要なフィールドを指定してデータを取得できる方式だと理解しています。RESTでは、リソース単位のエンドポイントを設計しやすい一方、画面が必要とするデータに対して過不足が出ることがあります。GraphQLでは、1つのQueryで複数の関連データを取得しやすく、クライアントごとの柔軟性が高いです。一方で、Resolver設計を誤るとN+1が起きやすく、認可をフィールド単位・リソース単位でどう適用するか、キャッシュをどう効かせるか、複雑すぎるクエリをどう制限するかが重要になります。</div><div class="supplement"><h4>GraphQLの基本要素</h4>
+<ul>
+<li><strong>Schema:</strong> APIで扱える型と関係を定義する。</li>
+<li><strong>Query:</strong> データ取得。</li>
+<li><strong>Mutation:</strong> データ変更。</li>
+<li><strong>Resolver:</strong> 各フィールドのデータ取得処理。</li>
+<li><strong>Subscription:</strong> リアルタイム通知用途で使われることがある。</li>
+</ul></div><div class="supplement"><h4>RESTとの比較</h4>
+<ul>
+<li><strong>REST:</strong> HTTPメソッドとリソースURIでシンプルに設計しやすい。HTTPキャッシュとも相性がよい。</li>
+<li><strong>GraphQL:</strong> クライアントが必要データを指定しやすい。BFF的な用途に向く場合がある。</li>
+<li><strong>注意:</strong> GraphQLにしても、DB設計、認可、性能、キャッシュ、エラー設計は消えない。</li>
+</ul></div><div class="supplement"><h4>よくある落とし穴</h4>
+<ul>
+<li>ネストしたQueryが大量のDBアクセスを生み、N+1になる。</li>
+<li>HTTPステータスだけでエラー分類しづらく、エラーレスポンス設計が必要。</li>
+<li>柔軟すぎるQueryでサーバー負荷が読みにくくなる。</li>
+<li>認可チェックをResolverごとにどう適用するかが複雑になる。</li>
+</ul></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: java / spring boot q045 beanとは何ですか？ springのdi/iocを語るための基本語彙を理解しているかを見る。 beanとは、springコンテナによって生成・管理されるオブジェクトです。通常のjavaでは必要なクラスをnewして使いますが、springでは@component、@service、@repository、@controller、@beanなどでbeanとして登録し、依存関係をdiで注入します。これにより、オブジェクトの生成、ライフサイクル、依存関係、設定、aop、トランザクション、例外変換などをspringの仕組みに乗せられます。重要なのは、beanとして管理されているからこそ、@transactionalなどの機能がプロキシを通じて適用される点です。逆に、自分でnewしたオブジェクトはspringコンテナの管理外なので、diやaopの対象になりません。 ioc: オブジェクト生成や依存解決をアプリ側ではなくコンテナ側に任せる考え方。 di: 必要な依存オブジェクトを外から注入する仕組み。 scope: デフォルトはsingleton。リクエストごと、セッションごとなどのscopeもある。 lifecycle: 初期化・破棄のタイミングをspringが管理できる。 serviceクラスがrepositoryをコンストラクタで受け取る場合、serviceもrepositoryもbeanとして登録されていれば、springが依存関係を解決してインスタンスを生成します。これにより、テスト時にはrepositoryをモックへ差し替えるなどの設計もしやすくなります。">
+<div class="qa-head">
+<div><span class="cat">A: Java / Spring Boot</span> <span class="badge badge-B">B</span></div>
+<div class="num">Q045</div>
+</div>
+<h3>Beanとは何ですか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>SpringのDI/Iocを語るための基本語彙を理解しているかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+Beanとは、Springコンテナによって生成・管理されるオブジェクトです。通常のJavaでは必要なクラスをnewして使いますが、Springでは@Component、@Service、@Repository、@Controller、@BeanなどでBeanとして登録し、依存関係をDIで注入します。これにより、オブジェクトの生成、ライフサイクル、依存関係、設定、AOP、トランザクション、例外変換などをSpringの仕組みに乗せられます。重要なのは、Beanとして管理されているからこそ、@Transactionalなどの機能がプロキシを通じて適用される点です。逆に、自分でnewしたオブジェクトはSpringコンテナの管理外なので、DIやAOPの対象になりません。</div><div class="supplement"><h4>Beanを理解するポイント</h4>
+<ul>
+<li><strong>IoC:</strong> オブジェクト生成や依存解決をアプリ側ではなくコンテナ側に任せる考え方。</li>
+<li><strong>DI:</strong> 必要な依存オブジェクトを外から注入する仕組み。</li>
+<li><strong>Scope:</strong> デフォルトはSingleton。リクエストごと、セッションごとなどのScopeもある。</li>
+<li><strong>Lifecycle:</strong> 初期化・破棄のタイミングをSpringが管理できる。</li>
+</ul></div><div class="supplement"><h4>面接での具体例</h4>
+<p>ServiceクラスがRepositoryをコンストラクタで受け取る場合、ServiceもRepositoryもBeanとして登録されていれば、Springが依存関係を解決してインスタンスを生成します。これにより、テスト時にはRepositoryをモックへ差し替えるなどの設計もしやすくなります。</p></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: java / spring boot q046 @component、@service、@repositoryの違いは？ 責務ごとにspringのステレオタイプを使い分けられるかを見る。 @component、@service、@repositoryはいずれもspringのcomponent scan対象になり、beanとして登録されるステレオタイプアノテーションです。@componentは汎用的なコンポーネント、@serviceは業務処理やユースケースを表すサービス層、@repositoryはdbアクセスなどの永続化層を表すために使います。実装上は同じようにbean登録されますが、コードを読む人に責務を伝える意味があります。また@repositoryには、永続化層の例外をspringのdataaccessexception体系に変換する対象として扱う意味もあります。したがって、単に動くから何でも@componentにするのではなく、責務に応じて使い分けるべきです。 @component: 特定レイヤーに限定されない汎用部品。 @service: 業務ルール、ユースケース、トランザクション境界を持ちやすい層。 @repository: dbや外部ストレージへのアクセスを担当する層。 @controller / @restcontroller: httpリクエストを受けるプレゼンテーション層。 「全部bean登録されるので同じです」だけだと浅いです。「実行上の共通点」と「設計上の意味づけ」を分けて説明するとよいです。特に@serviceには業務処理、@repositoryには永続化層という責務を示す意味があります。">
+<div class="qa-head">
+<div><span class="cat">A: Java / Spring Boot</span> <span class="badge badge-B">B</span></div>
+<div class="num">Q046</div>
+</div>
+<h3>@Component、@Service、@Repositoryの違いは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>責務ごとにSpringのステレオタイプを使い分けられるかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+@Component、@Service、@RepositoryはいずれもSpringのComponent Scan対象になり、Beanとして登録されるステレオタイプアノテーションです。@Componentは汎用的なコンポーネント、@Serviceは業務処理やユースケースを表すサービス層、@RepositoryはDBアクセスなどの永続化層を表すために使います。実装上は同じようにBean登録されますが、コードを読む人に責務を伝える意味があります。また@Repositoryには、永続化層の例外をSpringのDataAccessException体系に変換する対象として扱う意味もあります。したがって、単に動くから何でも@Componentにするのではなく、責務に応じて使い分けるべきです。</div><div class="supplement"><h4>使い分け</h4>
+<ul>
+<li><strong>@Component:</strong> 特定レイヤーに限定されない汎用部品。</li>
+<li><strong>@Service:</strong> 業務ルール、ユースケース、トランザクション境界を持ちやすい層。</li>
+<li><strong>@Repository:</strong> DBや外部ストレージへのアクセスを担当する層。</li>
+<li><strong>@Controller / @RestController:</strong> HTTPリクエストを受けるプレゼンテーション層。</li>
+</ul></div><div class="supplement"><h4>面接での補足</h4>
+<p>「全部Bean登録されるので同じです」だけだと浅いです。「実行上の共通点」と「設計上の意味づけ」を分けて説明するとよいです。特に@Serviceには業務処理、@Repositoryには永続化層という責務を示す意味があります。</p></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: api / web / security q047 putとpatchの違いは？ httpメソッドの意味と、api更新設計の注意点を理解しているかを見る。 putは、指定したリソースをリクエストボディの内容で全体置換する用途で使われます。patchは、指定したリソースに対して部分的な変更を適用する用途で使われます。putは同じリクエストを何度送ってもサーバー上の状態が同じになるため、冪等な設計にしやすいです。patchは部分更新なので、リクエスト形式によって冪等にも非冪等にもなり得ます。api設計では、未指定フィールドを「変更しない」と扱うのか、「nullで上書き」と扱うのかを明確にする必要があります。また、更新競合を防ぐために、etagやif-match、versionカラムを使うこともあります。 put /users/1: ユーザー1のリソース全体を、送信されたjson全体で置き換える。 patch /users/1: ユーザー1のnameだけ、emailだけなど、一部フィールドを更新する。 未指定フィールドは変更なしなのか。 nullは値を消す意味なのか、それとも未指定扱いなのか。 配列は全置換なのか、追加・削除差分なのか。 json patch、json merge patch、独自形式のどれを使うのか。 「putは全体更新、patchは部分更新」で大枠は十分ですが、もう一歩踏み込むなら「冪等性」と「未指定/nullの仕様」を話してください。web系面接ではここまで言えると実務感が出ます。">
+<div class="qa-head">
+<div><span class="cat">A: API / Web / Security</span> <span class="badge badge-B">B</span></div>
+<div class="num">Q047</div>
+</div>
+<h3>PUTとPATCHの違いは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>HTTPメソッドの意味と、API更新設計の注意点を理解しているかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+PUTは、指定したリソースをリクエストボディの内容で全体置換する用途で使われます。PATCHは、指定したリソースに対して部分的な変更を適用する用途で使われます。PUTは同じリクエストを何度送ってもサーバー上の状態が同じになるため、冪等な設計にしやすいです。PATCHは部分更新なので、リクエスト形式によって冪等にも非冪等にもなり得ます。API設計では、未指定フィールドを「変更しない」と扱うのか、「nullで上書き」と扱うのかを明確にする必要があります。また、更新競合を防ぐために、ETagやIf-Match、versionカラムを使うこともあります。</div><div class="supplement"><h4>具体例</h4>
+<ul>
+<li><strong>PUT /users/1:</strong> ユーザー1のリソース全体を、送信されたJSON全体で置き換える。</li>
+<li><strong>PATCH /users/1:</strong> ユーザー1のnameだけ、emailだけなど、一部フィールドを更新する。</li>
+</ul></div><div class="supplement"><h4>PATCHで注意すること</h4>
+<ul>
+<li>未指定フィールドは変更なしなのか。</li>
+<li>nullは値を消す意味なのか、それとも未指定扱いなのか。</li>
+<li>配列は全置換なのか、追加・削除差分なのか。</li>
+<li>JSON Patch、JSON Merge Patch、独自形式のどれを使うのか。</li>
+</ul></div><div class="supplement"><h4>面接での言い方</h4>
+<p>「PUTは全体更新、PATCHは部分更新」で大枠は十分ですが、もう一歩踏み込むなら「冪等性」と「未指定/nullの仕様」を話してください。Web系面接ではここまで言えると実務感が出ます。</p></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: db / sql q048 外部キー制約を貼るメリット・デメリットは？ db制約で守るべき整合性と、アプリ側で守るべき境界を理解しているかを見る。 外部キー制約のメリットは、dbレベルで参照整合性を守れることです。例えばorder_items.order_idがorders.idを参照する場合、存在しない注文idを持つ注文明細が登録されることをdbが防げます。アプリケーションにバグがあっても、dbが最後の防衛線になります。一方、デメリットは、削除やデータ移行、バルク投入、テストデータ投入が複雑になりやすいこと、書き込み時に制約チェックのコストがあること、マイクロサービスのようにdb境界を分ける設計ではサービスをまたいだ外部キーを貼れないことです。単一サービス・単一db内で強い整合性が必要なら外部キーは有効ですが、サービス境界をまたぐ整合性はアプリケーションやイベントで管理することになります。 存在しない親レコードへの参照を防げる。 dbが参照整合性を保証するため、アプリの実装漏れに強い。 データモデル上の関係が明示される。 joinやer図の理解にもつながる。 削除時に参照先が残っていると削除できない。cascade設計が必要。 大量データ投入や移行時に制約順序を意識する必要がある。 論理削除と相性が悪い場合がある。 マイクロサービス間でdbを分ける場合、サービスをまたいだ制約は貼れない。 「外部キーは絶対貼るべき」「外部キーは不要」と断定しない方がよいです。単一db内の重要な整合性はdb制約で守り、サービス境界をまたぐ整合性はapi・イベント・バッチ検査などで守る、という整理が現実的です。">
+<div class="qa-head">
+<div><span class="cat">A: DB / SQL</span> <span class="badge badge-B">B</span></div>
+<div class="num">Q048</div>
+</div>
+<h3>外部キー制約を貼るメリット・デメリットは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>DB制約で守るべき整合性と、アプリ側で守るべき境界を理解しているかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+外部キー制約のメリットは、DBレベルで参照整合性を守れることです。例えばorder_items.order_idがorders.idを参照する場合、存在しない注文IDを持つ注文明細が登録されることをDBが防げます。アプリケーションにバグがあっても、DBが最後の防衛線になります。一方、デメリットは、削除やデータ移行、バルク投入、テストデータ投入が複雑になりやすいこと、書き込み時に制約チェックのコストがあること、マイクロサービスのようにDB境界を分ける設計ではサービスをまたいだ外部キーを貼れないことです。単一サービス・単一DB内で強い整合性が必要なら外部キーは有効ですが、サービス境界をまたぐ整合性はアプリケーションやイベントで管理することになります。</div><div class="supplement"><h4>メリット</h4>
+<ul>
+<li>存在しない親レコードへの参照を防げる。</li>
+<li>DBが参照整合性を保証するため、アプリの実装漏れに強い。</li>
+<li>データモデル上の関係が明示される。</li>
+<li>JOINやER図の理解にもつながる。</li>
+</ul></div><div class="supplement"><h4>デメリット</h4>
+<ul>
+<li>削除時に参照先が残っていると削除できない。Cascade設計が必要。</li>
+<li>大量データ投入や移行時に制約順序を意識する必要がある。</li>
+<li>論理削除と相性が悪い場合がある。</li>
+<li>マイクロサービス間でDBを分ける場合、サービスをまたいだ制約は貼れない。</li>
+</ul></div><div class="supplement"><h4>面接での結論</h4>
+<p>「外部キーは絶対貼るべき」「外部キーは不要」と断定しない方がよいです。単一DB内の重要な整合性はDB制約で守り、サービス境界をまたぐ整合性はAPI・イベント・バッチ検査などで守る、という整理が現実的です。</p></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="a: aws / docker / ci/cd q049 ヘルスチェックはなぜ必要ですか？ アプリが起動していることと、利用可能であることの違いを理解しているかを見る。 ヘルスチェックは、ロードバランサやecsが正常なタスクだけに通信を流し、異常なタスクを切り離すために必要です。プロセスが起動していても、db接続ができない、依存サービスが落ちている、アプリ初期化が終わっていない、スレッドが詰まっているといった状態では、ユーザーリクエストを処理できません。albはターゲットグループのヘルスチェックでhealthyなターゲットへだけルーティングします。ecsもヘルスチェックに失敗したタスクを置き換えることがあります。設計では、単なる/healthだけでなく、起動確認、受付可能性、依存サービス確認をどう分けるかが重要です。spring bootならactuatorのhealth endpointを使う選択肢もあります。 liveness: プロセスが生きているか。落ちているなら再起動対象。 readiness: リクエストを受け付けてよい状態か。初期化中や依存先障害なら外す。 startup: 起動完了まで時間がかかるアプリで、起動中に誤って落とされないようにする。 dbや外部apiまで毎回深く確認すると、ヘルスチェック自体が重くなる。 依存サービス障害時に全タスクがunhealthyになり、かえって復旧を難しくすることがある。 alb向けには軽量で安定したエンドポイントを用意し、詳細診断は別の内部用エンドポイントに分けることもある。 db必須のアプリなら、readinessではdb接続を確認する価値がある。 「ヘルスチェックは死活監視です」だけだと浅いです。「プロセスが生きていること」と「ユーザーリクエストを処理できること」は違う、と説明できると運用視点が出ます。">
+<div class="qa-head">
+<div><span class="cat">A: AWS / Docker / CI/CD</span> <span class="badge badge-B">B</span></div>
+<div class="num">Q049</div>
+</div>
+<h3>ヘルスチェックはなぜ必要ですか？</h3>
+<p class="intent"><strong>面接官の意図：</strong>アプリが起動していることと、利用可能であることの違いを理解しているかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+ヘルスチェックは、ロードバランサやECSが正常なタスクだけに通信を流し、異常なタスクを切り離すために必要です。プロセスが起動していても、DB接続ができない、依存サービスが落ちている、アプリ初期化が終わっていない、スレッドが詰まっているといった状態では、ユーザーリクエストを処理できません。ALBはターゲットグループのヘルスチェックでHealthyなターゲットへだけルーティングします。ECSもヘルスチェックに失敗したタスクを置き換えることがあります。設計では、単なる/healthだけでなく、起動確認、受付可能性、依存サービス確認をどう分けるかが重要です。Spring BootならActuatorのhealth endpointを使う選択肢もあります。</div><div class="supplement"><h4>ヘルスチェックの種類</h4>
+<ul>
+<li><strong>Liveness:</strong> プロセスが生きているか。落ちているなら再起動対象。</li>
+<li><strong>Readiness:</strong> リクエストを受け付けてよい状態か。初期化中や依存先障害なら外す。</li>
+<li><strong>Startup:</strong> 起動完了まで時間がかかるアプリで、起動中に誤って落とされないようにする。</li>
+</ul></div><div class="supplement"><h4>設計上の注意</h4>
+<ul>
+<li>DBや外部APIまで毎回深く確認すると、ヘルスチェック自体が重くなる。</li>
+<li>依存サービス障害時に全タスクがUnhealthyになり、かえって復旧を難しくすることがある。</li>
+<li>ALB向けには軽量で安定したエンドポイントを用意し、詳細診断は別の内部用エンドポイントに分けることもある。</li>
+<li>DB必須のアプリなら、ReadinessではDB接続を確認する価値がある。</li>
+</ul></div><div class="supplement"><h4>面接での言い方</h4>
+<p>「ヘルスチェックは死活監視です」だけだと浅いです。「プロセスが生きていること」と「ユーザーリクエストを処理できること」は違う、と説明できると運用視点が出ます。</p></div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: システム設計 q050 キャッシュを入れるときの注意点は？ 性能改善のメリットだけでなく、不整合・失効・障害時の副作用を理解しているかを見る。 キャッシュは、読み取り性能を上げ、db負荷や外部api呼び出しを減らすために使います。ただし、キャッシュを入れると必ず不整合、失効、更新反映、キャッシュスタンピード、メモリ使用量、障害時の挙動が論点になります。基本的には、更新頻度が低く、読み取り頻度が高く、多少古いデータを許容できるものに向いています。例えばマスタデータ、設定値、公開プロフィール、url短縮のkey→original_urlなどです。設計時には、どのキーでキャッシュするか、ttlを何秒にするか、更新時に削除するのか上書きするのか、キャッシュが落ちたときにdbへフォールバックするのかを決めます。 cache aside: アプリがまずキャッシュを見て、なければdbから取得してキャッシュへ入れる。 write through: 書き込み時にdbとキャッシュを同時に更新する。 write behind: まずキャッシュへ書き、後からdbへ反映する。高性能だが整合性リスクがある。 古いデータ: db更新後にキャッシュが残ると古い値を返す。 キャッシュスタンピード: 人気キーが同時に期限切れになり、大量リクエストがdbへ流れる。 ホットキー: 特定キーへアクセスが集中する。 メモリ圧迫: 無制限にキャッシュするとredis等のメモリを使い切る。 障害時: キャッシュ障害でdbに負荷が集中する。 ttlを設定する。 更新時に該当キーを削除する。 人気キーは事前に温める。 期限切れにランダム性を持たせる。 ロックやsingle flightで同時再計算を防ぐ。 古い値を一時的に返すstale-while-revalidate的な考え方を使う。">
+<div class="qa-head">
+<div><span class="cat">S: システム設計</span> <span class="badge badge-B">B</span></div>
+<div class="num">Q050</div>
+</div>
+<h3>キャッシュを入れるときの注意点は？</h3>
+<p class="intent"><strong>面接官の意図：</strong>性能改善のメリットだけでなく、不整合・失効・障害時の副作用を理解しているかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+キャッシュは、読み取り性能を上げ、DB負荷や外部API呼び出しを減らすために使います。ただし、キャッシュを入れると必ず不整合、失効、更新反映、キャッシュスタンピード、メモリ使用量、障害時の挙動が論点になります。基本的には、更新頻度が低く、読み取り頻度が高く、多少古いデータを許容できるものに向いています。例えばマスタデータ、設定値、公開プロフィール、URL短縮のkey→original_urlなどです。設計時には、どのキーでキャッシュするか、TTLを何秒にするか、更新時に削除するのか上書きするのか、キャッシュが落ちたときにDBへフォールバックするのかを決めます。</div><div class="supplement"><h4>代表的なパターン</h4>
+<ul>
+<li><strong>Cache Aside:</strong> アプリがまずキャッシュを見て、なければDBから取得してキャッシュへ入れる。</li>
+<li><strong>Write Through:</strong> 書き込み時にDBとキャッシュを同時に更新する。</li>
+<li><strong>Write Behind:</strong> まずキャッシュへ書き、後からDBへ反映する。高性能だが整合性リスクがある。</li>
+</ul></div><div class="supplement"><h4>主な落とし穴</h4>
+<ul>
+<li><strong>古いデータ:</strong> DB更新後にキャッシュが残ると古い値を返す。</li>
+<li><strong>キャッシュスタンピード:</strong> 人気キーが同時に期限切れになり、大量リクエストがDBへ流れる。</li>
+<li><strong>ホットキー:</strong> 特定キーへアクセスが集中する。</li>
+<li><strong>メモリ圧迫:</strong> 無制限にキャッシュするとRedis等のメモリを使い切る。</li>
+<li><strong>障害時:</strong> キャッシュ障害でDBに負荷が集中する。</li>
+</ul></div><div class="supplement"><h4>対策例</h4>
+<ul>
+<li>TTLを設定する。</li>
+<li>更新時に該当キーを削除する。</li>
+<li>人気キーは事前に温める。</li>
+<li>期限切れにランダム性を持たせる。</li>
+<li>ロックやSingle Flightで同時再計算を防ぐ。</li>
+<li>古い値を一時的に返すstale-while-revalidate的な考え方を使う。</li>
+</ul></div><div class="caution"><strong>注意：</strong>キャッシュは「速くなる魔法」ではなく、整合性を犠牲にして性能を取る設計判断です。古いデータを返してよいかを確認せずに入れると事故ります。</div>
+</div>
+</details>
+</article>
+<article class="qa-card" data-text="s: 経験深掘り・認証認可 q051 fail-openとfail-closeの違いは？ 認可基盤・外部依存が障害になったときの安全側の設計を理解しているかを見る。 fail-openは、依存先の障害や判定不能時に処理を許可する考え方です。fail-closeは、判定不能時に処理を拒否する考え方です。認証認可のようなセキュリティ境界では、基本はfail-close、つまり判断できないなら拒否する設計が安全です。例えば認可基盤に問い合わせられないときに全リクエストを許可すると、本来アクセスできないリソースへアクセスできる危険があります。一方、fail-closeにすると認可基盤障害時にサービス全体が止まる可能性があります。そのため、重要操作はfail-close、低リスクな参照は短時間のキャッシュ済み認可判断を使う、管理者操作は必ずfail-closeにするなど、リスクに応じた設計が必要です。 fail-close向き: 認証、認可、決済、個人情報参照、管理者操作、権限変更。 fail-openを検討し得るもの: ログ送信、メトリクス送信、レコメンド表示など、止める方が影響が大きく、セキュリティリスクが低い処理。 中間案: 直近の認可結果を短時間キャッシュする、読み取りだけ許可する、機能を縮退する。 api gatewayが認可基盤へ問い合わせる。 認可基盤がタイムアウトする。 fail-openなら許可して処理を進める。 fail-closeなら403/503などで拒否・停止する。 キャッシュ方式なら、過去数分以内の同一subject/resource/action判断を使う可能性がある。 「セキュリティはfail-closeが基本。ただし可用性への影響が大きいので、操作のリスクごとにキャッシュ、縮退、監査ログ、アラートを組み合わせる」と答えるとバランスがよいです。">
+<div class="qa-head">
+<div><span class="cat">S: 経験深掘り・認証認可</span> <span class="badge badge-B">B</span></div>
+<div class="num">Q051</div>
+</div>
+<h3>fail-openとfail-closeの違いは？</h3>
+<p class="intent"><strong>面接官の意図：</strong>認可基盤・外部依存が障害になったときの安全側の設計を理解しているかを見る。</p>
+<details>
+<summary>回答例を見る</summary>
+<div class="answer structured">
+<div class="short-answer"><strong>回答例：</strong><br/>
+fail-openは、依存先の障害や判定不能時に処理を許可する考え方です。fail-closeは、判定不能時に処理を拒否する考え方です。認証認可のようなセキュリティ境界では、基本はfail-close、つまり判断できないなら拒否する設計が安全です。例えば認可基盤に問い合わせられないときに全リクエストを許可すると、本来アクセスできないリソースへアクセスできる危険があります。一方、fail-closeにすると認可基盤障害時にサービス全体が止まる可能性があります。そのため、重要操作はfail-close、低リスクな参照は短時間のキャッシュ済み認可判断を使う、管理者操作は必ずfail-closeにするなど、リスクに応じた設計が必要です。</div><div class="supplement"><h4>使い分けの考え方</h4>
+<ul>
+<li><strong>fail-close向き:</strong> 認証、認可、決済、個人情報参照、管理者操作、権限変更。</li>
+<li><strong>fail-openを検討し得るもの:</strong> ログ送信、メトリクス送信、レコメンド表示など、止める方が影響が大きく、セキュリティリスクが低い処理。</li>
+<li><strong>中間案:</strong> 直近の認可結果を短時間キャッシュする、読み取りだけ許可する、機能を縮退する。</li>
+</ul></div><div class="supplement"><h4>認可基盤での具体例</h4>
+<ol>
+<li>API Gatewayが認可基盤へ問い合わせる。</li>
+<li>認可基盤がタイムアウトする。</li>
+<li>fail-openなら許可して処理を進める。</li>
+<li>fail-closeなら403/503などで拒否・停止する。</li>
+<li>キャッシュ方式なら、過去数分以内の同一subject/resource/action判断を使う可能性がある。</li>
+</ol></div><div class="supplement"><h4>面接での言い方</h4>
+<p>「セキュリティはfail-closeが基本。ただし可用性への影響が大きいので、操作のリスクごとにキャッシュ、縮退、監査ログ、アラートを組み合わせる」と答えるとバランスがよいです。</p></div><div class="caution"><strong>注意：</strong>fail-openは便利な逃げ道に見えますが、認可で安易に使うと重大事故になります。特に個人情報・金銭・管理者権限に関わる操作では、基本的にfail-closeを前提にした方が安全です。</div>
+</div>
+</details>
+</article></main>
+</body>
+</html>
